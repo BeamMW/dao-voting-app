@@ -11,6 +11,12 @@ export const loadAppParams = createAsyncAction(
     '@@MAIN/LOAD_PARAMS_FAILURE',
 )<ArrayBuffer, VotingAppParams, any>();
 
+export const loadContractInfo = createAsyncAction(
+    '@@MAIN/LOAD_CONTRACT_INFO',
+    '@@MAIN/LOAD_CONTRACT_INFO_SUCCESS',
+    '@@MAIN/LOAD_CONTRACT_INFO_FAILURE',
+)<void, number, any>();
+
 export const loadPoposals = createAsyncAction(
     '@@MAIN/LOAD_PROPOSALS',
     '@@MAIN/LOAD_PROPOSALS_SUCCESS',

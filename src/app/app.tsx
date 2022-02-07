@@ -16,7 +16,7 @@ const routes = [
   //   element: <Progress />,
   // },
   {
-    path: `${ROUTES.MAIN.BASE}/*`,
+    path: `${ROUTES.MAIN.EPOCHES}/*`,
     element: <EpochesContainer />,
   }
 ];

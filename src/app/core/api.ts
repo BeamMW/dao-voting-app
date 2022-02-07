@@ -30,3 +30,12 @@ export function LoadProposalData<T = any>(id): Promise<T> {
         });
     });
 }
+
+export function LoadManagerView<T = any>(): Promise<T> {
+    return new Promise((resolve, reject) => {
+        Utils.invokeContract("role=manager,action=view,cid=" + CID, 
+        (error, result, full) => {
+            resolve(result);
+        });
+    });
+}

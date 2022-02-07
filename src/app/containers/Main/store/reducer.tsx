@@ -10,7 +10,7 @@ const initialState: EpochesStateType = {
   appParams: {
     aid: 0,
     current: {
-      id: 0,
+      iEpoch: 0,
       proposals: 0
     },
     epoch_dh: 0,
@@ -21,7 +21,8 @@ const initialState: EpochesStateType = {
     total_proposals: 0,
     pkAdmin: ''
   },
-  proposals: []
+  proposals: [],
+  contractHeight: 0
 };
 
 const reducer = createReducer<EpochesStateType, Action>(initialState)
@@ -30,6 +31,9 @@ const reducer = createReducer<EpochesStateType, Action>(initialState)
   }))
   .handleAction(actions.loadPoposals.success, (state, action) => produce(state, (nexState) => {
     nexState.appParams = action.payload;
+  }))
+  .handleAction(actions.loadContractInfo.success, (state, action) => produce(state, (nexState) => {
+    nexState.contractHeight = action.payload;
   }));
 
 export { reducer as MainReducer };

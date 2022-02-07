@@ -1,5 +1,9 @@
+export type Pallete = 'green' | 'ghost' | 'purple' | 'blue' | 'red' | 'white';
+
+export type ButtonVariant = 'regular' | 'ghost' | 'block' | 'link' | 'icon';
+
 export interface CurrentEpoch {
-    id: number;
+    iEpoch: number;
     proposals: number;
 }
 
@@ -27,4 +31,13 @@ export interface SystemState {
     tip_prev_state_hash: string;
     tip_state_hash: string;
     tip_state_timestamp: number;
+}
+
+interface ManagetViewContract {
+    cid: string,
+    Height: number,
+}
+
+export interface ManagerViewData {
+    contracts: ManagetViewContract[]
 }
