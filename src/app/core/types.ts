@@ -21,6 +21,11 @@ export interface VotingAppParams {
     pkAdmin: string;
 }
 
+export interface UserViewParams {
+    stake_active: number;
+    stake_passive: number;
+}
+
 export interface SystemState {
     current_height: number
     current_state_hash: string

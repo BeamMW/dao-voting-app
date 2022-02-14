@@ -11,10 +11,10 @@ import { EpochesContainer } from './containers/Main';
 import './styles';
 
 const routes = [
-  // {
-  //   path: '/',
-  //   element: <Progress />,
-  // },
+  {
+    path: '/',
+    element: <></>,
+  },
   {
     path: `${ROUTES.MAIN.EPOCHES}/*`,
     element: <EpochesContainer />,

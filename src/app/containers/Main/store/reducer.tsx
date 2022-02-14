@@ -22,10 +22,17 @@ const initialState: EpochesStateType = {
     pkAdmin: ''
   },
   proposals: [],
-  contractHeight: 0
+  contractHeight: 0,
+  userView: {
+    stake_active: 0,
+    stake_passive: 0
+  }
 };
 
 const reducer = createReducer<EpochesStateType, Action>(initialState)
+  .handleAction(actions.setUserView, (state, action) => produce(state, (nexState) => {
+    nexState.userView = action.payload;
+  }))
   .handleAction(actions.loadAppParams.success, (state, action) => produce(state, (nexState) => {
     nexState.appParams = action.payload;
   }))

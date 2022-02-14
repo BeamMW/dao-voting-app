@@ -6,6 +6,7 @@ css`
     :root {
       --color-purple: #da68f5;
       --color-red: #f25f5b;
+      --color-red-expiring: #ff436a;
       --color-yellow: #f4ce4a;
       --color-green: #00f6d2;
       --color-blue: #0bccf7;

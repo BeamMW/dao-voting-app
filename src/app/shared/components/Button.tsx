@@ -98,6 +98,11 @@ const LinkButtonStyled = styled(IconButtonStyled)`
   font-size: 14px;
   font-weight: 700;
   color: ${({ pallete }) => `var(--color-${pallete})`};
+
+  > svg {
+    vertical-align: sub;
+    margin-right: 10px;
+  }
 `;
 
 const VARIANTS = {

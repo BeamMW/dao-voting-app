@@ -18,7 +18,7 @@ export function remoteEventChannel() {
       "min_api_version": "6.2",
       "headless": false,
       "apiResultHandler": (error, result, full) => {
-        console.log(result);
+        console.log('api result data: ', result, full);
         emitter(full)
       }
     }, (err) => {
@@ -48,6 +48,7 @@ function* sharedSaga() {
   while (true) {
     try {
       const payload: any = yield take(remoteChannel);
+      console.log('PAYLOAD', payload)
 
       switch (payload.id) {
         case 'ev_system_state':

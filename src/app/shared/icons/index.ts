@@ -6,8 +6,10 @@ import IconCopyWhite from './icon-copy.svg';
 import IconReceived from './icon-received.svg';
 import IconLogout from './icon-logout.svg';
 import IconCancel from './icon-cancel.svg';
+import IconBeamx from './icon-beamx.svg';
 
 import ClockCircular from './clock-circular.svg';
+import ClockCircularExpires from './clock-circular-expires.svg';
 import IconWithdraw from './icon-withdraw.svg';
 import IconDeposit from './icon-deposit.svg';
 
@@ -20,7 +22,9 @@ export {
   IconReceived,
   IconLogout,
   IconCancel,
+  IconBeamx,
 
+  ClockCircularExpires,
   ClockCircular,
   IconDeposit,
   IconWithdraw

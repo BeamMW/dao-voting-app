@@ -1,8 +1,8 @@
 import { call, put, takeLatest } from 'redux-saga/effects';
 import { navigate, setError } from '@app/shared/store/actions';
 import { ROUTES, CID } from '@app/shared/constants';
-import Utils from '@core/Utils.js';
-import { LoadViewParams, LoadProposals, LoadManagerView } from '@core/api';
+import { LoadViewParams, LoadProposals, LoadProposalData, LoadManagerView, UserDeposit, UserWithdraw,
+  AddProposal, LoadUserView, VoteProposal } from '@core/api';
 // import {
 //   ConnectedData, Environment, NotificationType, SyncProgress,
 // } from '@core/types';
@@ -10,7 +10,7 @@ import { LoadViewParams, LoadProposals, LoadManagerView } from '@core/api';
 
 import { actions } from '.';
 import store from '../../../../index';
-import { VotingAppParams, ManagerViewData } from '@app/core/types';
+import { VotingAppParams, ManagerViewData, UserViewParams } from '@app/core/types';
 
 export function* handleParams(payload: VotingAppParams) {
     yield put(actions.setAppParams(payload));
@@ -23,6 +23,10 @@ export function* loadParamsSaga(
         const result = (yield call(LoadViewParams, action.payload)) as VotingAppParams;
         yield put(actions.loadAppParams.success(result));
         store.dispatch(actions.loadContractInfo.request());
+
+        const userView = (yield call(LoadUserView)) as UserViewParams;
+        yield put(actions.setUserView(userView))
+
         yield put(navigate(ROUTES.MAIN.EPOCHES));
 
         store.dispatch(actions.loadPoposals.request());
@@ -35,7 +39,29 @@ export function* loadProposalsSaga(
     action: ReturnType<typeof actions.loadPoposals.request>,
   ): Generator {
     try {
-        const result = (yield call(LoadProposals)) as VotingAppParams;
+        const result = (yield call(LoadProposals)) as any[];
+
+        const data = yield call(VoteProposal)
+        console.log(data);
+
+        //const d = yield call(UserWithdraw, 1000000)
+        //console.log(d);
+
+        let proposals = [];
+        for ( let item of result ) {
+          const proposalRes = yield call(LoadProposalData, item.id);
+
+          item['stats'] = proposalRes;
+          proposals.push(item);
+        }
+
+        console.log(proposals);
+
+        //const data = yield call(AddProposal)
+        //console.log('aaaaaaaaaaa', data)
+
+        
+        //console.log('proposal data: ', proposalRes)
         
         // yield put(actions.loadAppParams.success(result));
         // store.dispatch(actions.loadPoposals.request());
