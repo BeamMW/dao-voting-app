@@ -19,23 +19,22 @@ interface SeedListProps {
 
 const StyledStats = styled.div`
   width: 100%;
-  height: 250px;
   background-color: rgba(255, 255, 255, .05);
   border-radius: 10px;
   padding: 20px;
-`;
 
-const StatsTitle = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 20px;
-`;
+  > .stats-title-class {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
 
-const EpochTitle = styled.span`
-  font-weight: bold;
-  font-size: 14px;
-  line-height: 17px;
-  letter-spacing: 3.11111px;
+  > .stats-title-class .stats-epoch-class {
+    font-weight: bold;
+    font-size: 14px;
+    line-height: 17px;
+    letter-spacing: 3.11111px;
+  }
 `;
 
 const Separator = styled.div`
@@ -48,6 +47,7 @@ const Separator = styled.div`
 const StyledSection = styled.div`
   display: flex;
   flex-direction: row;
+  align-items: stretch;
 `;
 
 const LeftStats = styled.span`
@@ -56,12 +56,42 @@ const LeftStats = styled.span`
   flex-direction: row;
 `;
 
-const MiddleStats = styled.span`
-  margin-left: 50px;
+const LeftStatsProgress = styled(LeftStats)`
+    flex-direction: column;
+
+    > .progress {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+
+    > .progress .progress-percentage {
+        margin-left: 10px;
+        font-size: 12px;
+        color: rgba(255, 255, 255, .5);
+    }
+
+    > .progress-title {
+        margin-bottom: 10px;
+        font-size: 12px;
+        color: rgba(255, 255, 255, .5);
+    }
 `;
 
-const VotingsProgress = styled.span`
-  width: 400px
+const MiddleStats = styled.span`
+  margin-left: 50px;
+
+  > .next-epoch-title {
+    font-weight: bold;
+    font-size: 14px;
+    letter-spacing: 3.11111px;
+    color: rgba(255, 255, 255, .5);
+  }
+
+  > .next-epoch-date {
+      font-size: 14px;
+      margin-top: 22px;
+  }
 `;
 
 const SubSectionTitle = styled.div`
@@ -88,12 +118,25 @@ const StyledTotalLocked = styled.span`
 
 const StyledStaked = styled.span`
   margin-left: 60px;
+
+  > .voting-power-class {
+      font-size: 12px;
+      font-style: italic;
+      color: rgba(255, 255, 255, .7);
+      margin-left: 27px;
+  }
 `;
 
 const ButtonLinkClass = css`
   font-size: 16px !important;
   font-weight: normal !important;
   margin-left: auto !important;
+`;
+
+const ButtonBottomLinkClass = css`
+    font-size: 16px !important;
+    font-weight: normal !important;
+    margin: auto 0 0 auto !important
 `;
 
 const WithdrawClass = css`
@@ -114,43 +157,50 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
 
     return (
         <StyledStats className={className}>
-            <StatsTitle>
-            <EpochTitle>EPOCH #{appParams.current.iEpoch}</EpochTitle>
-            <ExpiresTimer appParams={appParams} systemState={systemState} cHeight={cHeight}></ExpiresTimer>
-            </StatsTitle>
+            <div className='stats-title-class'>
+                <span className='stats-epoch-class'>EPOCH #{appParams.current.iEpoch}</span>
+                <ExpiresTimer appParams={appParams} systemState={systemState} cHeight={cHeight}></ExpiresTimer>
+            </div>
             <StyledSection>
-            <LeftStats>
-                <StyledTotalLocked>
-                <SubSectionTitle>Total value locked</SubSectionTitle>
-                <SubSectionValue>
-                    <IconBeamx/>
-                    <span>0 BEAMX</span>
-                </SubSectionValue>
-                </StyledTotalLocked>
-                <StyledStaked>
-                <SubSectionTitle>Your staked</SubSectionTitle>
-                <SubSectionValue>
-                    <IconBeamx/>
-                    <span>{fromGroths(userViewData.stake_active)} BEAMX</span>
-                </SubSectionValue>
-                <div>Voting power is 10%</div>
-                </StyledStaked>
-            </LeftStats>
-            <MiddleStats>
-                <Button pallete='purple' variant='link' icon={IconDeposit}>deposit</Button>
-                <Button className={WithdrawClass} pallete='blue' variant='link' icon={IconWithdraw}>withdraw</Button>
-            </MiddleStats>
-            <Button className={ButtonLinkClass} pallete='green' variant='link'>Show my public key</Button>
+                <LeftStats>
+                    <StyledTotalLocked>
+                        <SubSectionTitle>Total value locked</SubSectionTitle>
+                        <SubSectionValue>
+                            <IconBeamx/>
+                            <span>0 BEAMX</span>
+                        </SubSectionValue>
+                    </StyledTotalLocked>
+                    <StyledStaked>
+                        <SubSectionTitle>Your staked</SubSectionTitle>
+                        <SubSectionValue>
+                            <IconBeamx/>
+                            <span>{fromGroths(userViewData.stake_active)} BEAMX</span>
+                        </SubSectionValue>
+                        <div className='voting-power-class'>Voting power is 10%</div>
+                    </StyledStaked>
+                </LeftStats>
+                <MiddleStats>
+                    <Button pallete='purple' variant='link' icon={IconDeposit}>deposit</Button>
+                    <Button className={WithdrawClass} pallete='blue' variant='link' icon={IconWithdraw}>withdraw</Button>
+                </MiddleStats>
+                <Button className={ButtonLinkClass} pallete='green' variant='link'>Show my public key</Button>
             </StyledSection>
 
             <Separator/>
 
             <StyledSection>
-            <LeftStats>
-                <ProgressBar active={true} percent={20}></ProgressBar>
-            </LeftStats>
-            <MiddleStats></MiddleStats>
-            <Button className={ButtonLinkClass} pallete='green' variant='link'>Show future votings</Button>
+                <LeftStatsProgress>
+                    <div className='progress-title'>Your completed proposals</div>                        
+                    <div className='progress'>
+                        <ProgressBar active={true} percent={20}></ProgressBar>
+                        <span className='progress-percentage'>50% (3 of 5)</span>
+                    </div>
+                </LeftStatsProgress>
+                <MiddleStats>
+                    <div className='next-epoch-title'>NEXT EPOCH #232</div>
+                    <div className='next-epoch-date'>05.02.2022 - 23.04.2022</div>
+                </MiddleStats>
+                <Button className={ButtonBottomLinkClass} pallete='green' variant='link'>Show future votings</Button>
             </StyledSection>
         </StyledStats>
     );

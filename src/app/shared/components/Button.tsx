@@ -80,7 +80,6 @@ const BlockButtonStyled = styled(GhostButtonStyled)`
 const IconButtonStyled = styled(BaseButtonStyled)`
   display: inline-block;
   vertical-align: sub;
-  line-height: 0;
   margin: 0 10px;
   padding: 0;
   background-color: transparent;
