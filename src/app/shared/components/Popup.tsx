@@ -20,7 +20,7 @@ const ContainerStyled = styled.div`
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 335px;
+  width: 391px;
   padding: 30px 20px;
   border-radius: 10px;
   background-color: var(--color-popup);
@@ -79,7 +79,7 @@ const Popup: React.FC<PopupProps> = ({
   <Backdrop onCancel={onCancel}>
     <ContainerStyled>
       <TitleStyled>{title}</TitleStyled>
-      <Button className="cancel-header" variant="icon" pallete="white" icon={IconCancel} onClick={onCancel} />
+      {/* <Button className="cancel-header" variant="icon" pallete="white" icon={IconCancel} onClick={onCancel} /> */}
       {children}
       <FooterStyled className={footerClass}>
         {cancelButton}

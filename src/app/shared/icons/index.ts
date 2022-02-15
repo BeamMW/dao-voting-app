@@ -15,6 +15,8 @@ import ClockCircular from './clock-circular.svg';
 import ClockCircularExpires from './clock-circular-expires.svg';
 import IconWithdraw from './icon-withdraw.svg';
 import IconDeposit from './icon-deposit.svg';
+import IconDepositBlue from './icon-deposit-blue.svg';
+import IconWithdrawBlue from './icon-withdraw-blue.svg';
 
 export {
   IconBack,
@@ -33,6 +35,7 @@ export {
   ClockCircularExpires,
   ClockCircular,
   IconDeposit,
-  IconWithdraw
-
+  IconWithdraw,
+  IconWithdrawBlue,
+  IconDepositBlue
 }

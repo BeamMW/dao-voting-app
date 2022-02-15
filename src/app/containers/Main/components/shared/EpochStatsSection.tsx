@@ -1,6 +1,6 @@
 import { styled } from '@linaria/react';
 import { css, cx } from '@linaria/core';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@app/shared/constants';
@@ -15,6 +15,10 @@ import { fromGroths } from '@core/appUtils';
 interface SeedListProps {
   data: any;
   className?: string;
+  depositPopupUpdate: (state: boolean)=>void;
+  isDepositVisible: boolean;
+  withdrawPopupUpdate: (state: boolean)=>void;
+  isWithdrawVisible: boolean;
 }
 
 const StyledStats = styled.div`
@@ -145,6 +149,10 @@ const WithdrawClass = css`
 
 const EpochStatsSection: React.FC<SeedListProps> = ({
   data,
+  depositPopupUpdate,
+  isDepositVisible,
+  withdrawPopupUpdate,
+  isWithdrawVisible,
   className
 }) => {
     const navigate = useNavigate();
@@ -154,6 +162,14 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
     const systemState = useSelector(selectSystemState());
     const cHeight = useSelector(selectContractHeight());
     const userViewData = useSelector(selectUserView())
+
+    const handleDeposit = () => {
+        depositPopupUpdate(!isDepositVisible);
+    };
+
+    const handleWithdraw = () => {
+        withdrawPopupUpdate(!isWithdrawVisible);
+    };
 
     return (
         <StyledStats className={className}>
@@ -180,8 +196,19 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
                     </StyledStaked>
                 </LeftStats>
                 <MiddleStats>
-                    <Button pallete='purple' variant='link' icon={IconDeposit}>deposit</Button>
-                    <Button className={WithdrawClass} pallete='blue' variant='link' icon={IconWithdraw}>withdraw</Button>
+                    <Button pallete='purple' 
+                    variant='link' 
+                    onClick={handleDeposit} 
+                    icon={IconDeposit}>
+                        deposit
+                    </Button>
+                    <Button pallete='blue'
+                    className={WithdrawClass}
+                    onClick={handleWithdraw}
+                    variant='link'
+                    icon={IconWithdraw}>
+                        withdraw
+                    </Button>
                 </MiddleStats>
                 <Button className={ButtonLinkClass} pallete='green' variant='link'>Show my public key</Button>
             </StyledSection>

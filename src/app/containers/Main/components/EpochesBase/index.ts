@@ -1,1 +1,2 @@
-export { default } from '../shared/ExpiresTimer';
+export { default as DepositPopup } from './DepositPopup';
+export { default as WithdrawPopup } from './WithdrawPopup';
