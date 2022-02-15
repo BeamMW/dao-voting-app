@@ -6,15 +6,22 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Window, Button } from '@app/shared/components';
 import { EpochStatsSection, ProposalsList } from '@app/containers/Main/components';
+import { selectCurrentProposals } from '../../store/selectors';
+
+const StatsSectionClass = css`
+  margin-bottom: 40px;
+`;
 
 const EpochesBase: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  const currentProposals = useSelector(selectCurrentProposals());
+
   return (
     <Window>
-      <EpochStatsSection data={true}></EpochStatsSection>
-      <ProposalsList data={true}></ProposalsList>
+      <EpochStatsSection className={StatsSectionClass} data={true}></EpochStatsSection>
+      <ProposalsList title='Proposals' data={currentProposals}></ProposalsList>
     </Window>
   );
 };

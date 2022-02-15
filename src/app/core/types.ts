@@ -11,6 +11,25 @@ export interface NextEpoch {
     proposals: number;
 }
 
+interface Quorum {
+    type: string;
+    value: number;
+}
+
+export interface InitialProposal {
+    id: number;
+    height: number;
+    text: string;
+    variants: number;
+}
+export interface ProposalData {
+    title: string;
+    description: string;
+    quorum: Quorum;
+    forum_link: string;
+    ref_link: string;
+}
+
 export interface VotingAppParams {
     aid: number;
     current: CurrentEpoch;

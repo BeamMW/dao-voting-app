@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "jsx": "react",
-    "target": "es2020",
+    "target": "es2021",
     "module": "commonjs",
     "moduleResolution": "Node",
     "esModuleInterop": true,

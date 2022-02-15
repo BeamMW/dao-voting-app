@@ -1,7 +1,7 @@
 import { createAsyncAction, createAction } from 'typesafe-actions';
 import React from 'react';
 import { AuthActionTypes } from './constants';
-import { UserViewParams, VotingAppParams } from '@core/types';
+import { ProposalData, UserViewParams, VotingAppParams } from '@core/types';
 
 export const setAppParams = createAction('@@MAIN/SET_PARAMS')<VotingAppParams>();
 
@@ -24,3 +24,8 @@ export const loadPoposals = createAsyncAction(
     '@@MAIN/LOAD_PROPOSALS_SUCCESS',
     '@@MAIN/LOAD_PROPOSALS_FAILURE',
 )<void, any, any>();
+
+export const setPrevProposals = createAction('@@MAIN/SET_PREV_PROPOSALS')<ProposalData[]>()
+export const setCurrentProposals = createAction('@@MAIN/SET_CURRENT_PROPOSALS')<ProposalData[]>()
+export const setFutureProposals = createAction('@@MAIN/SET_FUTURE_PROPOSALS')<ProposalData[]>()
+

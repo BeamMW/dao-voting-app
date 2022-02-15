@@ -15,6 +15,7 @@ import { fromGroths } from '@core/appUtils';
 
 interface SeedListProps {
   data: any;
+  className?: string;
 }
 
 const StyledStats = styled.div`
@@ -101,7 +102,8 @@ const WithdrawClass = css`
 `;
 
 const EpochStatsSection: React.FC<SeedListProps> = ({
-  data
+  data,
+  className
 }) => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -112,7 +114,7 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
     const userViewData = useSelector(selectUserView())
 
     return (
-        <StyledStats>
+        <StyledStats className={className}>
             <StatsTitle>
             <EpochTitle>EPOCH #{appParams.current.iEpoch}</EpochTitle>
             <ExpiresTimer appParams={appParams} systemState={systemState} cHeight={cHeight}></ExpiresTimer>

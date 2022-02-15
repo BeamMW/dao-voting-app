@@ -1,16 +1,16 @@
-import { call, put, takeLatest } from 'redux-saga/effects';
+import { call, put, takeLatest, select } from 'redux-saga/effects';
 import { navigate, setError } from '@app/shared/store/actions';
 import { ROUTES, CID } from '@app/shared/constants';
-import { LoadViewParams, LoadProposals, LoadProposalData, LoadManagerView, UserDeposit, UserWithdraw,
+import { LoadViewParams, LoadProposals, LoadProposalData, 
+  LoadManagerView, UserDeposit, UserWithdraw,
   AddProposal, LoadUserView, VoteProposal } from '@core/api';
-// import {
-//   ConnectedData, Environment, NotificationType, SyncProgress,
-// } from '@core/types';
-//import { DatabaseSyncProgress, SyncStep } from '@app/containers/Auth/interfaces';
 
 import { actions } from '.';
 import store from '../../../../index';
-import { VotingAppParams, ManagerViewData, UserViewParams } from '@app/core/types';
+import { VotingAppParams, ManagerViewData, UserViewParams, ProposalData, InitialProposal } from '@app/core/types';
+
+import { SharedStateType } from '@app/shared/interface';
+import { EpochesStateType } from '../interfaces';
 
 export function* handleParams(payload: VotingAppParams) {
     yield put(actions.setAppParams(payload));
@@ -25,7 +25,7 @@ export function* loadParamsSaga(
         store.dispatch(actions.loadContractInfo.request());
 
         const userView = (yield call(LoadUserView)) as UserViewParams;
-        yield put(actions.setUserView(userView))
+        yield put(actions.setUserView(userView));
 
         yield put(navigate(ROUTES.MAIN.EPOCHES));
 
@@ -39,32 +39,60 @@ export function* loadProposalsSaga(
     action: ReturnType<typeof actions.loadPoposals.request>,
   ): Generator {
     try {
-        const result = (yield call(LoadProposals)) as any[];
+        const initProposals = (yield call(LoadProposals)) as InitialProposal[];
 
-        const data = yield call(VoteProposal)
-        console.log(data);
+        const appParams = (yield select()) as {main: EpochesStateType, shared: SharedStateType};
+        console.log('params', appParams.main.appParams);
 
-        //const d = yield call(UserWithdraw, 1000000)
-        //console.log(d);
+        let proposalsData = {
+          prev: [],
+          current: [],
+          next: []
+        };
+        const nextEpochProps = appParams.main.appParams.next.proposals;
+        const currentEpochProps = appParams.main.appParams.current.proposals;
 
-        let proposals = [];
-        for ( let item of result ) {
-          const proposalRes = yield call(LoadProposalData, item.id);
+        if (nextEpochProps > 0) {
+          proposalsData.next = initProposals.splice(initProposals.length - nextEpochProps, nextEpochProps);
 
-          item['stats'] = proposalRes;
-          proposals.push(item);
+          for ( let item of proposalsData.next ) {
+            const proposalRes = yield call(LoadProposalData, item.id);
+  
+            item['stats'] = proposalRes;
+          }
         }
+        yield put(actions.setFutureProposals(proposalsData.next));
 
-        console.log(proposals);
+        if (currentEpochProps > 0) {
+          proposalsData.current = initProposals.splice(initProposals.length - currentEpochProps, currentEpochProps);
 
-        //const data = yield call(AddProposal)
-        //console.log('aaaaaaaaaaa', data)
+          for ( let item of proposalsData.current ) {
+            const proposalRes = yield call(LoadProposalData, item.id);
+  
+            item['stats'] = proposalRes;
+          }
+        }
+        yield put(actions.setCurrentProposals(proposalsData.current));
 
-        
-        //console.log('proposal data: ', proposalRes)
-        
-        // yield put(actions.loadAppParams.success(result));
-        // store.dispatch(actions.loadPoposals.request());
+        if (initProposals.length > 0) {
+          proposalsData.prev = initProposals;
+
+          for ( let item of proposalsData.prev ) {
+            const proposalRes = yield call(LoadProposalData, item.id);
+  
+            item['stats'] = proposalRes;
+          }
+        }
+        yield put(actions.setPrevProposals(proposalsData.prev));
+    
+        console.log(proposalsData);
+
+        yield put(actions.loadPoposals.success(true))
+
+        //const prop = proposals[proposals.length - 1].text;
+        //console.log('latest proposal: ', JSON.parse(prop.replaceAll('±', ',')))
+
+        //yield call(AddProposal)
     } catch (e) {
       yield put(actions.loadPoposals.failure(e));
     }
@@ -80,7 +108,7 @@ export function* loadContractInfoSaga(
             yield put(actions.loadContractInfo.success(contract.Height));
         }
     } catch (e) {
-      yield put(actions.loadPoposals.failure(e));
+      yield put(actions.loadContractInfo.failure(e));
     }
 }
 

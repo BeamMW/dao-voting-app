@@ -42,7 +42,20 @@ export function LoadManagerView<T = any>(): Promise<T> {
 
 export function AddProposal<T = any>(): Promise<T> {
     return new Promise((resolve, reject) => {
-        Utils.invokeContract("role=manager,action=add_proposal,variants=2,text=some test,cid=" + CID, 
+        const propData = JSON.stringify({
+            "title": "test title 2",
+            "description": "text about proposal 2",
+            "quorum": {
+            "type": "asset",
+            "value": 10000000000
+            },
+            "forum_link": "http://test",
+            "ref_link": "http://ref-link"
+            });
+
+            const shieldedData = propData.replaceAll(',', '±')
+            console.log(shieldedData)
+        Utils.invokeContract("role=manager,action=add_proposal,variants=2,text="+shieldedData+",cid=" + CID, 
         (error, result, full) => {
             console.log('ADD PROPOSAL', error, result, full)
             onMakeTx(error, result, full);
