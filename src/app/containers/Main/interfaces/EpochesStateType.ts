@@ -1,11 +1,11 @@
-import { VotingAppParams, UserViewParams, ProposalData } from '@core/types';
+import { VotingAppParams, UserViewParams, ProcessedProposal } from '@core/types';
 
 export interface EpochesStateType {
   appParams: VotingAppParams;
   proposals: {
-    prev: ProposalData[],
-    current: ProposalData[],
-    future: ProposalData[]
+    prev: ProcessedProposal[],
+    current: ProcessedProposal[],
+    future: ProcessedProposal[]
   };
   contractHeight: number;
   userView: UserViewParams;

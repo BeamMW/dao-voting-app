@@ -8,6 +8,9 @@ import IconLogout from './icon-logout.svg';
 import IconCancel from './icon-cancel.svg';
 import IconBeamx from './icon-beamx.svg';
 
+import IconEpochSelector from './icon-epoch-selector.svg';
+import IconSearch from './icon-search.svg';
+import IconOldEpoches from './icon-old-epoches.svg';
 import ClockCircular from './clock-circular.svg';
 import ClockCircularExpires from './clock-circular-expires.svg';
 import IconWithdraw from './icon-withdraw.svg';
@@ -24,6 +27,9 @@ export {
   IconCancel,
   IconBeamx,
 
+  IconEpochSelector,
+  IconSearch,
+  IconOldEpoches,
   ClockCircularExpires,
   ClockCircular,
   IconDeposit,

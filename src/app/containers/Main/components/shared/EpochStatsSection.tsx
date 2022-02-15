@@ -2,7 +2,6 @@ import { styled } from '@linaria/react';
 import { css, cx } from '@linaria/core';
 import React, { useEffect } from 'react';
 
-
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@app/shared/constants';
 import { IconWithdraw, IconDeposit, IconBeamx } from '@app/shared/icons';

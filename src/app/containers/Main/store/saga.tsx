@@ -7,7 +7,7 @@ import { LoadViewParams, LoadProposals, LoadProposalData,
 
 import { actions } from '.';
 import store from '../../../../index';
-import { VotingAppParams, ManagerViewData, UserViewParams, ProposalData, InitialProposal } from '@app/core/types';
+import { VotingAppParams, ManagerViewData, UserViewParams, ProposalData, InitialProposal, ProposalStats } from '@app/core/types';
 
 import { SharedStateType } from '@app/shared/interface';
 import { EpochesStateType } from '../interfaces';
@@ -39,6 +39,9 @@ export function* loadProposalsSaga(
     action: ReturnType<typeof actions.loadPoposals.request>,
   ): Generator {
     try {
+
+        //yield call(AddProposal)
+
         const initProposals = (yield call(LoadProposals)) as InitialProposal[];
 
         const appParams = (yield select()) as {main: EpochesStateType, shared: SharedStateType};
@@ -56,9 +59,15 @@ export function* loadProposalsSaga(
           proposalsData.next = initProposals.splice(initProposals.length - nextEpochProps, nextEpochProps);
 
           for ( let item of proposalsData.next ) {
-            const proposalRes = yield call(LoadProposalData, item.id);
+            const proposalRes = (yield call(LoadProposalData, item.id)) as ProposalStats;
   
             item['stats'] = proposalRes;
+            item['data'] = {};
+            try {
+              item['data'] = JSON.parse(item.text.replaceAll('±', ','));
+            } catch (e) {
+              
+            }
           }
         }
         yield put(actions.setFutureProposals(proposalsData.next));
@@ -67,9 +76,15 @@ export function* loadProposalsSaga(
           proposalsData.current = initProposals.splice(initProposals.length - currentEpochProps, currentEpochProps);
 
           for ( let item of proposalsData.current ) {
-            const proposalRes = yield call(LoadProposalData, item.id);
+            const proposalRes = (yield call(LoadProposalData, item.id)) as ProposalStats;
   
             item['stats'] = proposalRes;
+            item['data'] = {};
+            try {
+              item['data'] = JSON.parse(item.text.replaceAll('±', ','));
+            } catch (e) {
+
+            }
           }
         }
         yield put(actions.setCurrentProposals(proposalsData.current));
@@ -78,9 +93,15 @@ export function* loadProposalsSaga(
           proposalsData.prev = initProposals;
 
           for ( let item of proposalsData.prev ) {
-            const proposalRes = yield call(LoadProposalData, item.id);
+            const proposalRes = (yield call(LoadProposalData, item.id)) as ProposalStats;
   
             item['stats'] = proposalRes;
+            item['data'] = {};
+            try {
+              item['data'] = JSON.parse(item.text.replaceAll('±', ','));
+            } catch (e) {
+
+            }
           }
         }
         yield put(actions.setPrevProposals(proposalsData.prev));
@@ -90,9 +111,8 @@ export function* loadProposalsSaga(
         yield put(actions.loadPoposals.success(true))
 
         //const prop = proposals[proposals.length - 1].text;
-        //console.log('latest proposal: ', JSON.parse(prop.replaceAll('±', ',')))
+        //console.log('latest proposal: ', 
 
-        //yield call(AddProposal)
     } catch (e) {
       yield put(actions.loadPoposals.failure(e));
     }

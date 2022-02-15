@@ -43,11 +43,11 @@ export function LoadManagerView<T = any>(): Promise<T> {
 export function AddProposal<T = any>(): Promise<T> {
     return new Promise((resolve, reject) => {
         const propData = JSON.stringify({
-            "title": "test title 2",
-            "description": "text about proposal 2",
+            "title": "test title 5",
+            "description": "text about proposal 5",
             "quorum": {
             "type": "asset",
-            "value": 10000000000
+            "value": 5000000000
             },
             "forum_link": "http://test",
             "ref_link": "http://ref-link"

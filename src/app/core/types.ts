@@ -22,12 +22,23 @@ export interface InitialProposal {
     text: string;
     variants: number;
 }
+
+export interface ProposalStats {
+    total: number;
+    variants: number[];
+}
+
 export interface ProposalData {
     title: string;
     description: string;
     quorum: Quorum;
     forum_link: string;
     ref_link: string;
+}
+
+export interface ProcessedProposal extends InitialProposal{
+    stats: ProposalStats;
+    data: ProposalData;
 }
 
 export interface VotingAppParams {
