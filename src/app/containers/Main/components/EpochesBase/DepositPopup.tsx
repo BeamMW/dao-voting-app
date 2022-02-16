@@ -11,7 +11,7 @@ import { toGroths } from '@core/appUtils';
 import { UserDeposit } from '@core/api';
 import { css } from '@linaria/core';
 
-interface RemovePopupProps {
+interface DepositPopupProps {
   visible?: boolean;
   onCancel?: ()=>void;
 }
@@ -60,7 +60,7 @@ const DepositButtonsClass = css`
     max-width: 138px !important;
 `;
 
-const DepositPopup: React.FC<RemovePopupProps> = ({ visible, onCancel }) => {
+const DepositPopup: React.FC<DepositPopupProps> = ({ visible, onCancel }) => {
   const inputRef = useRef<HTMLInputElement>();
   const [warned, setWarned] = useState(false);
   const dispatch = useDispatch();

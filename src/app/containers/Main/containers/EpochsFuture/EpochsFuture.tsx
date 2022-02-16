@@ -7,25 +7,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Window, Button } from '@app/shared/components';
 import { EpochStatsSection, ProposalsList } from '@app/containers/Main/components';
 import { selectFutureProposals } from '../../store/selectors';
-import { IconNoProposals } from '@app/shared/icons';
 import { DepositPopup, WithdrawPopup } from '../../components/EpochesBase';
 import { ROUTES } from '@app/shared/constants';
 
 const StatsSectionClass = css`
   margin-bottom: 40px;
-`;
-
-const NoProposalsClass = css`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 80px;
-
-    > .title-class {
-        margin-top: 30px;
-        font-size: 14px;
-        color: rgba(255, 255, 255, .5);
-    }
 `;
 
 const EpochsFuture: React.FC = () => {
@@ -51,15 +37,7 @@ const EpochsFuture: React.FC = () => {
           isWithdrawVisible={isDepositVisible}
           withdrawPopupUpdate={(state: boolean)=>setIsWithdrawVisible(state)}
           className={StatsSectionClass} data={true}></EpochStatsSection>
-        { futureProposals.length > 0 ? 
-        <ProposalsList isFuture={true} title='Future proposals' data={futureProposals}></ProposalsList> :
-        <>
-            <div className={NoProposalsClass}>
-                <IconNoProposals/>
-                <div className='title-class'>There are no proposals</div>
-            </div>
-        </>
-        }
+        <ProposalsList isFuture={true} title='Future proposals' data={futureProposals}></ProposalsList>
       </Window>
       <DepositPopup visible={isDepositVisible} onCancel={()=>{setIsDepositVisible(false)}}/>
       <WithdrawPopup visible={isWithdrawVisible} onCancel={()=>{setIsWithdrawVisible(false)}}/>

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import { css } from '@linaria/core';
 import { styled } from '@linaria/react';
-import { IconEpochSelector, IconSearch } from '@app/shared/icons';
+import { IconEpochSelector, IconSearch, IconNoProposals } from '@app/shared/icons';
 import { ProcessedProposal } from '@app/core/types';
 
 interface ListProps {
@@ -82,6 +83,19 @@ const ListItem = styled.li`
     }
 `;
 
+const NoProposalsClass = css`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 80px;
+
+    > .title-class {
+        margin-top: 30px;
+        font-size: 14px;
+        color: rgba(255, 255, 255, .5);
+    }
+`;
+
 const ProposalsList: React.FC<ListProps> = ({ 
   data,
   title,
@@ -115,38 +129,40 @@ const ProposalsList: React.FC<ListProps> = ({
 
     }
 
-    return data.length > 0 ? (
-        <div>
-            <ProposalsHeader>
-                <PropTitle>{ title }</PropTitle>
-                { !isFuture ?
-                (<div className='selector-class'>
-                    {selectorData.map((item, index) => (
-                        <SelectorItem key={index} active={selectorActiveItem.id === item.id} 
-                        data-index={index} onClick={handleSelectorClick}>
-                            {item.title}
-                        </SelectorItem>
-                    ))}
-                </div>) : null}
-                <IconSearch className='icon-search-class' onClick={handleSearchClick}/>
-                <EpochSelector>
-                    <span className='epoches-selector-title'>Epoch</span>
-                    <span className='epoches-selected-item'>#22</span>
-                    <IconEpochSelector className='epoches-selector-icon'/>
-                </EpochSelector>
-            </ProposalsHeader>
-            <List>
-                {data.map((item, index) => (
-                    <ListItem data-index={index} key={index} onClick={handleListItemClick}>
-                        <span className='proposal-id'>#{item.id}</span>
-                        <span className='proposal-title'>{item.data.title}</span>
-                    </ListItem>
+    return (<div>
+        <ProposalsHeader>
+            <PropTitle>{ title }</PropTitle>
+            { !isFuture ?
+            (<div className='selector-class'>
+                {selectorData.map((item, index) => (
+                    <SelectorItem key={index} active={selectorActiveItem.id === item.id} 
+                    data-index={index} onClick={handleSelectorClick}>
+                        {item.title}
+                    </SelectorItem>
                 ))}
-            </List>
-        </div>
-    ) : (
-        <></>
-    );
+            </div>) : null}
+            <IconSearch className='icon-search-class' onClick={handleSearchClick}/>
+            <EpochSelector>
+                <span className='epoches-selector-title'>Epoch</span>
+                <span className='epoches-selected-item'>#22</span>
+                <IconEpochSelector className='epoches-selector-icon'/>
+            </EpochSelector>
+        </ProposalsHeader>
+        { data.length > 0 ?
+        (<List>
+            {data.map((item, index) => (
+                <ListItem data-index={index} key={index} onClick={handleListItemClick}>
+                    <span className='proposal-id'>#{item.id}</span>
+                    <span className='proposal-title'>{item.data.title}</span>
+                </ListItem>
+            ))}
+        </List>) :
+        (<div className={NoProposalsClass}>
+            <IconNoProposals/>
+            <div className='title-class'>There are no proposals</div>
+        </div>)
+        }
+    </div>);
 };
 
 export default ProposalsList;

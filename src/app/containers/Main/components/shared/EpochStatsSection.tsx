@@ -163,7 +163,7 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
     const appParams = useSelector(selectAppParams());
     const systemState = useSelector(selectSystemState());
     const cHeight = useSelector(selectContractHeight());
-    const userViewData = useSelector(selectUserView())
+    const userViewData = useSelector(selectUserView());
 
     const handleDeposit = () => {
         depositPopupUpdate(!isDepositVisible);

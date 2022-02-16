@@ -90,11 +90,15 @@ css`
     }
 
     html,
-    body, #root {
+    body {
       margin: 0;
       padding: 0;
       height: 100%;
-      min-width: 900px;
+      min-width: 860px;
+    }
+
+    #root {
+      display: inline;
     }
 
     html * {
@@ -104,11 +108,6 @@ css`
     body {
       font-size: 14px;
       color: white;
-      background-image: url(assets/bg.png);
-      background-attachment: fixed;
-      background-position: center;
-      background-repeat: no-repeat;
-      background-size: cover;
     }    
 
     p {
