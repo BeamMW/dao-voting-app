@@ -20,6 +20,7 @@ const initialState: SharedStateType = {
     tip_state_hash: '',
     tip_state_timestamp: 0
   },
+  isLoaded: false
 };
 
 const reducer = createReducer<SharedStateType, Action>(initialState)
@@ -28,6 +29,9 @@ const reducer = createReducer<SharedStateType, Action>(initialState)
   }))
   .handleAction(actions.setError, (state, action) => produce(state, (nexState) => {
     nexState.errorMessage = action.payload;
+  }))
+  .handleAction(actions.setIsLoaded, (state, action) => produce(state, (nexState) => {
+    nexState.isLoaded = action.payload;
   }))
   .handleAction(actions.setSystemState, (state, action) => produce(state, (nexState) => {
     nexState.systemState = action.payload;

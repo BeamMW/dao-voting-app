@@ -7,7 +7,7 @@ export function LoadViewParams<T = any>(payload): Promise<T> {
         (error, result, full) => {
             //setReady(true);
             resolve(result.params);
-        }, payload);
+        }, payload ? payload : null);
     });
 }
 

@@ -1,5 +1,5 @@
 import {
-  call, take, fork, takeLatest, put,
+  call, take, fork, takeLatest, put, select
 } from 'redux-saga/effects';
 
 import { eventChannel, END } from 'redux-saga';
@@ -8,6 +8,8 @@ import { actions as mainActions } from '@app/containers/Main/store/index';
 import { navigate, setSystemState } from '@app/shared/store/actions';
 import { ROUTES, CID } from '@app/shared/constants';
 import store from '../../../index';
+import { SharedStateType } from '../interface';
+import { EpochesStateType } from '@app/containers/Main/interfaces';
 
 import Utils from '@core/Utils.js';
 
@@ -50,9 +52,13 @@ function* sharedSaga() {
       const payload: any = yield take(remoteChannel);
       switch (payload.id) {
         case 'ev_system_state':
-          // trigger update
-          console.log('system state update')          
+          const appParams = (yield select()) as {main: EpochesStateType, shared: SharedStateType};
           store.dispatch(setSystemState(payload.result));
+
+          if (appParams.shared.isLoaded) {
+            store.dispatch(mainActions.loadAppParams.request(null));
+          }
+
           break;
         
         case 'ev_txs_changed':
