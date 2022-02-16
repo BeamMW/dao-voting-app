@@ -6,6 +6,7 @@ import { ProcessedProposal } from '@app/core/types';
 interface ListProps {
   data: ProcessedProposal[];
   title: string;
+  isFuture?: boolean;
 }
 
 const ProposalsHeader = styled.div`
@@ -33,6 +34,7 @@ const PropTitle = styled.span`
     text-transform: uppercase;
     font-size: 14px;
     font-weight: 700;
+    letter-spacing: 3.11111px;
 `;
 
 const SelectorItem = styled.span<{ active: boolean }>`
@@ -83,6 +85,7 @@ const ListItem = styled.li`
 const ProposalsList: React.FC<ListProps> = ({ 
   data,
   title,
+  isFuture = false
 }) => {
     const selectorData = [
         {
@@ -116,14 +119,15 @@ const ProposalsList: React.FC<ListProps> = ({
         <div>
             <ProposalsHeader>
                 <PropTitle>{ title }</PropTitle>
-                <div className='selector-class'>
+                { !isFuture ?
+                (<div className='selector-class'>
                     {selectorData.map((item, index) => (
                         <SelectorItem key={index} active={selectorActiveItem.id === item.id} 
                         data-index={index} onClick={handleSelectorClick}>
                             {item.title}
                         </SelectorItem>
                     ))}
-                </div>
+                </div>) : null}
                 <IconSearch className='icon-search-class' onClick={handleSearchClick}/>
                 <EpochSelector>
                     <span className='epoches-selector-title'>Epoch</span>

@@ -19,6 +19,7 @@ interface SeedListProps {
   isDepositVisible: boolean;
   withdrawPopupUpdate: (state: boolean)=>void;
   isWithdrawVisible: boolean;
+  isWithProgress?: boolean;
 }
 
 const StyledStats = styled.div`
@@ -153,7 +154,8 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
   isDepositVisible,
   withdrawPopupUpdate,
   isWithdrawVisible,
-  className
+  className,
+  isWithProgress = true
 }) => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -213,24 +215,27 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
                 <Button className={ButtonLinkClass} pallete='green' variant='link'>Show my public key</Button>
             </StyledSection>
 
-            <Separator/>
+            { isWithProgress ?
+            (<>
+                <Separator/>
 
-            <StyledSection>
-                <LeftStatsProgress>
-                    <div className='progress-title'>Your completed proposals</div>                        
-                    <div className='progress'>
-                        <ProgressBar active={true} percent={20}></ProgressBar>
-                        <span className='progress-percentage'>50% (3 of 5)</span>
-                    </div>
-                </LeftStatsProgress>
-                <MiddleStats>
-                    <div className='next-epoch-title'>NEXT EPOCH #232</div>
-                    <div className='next-epoch-date'>05.02.2022 - 23.04.2022</div>
-                </MiddleStats>
-                <Button className={ButtonBottomLinkClass}
-                onClick={() => navigate(ROUTES.MAIN.FUTURE_EPOCHS)}
-                pallete='green' variant='link'>Show future votings</Button>
-            </StyledSection>
+                <StyledSection>
+                    <LeftStatsProgress>
+                        <div className='progress-title'>Your completed proposals</div>                        
+                        <div className='progress'>
+                            <ProgressBar active={true} percent={20}></ProgressBar>
+                            <span className='progress-percentage'>50% (3 of 5)</span>
+                        </div>
+                    </LeftStatsProgress>
+                    <MiddleStats>
+                        <div className='next-epoch-title'>NEXT EPOCH #232</div>
+                        <div className='next-epoch-date'>05.02.2022 - 23.04.2022</div>
+                    </MiddleStats>
+                    <Button className={ButtonBottomLinkClass}
+                    onClick={() => navigate(ROUTES.MAIN.FUTURE_EPOCHS)}
+                    pallete='green' variant='link'>Show future votings</Button>
+                </StyledSection>
+            </>) : null}
         </StyledStats>
     );
 };

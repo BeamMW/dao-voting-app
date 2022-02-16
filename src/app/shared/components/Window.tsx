@@ -3,6 +3,11 @@ import { styled } from '@linaria/react';
 import Utils from '@core/Utils.js';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@app/shared/constants';
+import { IconBackWindow } from '@app/shared/icons';
+
+interface WindowProps {
+  onPrevious?: React.MouseEventHandler | undefined;
+}
 
 const Container = styled.div<{ bgColor: string }>`
   background-color: ${({ bgColor }) => Utils.isWeb() ? bgColor : 'transparent'};
@@ -22,14 +27,32 @@ const TitleValue = styled.span`
   cursor: pointer;
 `;
 
-const Window: React.FC<any> = ({
+const BackStyled = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 10px 5px;
+  font-weight: bold;
+  font-size: 14px;
+
+  > .control {
+    cursor: pointer;
+  }
+
+  > .control .control-text {
+    margin-left: 15px;
+  }
+`;
+
+const Window: React.FC<WindowProps> = ({
   children,
+  onPrevious
 }) => {
   const navigate = useNavigate();
   const rootRef = useRef();
 
   const titleClicked = () => {
-    navigate(ROUTES.MAIN.EPOCHES);
+    navigate(ROUTES.MAIN.EPOCHS);
   };
   
   return (
@@ -37,6 +60,13 @@ const Window: React.FC<any> = ({
       <StyledTitle>
         <TitleValue onClick={titleClicked}>Voting</TitleValue>
       </StyledTitle>
+      { onPrevious ? (
+      <BackStyled>
+        <div className='control' onClick={onPrevious}>
+          <IconBackWindow/>
+          <span className='control-text'>back</span>
+        </div>
+      </BackStyled>) : null}
       { children }
     </Container>
   );

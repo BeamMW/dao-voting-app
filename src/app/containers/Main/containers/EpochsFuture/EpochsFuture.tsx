@@ -6,21 +6,26 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Window, Button } from '@app/shared/components';
 import { EpochStatsSection, ProposalsList } from '@app/containers/Main/components';
-import { selectCurrentProposals, selectPrevProposals } from '../../store/selectors';
-import { IconOldEpoches } from '@app/shared/icons';
+import { selectFutureProposals } from '../../store/selectors';
+import { IconNoProposals } from '@app/shared/icons';
 import { DepositPopup, WithdrawPopup } from '../../components/EpochesBase';
+import { ROUTES } from '@app/shared/constants';
 
 const StatsSectionClass = css`
   margin-bottom: 40px;
 `;
 
-const OldButtonClass = css`
-  max-width: 205px !important;
-  margin: 30px auto !important;
+const NoProposalsClass = css`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 80px;
 
-  > svg {
-    margin-bottom: 2px;
-  }
+    > .title-class {
+        margin-top: 30px;
+        font-size: 14px;
+        color: rgba(255, 255, 255, .5);
+    }
 `;
 
 const EpochsFuture: React.FC = () => {
@@ -30,21 +35,31 @@ const EpochsFuture: React.FC = () => {
   const [isDepositVisible, setIsDepositVisible] = useState(false);
   const [isWithdrawVisible, setIsWithdrawVisible] = useState(false);
 
-  const currentProposals = useSelector(selectCurrentProposals());
-  const prevProposals = useSelector(selectPrevProposals());
+  const futureProposals = useSelector(selectFutureProposals());
+
+  const handlePrevious: React.MouseEventHandler = () => {
+    navigate(ROUTES.MAIN.EPOCHS);
+  };
 
   return (
     <>
-      <Window>
+      <Window onPrevious={handlePrevious}>
         <EpochStatsSection
+          isWithProgress={false}
           isDepositVisible={isDepositVisible}
           depositPopupUpdate={(state: boolean)=>setIsDepositVisible(state)}
           isWithdrawVisible={isDepositVisible}
           withdrawPopupUpdate={(state: boolean)=>setIsWithdrawVisible(state)}
           className={StatsSectionClass} data={true}></EpochStatsSection>
-        <ProposalsList title='Proposals' data={currentProposals}></ProposalsList>
-        { prevProposals.length > 0 ?
-        <Button variant='ghost' icon={IconOldEpoches} className={OldButtonClass}>show old epochs</Button> : null }
+        { futureProposals.length > 0 ? 
+        <ProposalsList isFuture={true} title='Future proposals' data={futureProposals}></ProposalsList> :
+        <>
+            <div className={NoProposalsClass}>
+                <IconNoProposals/>
+                <div className='title-class'>There are no proposals</div>
+            </div>
+        </>
+        }
       </Window>
       <DepositPopup visible={isDepositVisible} onCancel={()=>{setIsDepositVisible(false)}}/>
       <WithdrawPopup visible={isWithdrawVisible} onCancel={()=>{setIsWithdrawVisible(false)}}/>

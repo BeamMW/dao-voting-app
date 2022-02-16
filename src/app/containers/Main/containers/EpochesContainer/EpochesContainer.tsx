@@ -9,7 +9,7 @@ import {
 
 const routes = [
   {
-    path: '/',
+    path: ROUTES_PATH.MAIN.EPOCHES,
     element: <EpochesBase />,
     exact: true,
   },

@@ -17,6 +17,8 @@ import IconWithdraw from './icon-withdraw.svg';
 import IconDeposit from './icon-deposit.svg';
 import IconDepositBlue from './icon-deposit-blue.svg';
 import IconWithdrawBlue from './icon-withdraw-blue.svg';
+import IconNoProposals from './icon-no-proposals.svg';
+import IconBackWindow from './icon-back-window.svg';
 
 export {
   IconBack,
@@ -37,5 +39,7 @@ export {
   IconDeposit,
   IconWithdraw,
   IconWithdrawBlue,
-  IconDepositBlue
+  IconDepositBlue,
+  IconNoProposals,
+  IconBackWindow
 }

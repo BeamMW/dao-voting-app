@@ -27,7 +27,7 @@ export function* loadParamsSaga(
         const userView = (yield call(LoadUserView)) as UserViewParams;
         yield put(actions.setUserView(userView));
 
-        yield put(navigate(ROUTES.MAIN.BASE));
+        yield put(navigate(ROUTES.MAIN.EPOCHS));
 
         store.dispatch(actions.loadPoposals.request());
     } catch (e) {
