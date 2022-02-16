@@ -11,3 +11,4 @@ export const selectUserView = () => createSelector(selectMain, (state) => state.
 export const selectPrevProposals = () => createSelector(selectMain, (state) => state.proposals.prev);
 export const selectCurrentProposals= () => createSelector(selectMain, (state) => state.proposals.current);
 export const selectFutureProposals = () => createSelector(selectMain, (state) => state.proposals.future);
+export const selectRate = () => createSelector(selectMain, (state) => state.rate);

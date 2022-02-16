@@ -10,7 +10,11 @@ import store from '../../../../index';
 import { VotingAppParams, ManagerViewData, UserViewParams, ProposalData, InitialProposal, ProposalStats } from '@app/core/types';
 
 import { SharedStateType } from '@app/shared/interface';
-import { EpochesStateType } from '../interfaces';
+import { EpochesStateType, RateResponse } from '../interfaces';
+
+const FETCH_INTERVAL = 310000;
+const API_URL = 'https://api.coingecko.com/api/v3/simple/price';
+const RATE_PARAMS = 'ids=beam&vs_currencies=usd';
 
 export function* handleParams(payload: VotingAppParams) {
     yield put(actions.setAppParams(payload));
@@ -132,10 +136,28 @@ export function* loadContractInfoSaga(
     }
 }
 
+async function loadRatesApiCall() {
+  const response = await fetch(`${API_URL}?${RATE_PARAMS}`);
+  const promise: RateResponse = await response.json();
+  return promise.beam.usd;
+}
+
+export function* loadRate() {
+  try {
+    const result: number = yield call(loadRatesApiCall);
+
+    yield put(actions.loadRate.success(result));
+    setTimeout(() => store.dispatch(actions.loadRate.request()), FETCH_INTERVAL);
+  } catch (e) {
+    yield put(actions.loadRate.failure(e));
+  }
+}
+
 function* mainSaga() {
     yield takeLatest(actions.loadAppParams.request, loadParamsSaga);
     yield takeLatest(actions.loadPoposals.request, loadProposalsSaga);
     yield takeLatest(actions.loadContractInfo.request, loadContractInfoSaga);
+    yield takeLatest(actions.loadRate.request, loadRate);
 }
 
 export default mainSaga;

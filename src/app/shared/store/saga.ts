@@ -48,8 +48,6 @@ function* sharedSaga() {
   while (true) {
     try {
       const payload: any = yield take(remoteChannel);
-      console.log('PAYLOAD', payload)
-
       switch (payload.id) {
         case 'ev_system_state':
           // trigger update

@@ -30,7 +30,8 @@ const initialState: EpochesStateType = {
   userView: {
     stake_active: 0,
     stake_passive: 0
-  }
+  },
+  rate: 0,
 };
 
 const reducer = createReducer<EpochesStateType, Action>(initialState)
@@ -51,6 +52,9 @@ const reducer = createReducer<EpochesStateType, Action>(initialState)
   }))
   .handleAction(actions.loadPoposals.success, (state, action) => produce(state, (nexState) => {
     //nexState.appParams = action.payload;
+  }))
+  .handleAction(actions.loadRate.success, (state, action) => produce(state, (nexState) => {
+    nexState.rate = action.payload;
   }))
   .handleAction(actions.loadContractInfo.success, (state, action) => produce(state, (nexState) => {
     nexState.contractHeight = action.payload;

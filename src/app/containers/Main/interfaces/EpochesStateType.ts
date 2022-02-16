@@ -9,4 +9,5 @@ export interface EpochesStateType {
   };
   contractHeight: number;
   userView: UserViewParams;
+  rate: number;
 }

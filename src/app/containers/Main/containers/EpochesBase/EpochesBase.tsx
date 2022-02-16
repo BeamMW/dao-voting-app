@@ -6,7 +6,8 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Window, Button } from '@app/shared/components';
 import { EpochStatsSection, ProposalsList } from '@app/containers/Main/components';
-import { selectCurrentProposals, selectPrevProposals } from '../../store/selectors';
+import { selectCurrentProposals, selectPrevProposals, selectRate } from '../../store/selectors';
+import { loadRate } from '@app/containers/Main/store/actions';
 import { IconOldEpoches } from '@app/shared/icons';
 import { DepositPopup, WithdrawPopup } from '../../components/EpochesBase';
 
@@ -26,6 +27,13 @@ const OldButtonClass = css`
 const EpochesBase: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const rate = useSelector(selectRate());
+
+  useEffect(() => {
+    if (!rate) {
+      dispatch(loadRate.request());
+    }
+  }, [dispatch, rate]);
 
   const [isDepositVisible, setIsDepositVisible] = useState(false);
   const [isWithdrawVisible, setIsWithdrawVisible] = useState(false);

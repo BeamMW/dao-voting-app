@@ -24,6 +24,12 @@ export const loadPoposals = createAsyncAction(
     '@@MAIN/LOAD_PROPOSALS_FAILURE',
 )<void, any, any>();
 
+export const loadRate = createAsyncAction(
+    '@@MAIN/GET_RATE',
+    '@@MAIN/GET_RATE_SUCCESS',
+    '@@MAIN/GET_RATE_FAILURE',
+  )<void, number, any>();
+
 export const setPrevProposals = createAction('@@MAIN/SET_PREV_PROPOSALS')<ProcessedProposal[]>()
 export const setCurrentProposals = createAction('@@MAIN/SET_CURRENT_PROPOSALS')<ProcessedProposal[]>()
 export const setFutureProposals = createAction('@@MAIN/SET_FUTURE_PROPOSALS')<ProcessedProposal[]>()
