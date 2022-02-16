@@ -3,6 +3,8 @@ import { css } from '@linaria/core';
 import { styled } from '@linaria/react';
 import { IconEpochSelector, IconSearch, IconNoProposals } from '@app/shared/icons';
 import { ProcessedProposal } from '@app/core/types';
+import { useNavigate } from 'react-router-dom';
+import { ROUTES } from '@app/shared/constants';
 
 interface ListProps {
   data: ProcessedProposal[];
@@ -101,6 +103,7 @@ const ProposalsList: React.FC<ListProps> = ({
   title,
   isFuture = false
 }) => {
+    const navigate = useNavigate();
     const selectorData = [
         {
             id: 0,
@@ -125,8 +128,8 @@ const ProposalsList: React.FC<ListProps> = ({
 
     };
 
-    const handleListItemClick: React.MouseEventHandler<HTMLLIElement> = ({ currentTarget }) => {
-
+    const handleListItemClick = (id: number) => {
+        navigate(`${ROUTES.MAIN.EPOCH_PAGE.replace(':id', '')}${id}`);
     }
 
     return (<div>
@@ -151,7 +154,7 @@ const ProposalsList: React.FC<ListProps> = ({
         { data.length > 0 ?
         (<List>
             {data.map((item, index) => (
-                <ListItem data-index={index} key={index} onClick={handleListItemClick}>
+                <ListItem data-index={index} key={index} onClick={() => handleListItemClick(item.id)}>
                     <span className='proposal-id'>#{item.id}</span>
                     <span className='proposal-title'>{item.data.title}</span>
                 </ListItem>

@@ -4,7 +4,9 @@ import { useRoutes } from 'react-router-dom';
 import { ROUTES_PATH } from '@app/shared/constants';
 import {
   EpochesBase,
-  EpochsFuture
+  EpochsFuture,
+  EpochsPrevious,
+  EpochPage
 } from '@app/containers/Main/containers';
 
 const routes = [
@@ -16,7 +18,18 @@ const routes = [
   {
     path: ROUTES_PATH.MAIN.FUTURE_EPOCHS,
     element: <EpochsFuture />,
+    exact: true,
   },
+  {
+    path: ROUTES_PATH.MAIN.PREVIOUS_EPOCH,
+    element: <EpochsPrevious />,
+    exact: true,
+  },
+  {
+    path: ROUTES_PATH.MAIN.EPOCH_PAGE,
+    element: <EpochPage />,
+    exact: true,
+  }
 ];
 
 const EpochesContainer = () => {

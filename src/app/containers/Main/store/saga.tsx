@@ -2,7 +2,7 @@ import { call, put, takeLatest, select } from 'redux-saga/effects';
 import { navigate, setError } from '@app/shared/store/actions';
 import { ROUTES, CID } from '@app/shared/constants';
 import { LoadViewParams, LoadProposals, LoadProposalData, 
-  LoadManagerView, LoadUserView, VoteProposal } from '@core/api';
+  LoadManagerView, LoadUserView, VoteProposal, AddProposal } from '@core/api';
 
 import { actions } from '.';
 import store from '../../../../index';
@@ -48,7 +48,7 @@ export function* loadProposalsSaga(
     try {
         const initProposals = (yield call(LoadProposals)) as InitialProposal[];
         const appParams = (yield select()) as {main: EpochesStateType, shared: SharedStateType};
-        
+        //yield call(AddProposal)
         let proposalsData = {
           prev: [],
           current: [],
