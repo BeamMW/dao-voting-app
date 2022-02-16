@@ -227,7 +227,9 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
                     <div className='next-epoch-title'>NEXT EPOCH #232</div>
                     <div className='next-epoch-date'>05.02.2022 - 23.04.2022</div>
                 </MiddleStats>
-                <Button className={ButtonBottomLinkClass} pallete='green' variant='link'>Show future votings</Button>
+                <Button className={ButtonBottomLinkClass}
+                onClick={() => navigate(ROUTES.MAIN.FUTURE_EPOCHS)}
+                pallete='green' variant='link'>Show future votings</Button>
             </StyledSection>
         </StyledStats>
     );

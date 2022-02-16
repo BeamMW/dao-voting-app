@@ -16,7 +16,7 @@ const routes = [
     element: <></>,
   },
   {
-    path: `${ROUTES.MAIN.EPOCHES}/*`,
+    path: `${ROUTES.MAIN.BASE}/*`,
     element: <EpochesContainer />,
   }
 ];

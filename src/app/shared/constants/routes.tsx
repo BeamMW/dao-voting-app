@@ -1,14 +1,16 @@
 export const ROUTES = {
   MAIN: {
     BASE: '/main',
-    EPOCHES: '/main/epoches',
+    EPOCHS: '/main/epochs',
+    FUTURE_EPOCHS: '/main/future_epochs'
   },
 };
 
 export const ROUTES_PATH = {
   MAIN: {
     BASE: '/',
-    EPOCHES: '/epoches',
+    EPOCHES: '/epochs',
+    FUTURE_EPOCHS: '/future_epochs'
   },
   
 };
