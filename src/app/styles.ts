@@ -17,7 +17,7 @@ css`
       --color-white: white;
       --color-disconnect: #ff746b;
 
-      --color-popup: rgba(13, 77, 118, .95);
+      --color-popup: rgba(13, 77, 118);
       --color-select: #184469;
 
       --color-disabled: #8da1ad;

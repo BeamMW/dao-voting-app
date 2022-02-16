@@ -44,9 +44,10 @@ const FooterStyled = styled.div`
   display: flex;
   margin: 0 -7px;
   margin-top: 20px;
+  justify-content: center;
 
   > button {
-    margin: 0 7px !important;
+    margin: 0 15px !important;
   }
   &.justify-right {
     justify-content: right;

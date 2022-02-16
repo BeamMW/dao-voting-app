@@ -26,7 +26,7 @@ const ButtonStyled = styled(BaseButtonStyled)`
   max-width: 254px;
   margin: 0 auto;
   margin-bottom: 10px;
-  padding: 12px 24px;
+  padding: 10px 24px;
   border: none;
   border-radius: 22px;
   background-color: ${({ pallete }) => `var(--color-${pallete})`};

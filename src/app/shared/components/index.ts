@@ -5,3 +5,4 @@ export { default as Popup } from './Popup';
 export { default as ProgressBar } from './ProgressBar';
 export { default as Input } from './Input';
 export { default as AmountInput } from './AmountInput';
+export { default as Rate } from './Rate';

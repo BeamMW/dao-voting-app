@@ -48,10 +48,18 @@ const InputGrayStyled = styled(InputStyled)`
 `;
 
 const InputAmountStyled = styled(InputGrayStyled)<{ pallete: string }>`
-  font-size: 18px;
-  font-weight: 600;
-  letter-spacing: 0.34px;
+  font-size: 24px;
+  font-weight: normal;
   color: ${({ pallete }) => `var(--color-${pallete})`};
+  height: 45px;
+  background-color: rgba(255, 255, 255, .05);
+  border: none;
+  padding: 0 15px;
+  border-radius: 10px;
+
+  &::placeholder {
+    font-size: 24px;
+  }
 `;
 
 const LabelStyled = styled.div<InputProps>`

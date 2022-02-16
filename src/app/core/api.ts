@@ -88,7 +88,6 @@ export function UserDeposit<T = any>(amount): Promise<T> {
     return new Promise((resolve, reject) => {
         Utils.invokeContract("role=user,action=move_funds,amount="+ amount +",bLock=1,cid=" + CID, 
         (error, result, full) => {
-            console.log('USER DEPOSIT', error, result, full)
             onMakeTx(error, result, full);
             resolve(result);
         });
