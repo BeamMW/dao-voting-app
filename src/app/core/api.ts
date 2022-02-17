@@ -53,7 +53,7 @@ export function AddProposal<T = any>(): Promise<T> {
             "ref_link": "http://ref-link"
             });
 
-            const shieldedData = propData.replaceAll(',', '±')
+            const shieldedData = propData.replace(/,/g, '±');
             console.log(shieldedData)
         Utils.invokeContract("role=manager,action=add_proposal,variants=2,text="+shieldedData+",cid=" + CID, 
         (error, result, full) => {
