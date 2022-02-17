@@ -13,6 +13,7 @@ interface PopupProps {
   visible?: boolean;
   onCancel?: React.MouseEventHandler;
   footerClass?: string;
+  className?: string;
 }
 
 const ContainerStyled = styled.div`
@@ -76,9 +77,10 @@ const Popup: React.FC<PopupProps> = ({
   confirmButton,
   children,
   footerClass,
+  className
 }) => (visible ? (
   <Backdrop onCancel={onCancel}>
-    <ContainerStyled>
+    <ContainerStyled className={className}>
       <TitleStyled>{title}</TitleStyled>
       {/* <Button className="cancel-header" variant="icon" pallete="white" icon={IconCancel} onClick={onCancel} /> */}
       {children}

@@ -5,6 +5,8 @@ import { IconEpochSelector, IconSearch, IconNoProposals } from '@app/shared/icon
 import { ProcessedProposal } from '@app/core/types';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@app/shared/constants';
+import { useSelector } from 'react-redux';
+import { selectIsLoaded } from '@app/shared/store/selectors';
 
 interface ListProps {
   data: ProcessedProposal[];
@@ -104,6 +106,7 @@ const ProposalsList: React.FC<ListProps> = ({
   isFuture = false
 }) => {
     const navigate = useNavigate();
+    const isLoaded = useSelector(selectIsLoaded());
     const selectorData = [
         {
             id: 0,
@@ -160,10 +163,10 @@ const ProposalsList: React.FC<ListProps> = ({
                 </ListItem>
             ))}
         </List>) :
-        (<div className={NoProposalsClass}>
+        (isLoaded ? <div className={NoProposalsClass}>
             <IconNoProposals/>
             <div className='title-class'>There are no proposals</div>
-        </div>)
+        </div> : null)
         }
     </div>);
 };

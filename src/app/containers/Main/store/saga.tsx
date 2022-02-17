@@ -68,7 +68,7 @@ export function* loadProposalsSaga(
             try {
               item['data'] = JSON.parse(item.text.replace(/±/g, ','));
             } catch (e) {
-              console.log(e)
+              //console.log(e)
             }
           }
         }
@@ -85,7 +85,7 @@ export function* loadProposalsSaga(
             try {
               item['data'] = JSON.parse(item.text.replace(/±/g, ','));
             } catch (e) {
-              console.log(e)
+              //console.log(e)
             }
           }
         }
@@ -103,7 +103,7 @@ export function* loadProposalsSaga(
               const data = item.text.replace(/±/g, ',');
               item['data'] = JSON.parse(data);
             } catch (e) {
-              console.log(e)
+              //console.log(e)
             }
           }
         }

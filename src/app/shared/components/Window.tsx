@@ -3,7 +3,10 @@ import { styled } from '@linaria/react';
 import Utils from '@core/Utils.js';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@app/shared/constants';
-import { IconBackWindow } from '@app/shared/icons';
+import { IconBackWindow, IconAddProposal } from '@app/shared/icons';
+import { useSelector } from 'react-redux';
+import { selectAppParams } from '@app/containers/Main/store/selectors';
+import { NewProposalPopup, Button } from './';
 
 interface WindowProps {
   onPrevious?: React.MouseEventHandler | undefined;
@@ -21,6 +24,12 @@ const StyledTitle = styled.div`
   font-weight: 500;
   font-size: 36px;
   margin-bottom: 20px;
+
+  > .new-button-class {
+    position: absolute !important;
+    right: 20px !important;
+    top: 30px !important;
+  }
 `;
 
 const TitleValue = styled.span`
@@ -51,14 +60,29 @@ const Window: React.FC<WindowProps> = ({
   const navigate = useNavigate();
   const rootRef = useRef();
 
+  const [isNewProposalVisible, setIsNewProposalVisible] = useState(false);
+  const appParams = useSelector(selectAppParams());
+
   const titleClicked = () => {
     navigate(ROUTES.MAIN.EPOCHS);
+  };
+
+  const handleNewProposal = () => {
+    setIsNewProposalVisible(true);
+  };
+
+  const hideNewProposalPopup = () => {
+    setIsNewProposalVisible(false);
   };
   
   return (
     <Container bgColor={Utils.getStyles().background_main} ref={rootRef}>
       <StyledTitle>
         <TitleValue onClick={titleClicked}>Voting</TitleValue>
+        {appParams.is_admin ?
+        <Button className='new-button-class' variant='ghostBordered' pallete='green'
+        onClick={()=>handleNewProposal()}
+        icon={IconAddProposal}>create new proposal</Button> : null}
       </StyledTitle>
       { onPrevious ? (
       <BackStyled>
@@ -68,6 +92,7 @@ const Window: React.FC<WindowProps> = ({
         </div>
       </BackStyled>) : null}
       { children }
+      <NewProposalPopup visible={isNewProposalVisible} onCancel={()=>{hideNewProposalPopup()}}/>
     </Container>
   );
 };

@@ -1,6 +1,6 @@
 export type Pallete = 'green' | 'ghost' | 'purple' | 'blue' | 'red' | 'white';
 
-export type ButtonVariant = 'regular' | 'ghost' | 'block' | 'link' | 'icon';
+export type ButtonVariant = 'regular' | 'ghost' | 'ghostBordered' | 'block' | 'link' | 'icon';
 
 export interface CurrentEpoch {
     iEpoch: number;

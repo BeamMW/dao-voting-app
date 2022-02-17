@@ -128,7 +128,7 @@ const StyledStaked = styled.span`
       font-size: 12px;
       font-style: italic;
       color: rgba(255, 255, 255, .7);
-      margin-left: 27px;
+      margin-left: 28px;
   }
 `;
 

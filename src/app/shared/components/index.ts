@@ -6,3 +6,4 @@ export { default as ProgressBar } from './ProgressBar';
 export { default as Input } from './Input';
 export { default as AmountInput } from './AmountInput';
 export { default as Rate } from './Rate';
+export { default as NewProposalPopup } from './NewProposalPopup';

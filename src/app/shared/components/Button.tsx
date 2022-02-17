@@ -42,7 +42,26 @@ const ButtonStyled = styled(BaseButtonStyled)`
   }
 
   > svg {
-    vertical-align: sub;
+    vertical-align: middle;
+    margin-right: 10px;
+  }
+`;
+
+const GhostBorderedButtonStyled = styled(ButtonStyled)`
+  background-color: rgba(0, 246, 210, .1);
+  color: ${({ pallete }) => `var(--color-${pallete})`};
+  border: ${({ pallete }) => `1px solid var(--color-${pallete})`};
+  max-width: 215px;
+  padding: 8px 18px;
+
+  &:hover,
+  &:active {
+    box-shadow: 0 0 8px rgba(0, 246, 210, 0.15);
+    background-color: rgba(0, 246, 210, 0.3);
+  }
+
+  > svg {
+    vertical-align: middle;
     margin-right: 10px;
   }
 `;
@@ -88,7 +107,7 @@ const IconButtonStyled = styled(BaseButtonStyled)`
   color: ${({ pallete }) => `var(--color-${pallete})`};
 
   > svg {
-    vertical-align: sub;
+    vertical-align: middle;
   }
 `;
 
@@ -99,7 +118,7 @@ const LinkButtonStyled = styled(IconButtonStyled)`
   color: ${({ pallete }) => `var(--color-${pallete})`};
 
   > svg {
-    vertical-align: sub;
+    vertical-align: middle;
     margin-right: 10px;
   }
 `;
@@ -107,6 +126,7 @@ const LinkButtonStyled = styled(IconButtonStyled)`
 const VARIANTS = {
   regular: ButtonStyled,
   ghost: GhostButtonStyled,
+  ghostBordered: GhostBorderedButtonStyled,
   link: LinkButtonStyled,
   icon: IconButtonStyled,
   block: BlockButtonStyled,

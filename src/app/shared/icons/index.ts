@@ -20,6 +20,8 @@ import IconWithdrawBlue from './icon-withdraw-blue.svg';
 import IconNoProposals from './icon-no-proposals.svg';
 import IconBackWindow from './icon-back-window.svg';
 import IconAddMax from './icon-add-max.svg';
+import IconAddProposal from './icon-add-proposal.svg';
+import IconCreateProposal from './icon-create-proposal.svg';
 
 export {
   IconBack,
@@ -43,5 +45,7 @@ export {
   IconDepositBlue,
   IconNoProposals,
   IconBackWindow,
-  IconAddMax
+  IconAddMax,
+  IconAddProposal,
+  IconCreateProposal,
 }
