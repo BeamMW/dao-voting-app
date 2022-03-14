@@ -7,6 +7,8 @@ export const selectAppParams = () => createSelector(selectMain, (state) => state
 
 export const selectContractHeight = () => createSelector(selectMain, (state) => state.contractHeight);
 export const selectUserView = () => createSelector(selectMain, (state) => state.userView);
+export const selectTotalsView = () => createSelector(selectMain, (state) => state.totalsView);
+export const selectIsModerator = () => createSelector(selectMain, (state) => state.is_moderator);
 
 export const selectPrevProposals = () => createSelector(selectMain, (state) => state.proposals.prev);
 export const selectCurrentProposals= () => createSelector(selectMain, (state) => state.proposals.current);

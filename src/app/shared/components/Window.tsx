@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@app/shared/constants';
 import { IconBackWindow, IconAddProposal } from '@app/shared/icons';
 import { useSelector } from 'react-redux';
-import { selectAppParams } from '@app/containers/Main/store/selectors';
+import { selectAppParams, selectIsModerator } from '@app/containers/Main/store/selectors';
 import { NewProposalPopup, Button } from './';
 
 interface WindowProps {
@@ -62,6 +62,7 @@ const Window: React.FC<WindowProps> = ({
 
   const [isNewProposalVisible, setIsNewProposalVisible] = useState(false);
   const appParams = useSelector(selectAppParams());
+  const isModerator = useSelector(selectIsModerator());
 
   const titleClicked = () => {
     navigate(ROUTES.MAIN.EPOCHS);
@@ -79,7 +80,7 @@ const Window: React.FC<WindowProps> = ({
     <Container bgColor={Utils.getStyles().background_main} ref={rootRef}>
       <StyledTitle>
         <TitleValue onClick={titleClicked}>Voting</TitleValue>
-        {appParams.is_admin ?
+        {appParams.is_admin || isModerator ?
         <Button className='new-button-class' variant='ghostBordered' pallete='green'
         onClick={()=>handleNewProposal()}
         icon={IconAddProposal}>create new proposal</Button> : null}

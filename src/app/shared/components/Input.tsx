@@ -4,7 +4,7 @@ import { styled } from '@linaria/react';
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   valid?: boolean;
-  variant?: 'regular' | 'gray' | 'amount';
+  variant?: 'regular' | 'gray' | 'proposal';
   pallete?: 'purple' | 'blue';
   margin?: 'none' | 'large';
 }
@@ -47,8 +47,8 @@ const InputGrayStyled = styled(InputStyled)`
   border-color: ${({ valid }) => (valid ? 'rgba(255,255,255,0.3)' : 'var(--color-red)')};
 `;
 
-const InputAmountStyled = styled(InputGrayStyled)<{ pallete: string }>`
-  font-size: 24px;
+const InputProposalStyled = styled(InputGrayStyled)<{ pallete: string }>`
+  font-size: 16px;
   font-weight: normal;
   color: ${({ pallete }) => `var(--color-${pallete})`};
   height: 45px;
@@ -58,16 +58,17 @@ const InputAmountStyled = styled(InputGrayStyled)<{ pallete: string }>`
   border-radius: 10px;
 
   &::placeholder {
-    font-size: 24px;
+    font-size: 16px;
   }
 `;
 
 const LabelStyled = styled.div<InputProps>`
+  text-align: start;
   margin-top: 4px;
   font-family: SFProDisplay;
   font-size: 14px;
   font-style: italic;
-  color: ${({ valid }) => (valid ? 'var(--color-gray)' : 'var(--color-red)')};
+  color: ${({ valid }) => (valid ? 'rgba(255, 255, 255, .7)' : 'var(--color-red)')};
 `;
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
@@ -77,7 +78,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     const InputComponent = {
       regular: InputRegularStyled,
       gray: InputGrayStyled,
-      amount: InputAmountStyled,
+      proposal: InputProposalStyled,
     }[variant];
 
     return (

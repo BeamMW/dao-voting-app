@@ -21,6 +21,8 @@ const initialState: EpochesStateType = {
     total_proposals: 0,
     pkAdmin: ''
   },
+  is_moderator: false,
+  public_key: '',
   proposals: {
     prev: [],
     current: [],
@@ -31,12 +33,25 @@ const initialState: EpochesStateType = {
     stake_active: 0,
     stake_passive: 0
   },
+  totalsView: {
+    stake_active: 0,
+    stake_passive: 0
+  },
   rate: 0,
 };
 
 const reducer = createReducer<EpochesStateType, Action>(initialState)
   .handleAction(actions.setUserView, (state, action) => produce(state, (nexState) => {
     nexState.userView = action.payload;
+  }))
+  .handleAction(actions.setTotals, (state, action) => produce(state, (nexState) => {
+    nexState.totalsView = action.payload;
+  }))
+  .handleAction(actions.setIsModerator, (state, action) => produce(state, (nexState) => {
+    nexState.is_moderator = action.payload;
+  }))
+  .handleAction(actions.setPublicKey, (state, action) => produce(state, (nexState) => {
+    nexState.public_key = action.payload;
   }))
   .handleAction(actions.setPrevProposals, (state, action) => produce(state, (nexState) => {
     nexState.proposals.prev = action.payload;

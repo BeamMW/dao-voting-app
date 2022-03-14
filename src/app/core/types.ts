@@ -56,6 +56,11 @@ export interface UserViewParams {
     stake_passive: number;
 }
 
+export interface Moderator {
+    height: number;
+    pk: string;
+}
+
 export interface SystemState {
     current_height: number
     current_state_hash: string

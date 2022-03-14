@@ -1,12 +1,13 @@
 import { call, put, takeLatest, select } from 'redux-saga/effects';
 import { navigate, setError } from '@app/shared/store/actions';
 import { ROUTES, CID } from '@app/shared/constants';
-import { LoadViewParams, LoadProposals, LoadProposalData, 
-  LoadManagerView, LoadUserView, VoteProposal, AddProposal } from '@core/api';
+import { LoadViewParams, LoadProposals, LoadProposalData, LoadTotals, LoadPublicKey,
+  LoadManagerView, LoadUserView, LoadModeratorsView } from '@core/api';
 
 import { actions } from '.';
 import store from '../../../../index';
-import { VotingAppParams, ManagerViewData, UserViewParams, ProposalData, InitialProposal, ProposalStats } from '@app/core/types';
+import { VotingAppParams, ManagerViewData, UserViewParams, 
+  ProposalData, InitialProposal, ProposalStats, Moderator } from '@app/core/types';
 
 import { SharedStateType } from '@app/shared/interface';
 import { setIsLoaded } from '@app/shared/store/actions';
@@ -36,10 +37,28 @@ export function* loadParamsSaga(
           yield put(navigate(ROUTES.MAIN.EPOCHS));
         }
 
+        const pubKey = (yield call(LoadPublicKey)) as string;
+        yield put(actions.setPublicKey(pubKey));
+
+        const moderators = (yield call(LoadModeratorsView)) as Moderator[];
+        if (moderators.length > 0) {
+          const isMod = moderators.find((item) => item.pk === pubKey);
+          yield put(actions.setIsModerator(!!isMod));
+        }
+
+        const totals = (yield call(LoadTotals)) as UserViewParams;
+        yield put(actions.setTotals(totals));
+
         store.dispatch(actions.loadPoposals.request());
     } catch (e) {
       yield put(actions.loadAppParams.failure(e));
     }
+}
+
+function Base64DecodeUrl(str){
+  if (str.length % 4 != 0)
+    str += ('===').slice(0, 4 - (str.length % 4));
+  return str.replace(/-/g, '+').replace(/_/g, '/');
 }
 
 export function* loadProposalsSaga(
@@ -49,6 +68,8 @@ export function* loadProposalsSaga(
         const initProposals = (yield call(LoadProposals)) as InitialProposal[];
         const appParams = (yield select()) as {main: EpochesStateType, shared: SharedStateType};
         //yield call(AddProposal)
+        //yield call(VoteProposal)
+
         let proposalsData = {
           prev: [],
           current: [],
@@ -62,13 +83,12 @@ export function* loadProposalsSaga(
 
           for ( let item of proposalsData.next ) {
             const proposalRes = (yield call(LoadProposalData, item.id)) as ProposalStats;
-  
             item['stats'] = proposalRes;
             item['data'] = {};
             try {
-              item['data'] = JSON.parse(item.text.replace(/±/g, ','));
+              item['data'] = JSON.parse(window.atob(Base64DecodeUrl(item.text)));
             } catch (e) {
-              //console.log(e)
+              console.log(e)
             }
           }
         }
@@ -79,40 +99,37 @@ export function* loadProposalsSaga(
 
           for ( let item of proposalsData.current ) {
             const proposalRes = (yield call(LoadProposalData, item.id)) as ProposalStats;
-  
             item['stats'] = proposalRes;
             item['data'] = {};
             try {
-              item['data'] = JSON.parse(item.text.replace(/±/g, ','));
+              item['data'] = JSON.parse(window.atob(Base64DecodeUrl(item.text)));
             } catch (e) {
-              //console.log(e)
+              console.log(e)
             }
           }
         }
         yield put(actions.setCurrentProposals(proposalsData.current));
+
+        if (!appParams.shared.isLoaded) {
+          store.dispatch(setIsLoaded(true));
+        }
 
         if (initProposals.length > 0) {
           proposalsData.prev = initProposals;
 
           for ( let item of proposalsData.prev ) {
             const proposalRes = (yield call(LoadProposalData, item.id)) as ProposalStats;
-  
             item['stats'] = proposalRes;
             item['data'] = {};
             try {
-              const data = item.text.replace(/±/g, ',');
-              item['data'] = JSON.parse(data);
+              item['data'] = JSON.parse(window.atob(Base64DecodeUrl(item.text)));
             } catch (e) {
-              //console.log(e)
+              console.log(e)
             }
           }
         }
         yield put(actions.setPrevProposals(proposalsData.prev));
         yield put(actions.loadPoposals.success(true));
-
-        if (!appParams.shared.isLoaded) {
-          store.dispatch(setIsLoaded(true));
-        }
     } catch (e) {
       yield put(actions.loadPoposals.failure(e));
     }

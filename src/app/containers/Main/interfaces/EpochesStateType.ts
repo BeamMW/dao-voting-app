@@ -7,7 +7,10 @@ export interface EpochesStateType {
     current: ProcessedProposal[],
     future: ProcessedProposal[]
   };
+  is_moderator: boolean;
+  public_key: string;
   contractHeight: number;
   userView: UserViewParams;
+  totalsView: UserViewParams;
   rate: number;
 }

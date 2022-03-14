@@ -9,7 +9,8 @@ import ExpiresTimer  from './ExpiresTimer';
 import { useDispatch, useSelector } from 'react-redux';
 import { Window, Button, ProgressBar } from '@app/shared/components';
 import { selectSystemState } from '@app/shared/store/selectors';
-import { selectAppParams, selectContractHeight, selectUserView } from '@app/containers/Main/store/selectors';
+import { selectAppParams, selectTotalsView, selectCurrentProposals,
+  selectContractHeight, selectUserView } from '@app/containers/Main/store/selectors';
 import { fromGroths } from '@core/appUtils';
 
 interface SeedListProps {
@@ -164,6 +165,9 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
     const systemState = useSelector(selectSystemState());
     const cHeight = useSelector(selectContractHeight());
     const userViewData = useSelector(selectUserView());
+    const totalsView = useSelector(selectTotalsView());
+
+    const currentProposals = useSelector(selectCurrentProposals());
 
     const handleDeposit = () => {
         depositPopupUpdate(!isDepositVisible);
@@ -185,7 +189,7 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
                         <SubSectionTitle>Total value locked</SubSectionTitle>
                         <SubSectionValue>
                             <IconBeamx/>
-                            <span>0 BEAMX</span>
+                            <span>{fromGroths(totalsView.stake_active)} BEAMX</span>
                         </SubSectionValue>
                     </StyledTotalLocked>
                     <StyledStaked>
@@ -194,7 +198,11 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
                             <IconBeamx/>
                             <span>{fromGroths(userViewData.stake_active)} BEAMX</span>
                         </SubSectionValue>
-                        <div className='voting-power-class'>Voting power is 10%</div>
+                        { totalsView.stake_active > 0 ?
+                        (<div className='voting-power-class'>
+                          Voting power is {parseInt(userViewData.stake_active / totalsView.stake_active * 100 + '')}%
+                        </div>)
+                        : null }
                     </StyledStaked>
                 </LeftStats>
                 <MiddleStats>
@@ -221,14 +229,17 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
 
                 <StyledSection>
                     <LeftStatsProgress>
+                      { currentProposals.length > 0 ?
+                      (<>
                         <div className='progress-title'>Your completed proposals</div>                        
                         <div className='progress'>
                             <ProgressBar active={true} percent={20}></ProgressBar>
                             <span className='progress-percentage'>50% (3 of 5)</span>
                         </div>
+                      </>) : null }
                     </LeftStatsProgress>
                     <MiddleStats>
-                        <div className='next-epoch-title'>NEXT EPOCH #232</div>
+                        <div className='next-epoch-title'>NEXT EPOCH #{appParams.current.iEpoch + 1}</div>
                         <div className='next-epoch-date'>05.02.2022 - 23.04.2022</div>
                     </MiddleStats>
                     <Button className={ButtonBottomLinkClass}

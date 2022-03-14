@@ -7,3 +7,5 @@ export { default as Input } from './Input';
 export { default as AmountInput } from './AmountInput';
 export { default as Rate } from './Rate';
 export { default as NewProposalPopup } from './NewProposalPopup';
+export { default as QuorumInput } from './QuorumInput';
+export { default as Toggle } from './Toggle';
