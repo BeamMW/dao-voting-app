@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { styled } from '@linaria/react';
-import Utils from '@core/Utils.js';
+import Utils from '@core/utils.js';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@app/shared/constants';
 import { IconBackWindow, IconAddProposal } from '@app/shared/icons';

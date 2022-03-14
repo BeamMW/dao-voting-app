@@ -1,4 +1,4 @@
-import Utils from '@core/Utils.js';
+import Utils from '@core/utils.js';
 import { CID } from '@app/shared/constants';
 
 export function LoadViewParams<T = any>(payload): Promise<T> {

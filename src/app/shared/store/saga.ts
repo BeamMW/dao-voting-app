@@ -11,7 +11,7 @@ import store from '../../../index';
 import { SharedStateType } from '../interface';
 import { EpochesStateType } from '@app/containers/Main/interfaces';
 
-import Utils from '@core/Utils.js';
+import Utils from '@core/utils.js';
 
 export function remoteEventChannel() {
   return eventChannel((emitter) => {
