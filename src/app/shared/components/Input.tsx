@@ -11,7 +11,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 
 const ContainerStyled = styled.div<InputProps>`
   position: relative;
-  min-height: 53px;
+  min-height: 50px;
   margin-bottom: ${({ margin }) => (margin === 'none' ? 0 : 50)}px;
 `;
 
@@ -52,7 +52,7 @@ const InputProposalStyled = styled(InputGrayStyled)<{ pallete: string }>`
   font-weight: normal;
   color: ${({ pallete }) => `var(--color-${pallete})`};
   height: 45px;
-  background-color: rgba(255, 255, 255, .05);
+  background-color: ${({ valid }) => (valid ? 'rgba(255, 255, 255, .05)' : 'rgb(255, 116, 107, .15)')};
   border: none;
   padding: 0 15px;
   border-radius: 10px;
@@ -84,7 +84,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <ContainerStyled className={className} margin={margin}>
         <InputComponent ref={ref} valid={valid} pallete={pallete} {...rest} />
-        {!!label && <LabelStyled valid={valid}>{label}</LabelStyled>}
+        {!!label && <LabelStyled valid={valid}>{valid ? label : ''}</LabelStyled>}
       </ContainerStyled>
     );
   },

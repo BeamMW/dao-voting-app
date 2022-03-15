@@ -31,7 +31,7 @@ export interface ProposalStats {
 export interface ProposalData {
     title: string;
     description: string;
-    quorum: Quorum;
+    quorum?: Quorum;
     forum_link: string;
     ref_link: string;
 }

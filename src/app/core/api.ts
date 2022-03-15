@@ -1,5 +1,6 @@
 import Utils from '@core/utils.js';
 import { CID } from '@app/shared/constants';
+import { ProposalData } from './types';
 
 export function LoadViewParams<T = any>(payload): Promise<T> {
     return new Promise((resolve, reject) => {
@@ -74,19 +75,10 @@ function Base64EncodeUrl(str){
     return str.replace(/\+/g, '-').replace(/\//g, '_').replace(/\=+$/, '');
 }
 
-export function AddProposal<T = any>(): Promise<T> {
+export function AddProposal<T = any>(payload: ProposalData): Promise<T> {
     return new Promise((resolve, reject) => {
-        const propData = JSON.stringify({
-            "title": "test title",
-            "description": "text about proposal 5",
-            "quorum": {
-                "type": "asset",
-                "value": 5000000000
-            },
-            "forum_link": "http://test",
-            "ref_link": "http://ref-link"
-        });
-        const proposal = Base64EncodeUrl(window.btoa(propData));
+        const jsonData = JSON.stringify(payload);
+        const proposal = Base64EncodeUrl(window.btoa(jsonData));
         Utils.invokeContract("role=manager,action=add_proposal,variants=2,text="+proposal+",cid=" + CID, 
         (error, result, full) => {
             console.log('ADD PROPOSAL', error, result, full)
