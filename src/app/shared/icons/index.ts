@@ -23,6 +23,13 @@ import IconAddMax from './icon-add-max.svg';
 import IconAddProposal from './icon-add-proposal.svg';
 import IconCreateProposal from './icon-create-proposal.svg';
 
+import IconExternalLink from './external-link-icon.svg';
+import IconVoteButtonNo from './icon-vote-no-button.svg';
+import IconVoteButtonYes from './icon-vote-yes-button.svg';
+import IconVotedYes from './icon-voted-yes.svg';
+import IconVotedNo from './icon-voted-no.svg';
+import IconChangeDecision from './icon-change-decision.svg';
+
 export {
   IconBack,
   IconReceive,
@@ -48,4 +55,11 @@ export {
   IconAddMax,
   IconAddProposal,
   IconCreateProposal,
+
+  IconVoteButtonNo,
+  IconVoteButtonYes,
+  IconVotedNo,
+  IconVotedYes,
+  IconExternalLink,
+  IconChangeDecision,
 }

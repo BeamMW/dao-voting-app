@@ -1,4 +1,4 @@
-export type Pallete = 'green' | 'ghost' | 'purple' | 'blue' | 'red' | 'white';
+export type Pallete = 'green' | 'ghost' | 'purple' | 'blue' | 'red' | 'white' | 'vote-red';
 
 export type ButtonVariant = 'regular' | 'ghost' | 'ghostBordered' | 'block' | 'link' | 'icon';
 
@@ -39,6 +39,12 @@ export interface ProposalData {
 export interface ProcessedProposal extends InitialProposal{
     stats: ProposalStats;
     data: ProposalData;
+    voted?: number;
+}
+
+export interface ProposalState {
+    items: ProcessedProposal[];
+    is_active: boolean;
 }
 
 export interface VotingAppParams {
@@ -52,6 +58,7 @@ export interface VotingAppParams {
 }
 
 export interface UserViewParams {
+    current_votes?: number[];
     stake_active: number;
     stake_passive: number;
 }

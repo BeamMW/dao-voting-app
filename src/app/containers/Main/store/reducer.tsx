@@ -24,9 +24,18 @@ const initialState: EpochesStateType = {
   is_moderator: false,
   public_key: '',
   proposals: {
-    prev: [],
-    current: [],
-    future: []
+    prev: {
+      items: [],
+      is_active: true,
+    },
+    current: {
+      items: [],
+      is_active: true,
+    },
+    future: {
+      items: [],
+      is_active: false,
+    }
   },
   contractHeight: 0,
   userView: {
@@ -54,13 +63,16 @@ const reducer = createReducer<EpochesStateType, Action>(initialState)
     nexState.public_key = action.payload;
   }))
   .handleAction(actions.setPrevProposals, (state, action) => produce(state, (nexState) => {
-    nexState.proposals.prev = action.payload;
+    nexState.proposals.prev.items = action.payload;
   }))
   .handleAction(actions.setCurrentProposals, (state, action) => produce(state, (nexState) => {
-    nexState.proposals.current = action.payload;
+    nexState.proposals.current.items = action.payload;
   }))
   .handleAction(actions.setFutureProposals, (state, action) => produce(state, (nexState) => {
-    nexState.proposals.future = action.payload;
+    nexState.proposals.future.items = action.payload;
+  }))
+  .handleAction(actions.setProposalsState, (state, action) => produce(state, (nexState) => {
+    nexState.proposals[action.payload.type].is_active = action.payload.is_active;
   }))
   .handleAction(actions.loadAppParams.success, (state, action) => produce(state, (nexState) => {
     nexState.appParams = action.payload;

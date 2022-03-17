@@ -1,7 +1,7 @@
 import { call, put, takeLatest, select } from 'redux-saga/effects';
 import { navigate, setError } from '@app/shared/store/actions';
 import { ROUTES, CID } from '@app/shared/constants';
-import { LoadViewParams, LoadProposals, LoadProposalData, LoadTotals, LoadPublicKey,
+import { LoadViewParams, LoadProposals, LoadProposalData, LoadTotals, LoadPublicKey, LoadVotes,
   LoadManagerView, LoadUserView, LoadModeratorsView } from '@core/api';
 
 import { actions } from '.';
@@ -12,6 +12,7 @@ import { VotingAppParams, ManagerViewData, UserViewParams,
 import { SharedStateType } from '@app/shared/interface';
 import { setIsLoaded } from '@app/shared/store/actions';
 import { EpochesStateType, RateResponse } from '../interfaces';
+import { Base64DecodeUrl } from '@core/appUtils';
 
 const FETCH_INTERVAL = 310000;
 const API_URL = 'https://api.coingecko.com/api/v3/simple/price';
@@ -49,16 +50,13 @@ export function* loadParamsSaga(
         const totals = (yield call(LoadTotals)) as UserViewParams;
         yield put(actions.setTotals(totals));
 
+        const votes = yield call(LoadVotes);
+        console.log('VOTES:', votes)
+
         store.dispatch(actions.loadPoposals.request());
     } catch (e) {
       yield put(actions.loadAppParams.failure(e));
     }
-}
-
-function Base64DecodeUrl(str){
-  if (str.length % 4 != 0)
-    str += ('===').slice(0, 4 - (str.length % 4));
-  return str.replace(/-/g, '+').replace(/_/g, '/');
 }
 
 export function* loadProposalsSaga(
@@ -66,29 +64,29 @@ export function* loadProposalsSaga(
   ): Generator {
     try {
         const initProposals = (yield call(LoadProposals)) as InitialProposal[];
-        const appParams = (yield select()) as {main: EpochesStateType, shared: SharedStateType};
-        //yield call(AddProposal)
-        //yield call(VoteProposal)
-
+        const state = (yield select()) as {main: EpochesStateType, shared: SharedStateType};
+        
         let proposalsData = {
           prev: [],
           current: [],
           next: []
         };
-        const nextEpochProps = appParams.main.appParams.next.proposals;
-        const currentEpochProps = appParams.main.appParams.current.proposals;
+        const nextEpochProps = state.main.appParams.next.proposals;
+        const currentEpochProps = state.main.appParams.current.proposals;
 
         if (nextEpochProps > 0) {
           proposalsData.next = initProposals.splice(initProposals.length - nextEpochProps, nextEpochProps);
 
-          for ( let item of proposalsData.next ) {
-            const proposalRes = (yield call(LoadProposalData, item.id)) as ProposalStats;
-            item['stats'] = proposalRes;
-            item['data'] = {};
-            try {
-              item['data'] = JSON.parse(window.atob(Base64DecodeUrl(item.text)));
-            } catch (e) {
-              console.log(e)
+          if (state.main.proposals.future.is_active) {
+            for ( let item of proposalsData.next ) {
+              const proposalRes = (yield call(LoadProposalData, item.id)) as ProposalStats;
+              item['stats'] = proposalRes;
+              item['data'] = {};
+              try {
+                item['data'] = JSON.parse(window.atob(Base64DecodeUrl(item.text)));
+              } catch (e) {
+                console.log(e)
+              }
             }
           }
         }
@@ -97,34 +95,44 @@ export function* loadProposalsSaga(
         if (currentEpochProps > 0) {
           proposalsData.current = initProposals.splice(initProposals.length - currentEpochProps, currentEpochProps);
 
-          for ( let item of proposalsData.current ) {
-            const proposalRes = (yield call(LoadProposalData, item.id)) as ProposalStats;
-            item['stats'] = proposalRes;
-            item['data'] = {};
-            try {
-              item['data'] = JSON.parse(window.atob(Base64DecodeUrl(item.text)));
-            } catch (e) {
-              console.log(e)
+          if (state.main.proposals.current.is_active) {
+            for (let i = 0; i < proposalsData.current.length; i++) {
+              let item = proposalsData.current[i];
+              const proposalRes = (yield call(LoadProposalData, item.id)) as ProposalStats;
+              item['stats'] = proposalRes;
+              item['data'] = {};
+              try {
+                item['data'] = JSON.parse(window.atob(Base64DecodeUrl(item.text)));
+              } catch (e) {
+                console.log(e)
+              }
+
+              const userViewData = state.main.userView;
+              if (userViewData.current_votes !== undefined && userViewData.current_votes.length > 0) {
+                item['voted'] = state.main.userView.current_votes[i];
+              }
             }
           }
         }
         yield put(actions.setCurrentProposals(proposalsData.current));
 
-        if (!appParams.shared.isLoaded) {
+        if (!state.shared.isLoaded) {
           store.dispatch(setIsLoaded(true));
         }
 
         if (initProposals.length > 0) {
           proposalsData.prev = initProposals;
 
-          for ( let item of proposalsData.prev ) {
-            const proposalRes = (yield call(LoadProposalData, item.id)) as ProposalStats;
-            item['stats'] = proposalRes;
-            item['data'] = {};
-            try {
-              item['data'] = JSON.parse(window.atob(Base64DecodeUrl(item.text)));
-            } catch (e) {
-              console.log(e)
+          if (state.main.proposals.future.is_active) {
+            for ( let item of proposalsData.prev ) {
+              const proposalRes = (yield call(LoadProposalData, item.id)) as ProposalStats;
+              item['stats'] = proposalRes;
+              item['data'] = {};
+              try {
+                item['data'] = JSON.parse(window.atob(Base64DecodeUrl(item.text)));
+              } catch (e) {
+                console.log(e)
+              }
             }
           }
         }

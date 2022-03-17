@@ -169,6 +169,21 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
 
     const currentProposals = useSelector(selectCurrentProposals());
 
+    const [votes, setVotes] = useState(0);
+    
+    useEffect(() => {
+      let count = 0;
+      if (userViewData.current_votes !== undefined) {
+        console.log(userViewData.current_votes)
+        for (let item of userViewData.current_votes) {
+          if (item < 255) {
+            count += 1;
+          }
+        }
+      }
+      setVotes(count);
+    }, [userViewData]);
+
     const handleDeposit = () => {
         depositPopupUpdate(!isDepositVisible);
     };
@@ -229,18 +244,22 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
 
                 <StyledSection>
                     <LeftStatsProgress>
-                      { currentProposals.length > 0 ?
+                      { currentProposals.items.length > 0 ?
                       (<>
                         <div className='progress-title'>Your completed proposals</div>                        
                         <div className='progress'>
-                            <ProgressBar active={true} percent={20}></ProgressBar>
-                            <span className='progress-percentage'>50% (3 of 5)</span>
+                            <ProgressBar active={true} percent={
+                              (votes / currentProposals.items.length) * 100
+                            }></ProgressBar>
+                            <span className='progress-percentage'>
+                              {parseInt((votes / currentProposals.items.length) * 100 + '')}% ({votes} of {currentProposals.items.length})
+                            </span>
                         </div>
                       </>) : null }
                     </LeftStatsProgress>
                     <MiddleStats>
                         <div className='next-epoch-title'>NEXT EPOCH #{appParams.current.iEpoch + 1}</div>
-                        <div className='next-epoch-date'>05.02.2022 - 23.04.2022</div>
+                        {/* <div className='next-epoch-date'>05.02.2022 - 23.04.2022</div> */}
                     </MiddleStats>
                     <Button className={ButtonBottomLinkClass}
                     onClick={() => navigate(ROUTES.MAIN.FUTURE_EPOCHS)}

@@ -4,7 +4,7 @@ export const ROUTES = {
     EPOCHS: '/main/epochs',
     FUTURE_EPOCHS: '/main/future_epochs',
     PREVIOUS_EPOCHS: '/main/previous_epochs',
-    EPOCH_PAGE: '/main/:id'
+    PROPOSAL_PAGE: '/main/proposal'
   },
 };
 
@@ -14,7 +14,7 @@ export const ROUTES_PATH = {
     EPOCHES: '/epochs',
     FUTURE_EPOCHS: '/future_epochs',
     PREVIOUS_EPOCH: '/previous_epochs',
-    EPOCH_PAGE: '/:id'
+    PROPOSAL_PAGE: '/proposal'
   },
   
 };

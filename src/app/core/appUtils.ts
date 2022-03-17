@@ -47,3 +47,13 @@ export function toGroths(value: number): number {
 export function getSign(positive: boolean): string {
   return positive ? '+ ' : '- ';
 }
+
+export function Base64DecodeUrl(str){
+  if (str.length % 4 != 0)
+    str += ('===').slice(0, 4 - (str.length % 4));
+  return str.replace(/-/g, '+').replace(/_/g, '/');
+}
+
+export function Base64EncodeUrl(str){
+  return str.replace(/\+/g, '-').replace(/\//g, '_').replace(/\=+$/, '');
+}

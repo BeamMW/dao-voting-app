@@ -1,11 +1,11 @@
-import { VotingAppParams, UserViewParams, ProcessedProposal } from '@core/types';
+import { VotingAppParams, UserViewParams, ProposalState } from '@core/types';
 
 export interface EpochesStateType {
   appParams: VotingAppParams;
   proposals: {
-    prev: ProcessedProposal[],
-    current: ProcessedProposal[],
-    future: ProcessedProposal[]
+    prev: ProposalState,
+    current: ProposalState,
+    future: ProposalState
   };
   is_moderator: boolean;
   public_key: string;

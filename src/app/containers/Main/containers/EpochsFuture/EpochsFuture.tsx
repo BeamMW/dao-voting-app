@@ -8,7 +8,7 @@ import { Window, Button } from '@app/shared/components';
 import { EpochStatsSection, ProposalsList } from '@app/containers/Main/components';
 import { selectFutureProposals } from '../../store/selectors';
 import { DepositPopup, WithdrawPopup } from '../../components/EpochesBase';
-import { ROUTES } from '@app/shared/constants';
+import { PROPOSALS, ROUTES } from '@app/shared/constants';
 
 const StatsSectionClass = css`
   margin-bottom: 40px;
@@ -37,7 +37,7 @@ const EpochsFuture: React.FC = () => {
           isWithdrawVisible={isDepositVisible}
           withdrawPopupUpdate={(state: boolean)=>setIsWithdrawVisible(state)}
           className={StatsSectionClass} data={true}></EpochStatsSection>
-        <ProposalsList isFuture={true} title='Future proposals' data={futureProposals}></ProposalsList>
+        <ProposalsList type={PROPOSALS.FUTURE} title='Future proposals' data={futureProposals.items}></ProposalsList>
       </Window>
       <DepositPopup visible={isDepositVisible} onCancel={()=>{setIsDepositVisible(false)}}/>
       <WithdrawPopup visible={isWithdrawVisible} onCancel={()=>{setIsWithdrawVisible(false)}}/>

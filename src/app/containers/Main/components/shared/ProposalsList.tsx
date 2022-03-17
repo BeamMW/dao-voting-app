@@ -4,13 +4,14 @@ import { styled } from '@linaria/react';
 import { IconEpochSelector, IconSearch, IconNoProposals } from '@app/shared/icons';
 import { ProcessedProposal } from '@app/core/types';
 import { useNavigate } from 'react-router-dom';
-import { ROUTES } from '@app/shared/constants';
+import { PROPOSALS, ROUTES } from '@app/shared/constants';
 import { useSelector } from 'react-redux';
 import { selectIsLoaded } from '@app/shared/store/selectors';
 
 interface ListProps {
   data: ProcessedProposal[];
   title: string;
+  type: string;
   isFuture?: boolean;
 }
 
@@ -87,7 +88,7 @@ const ListItem = styled.li`
     }
 `;
 
-const NoProposalsClass = css`
+const EmptyListClass = css`
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -103,7 +104,7 @@ const NoProposalsClass = css`
 const ProposalsList: React.FC<ListProps> = ({ 
   data,
   title,
-  isFuture = false
+  type
 }) => {
     const navigate = useNavigate();
     const isLoaded = useSelector(selectIsLoaded());
@@ -131,14 +132,14 @@ const ProposalsList: React.FC<ListProps> = ({
 
     };
 
-    const handleListItemClick = (id: number) => {
-        navigate(`${ROUTES.MAIN.EPOCH_PAGE.replace(':id', '')}${id}`);
+    const handleListItemClick = (id: number, index: number) => {
+        navigate(ROUTES.MAIN.PROPOSAL_PAGE, {state: {id, type, index}});
     }
 
     return (<div>
         <ProposalsHeader>
             <PropTitle>{ title }</PropTitle>
-            { !isFuture ?
+            { type === PROPOSALS.CURRENT ?
             (<div className='selector-class'>
                 {selectorData.map((item, index) => (
                     <SelectorItem key={index} active={selectorActiveItem.id === item.id} 
@@ -157,13 +158,13 @@ const ProposalsList: React.FC<ListProps> = ({
         { data.length > 0 ?
         (<List>
             {data.map((item, index) => (
-                <ListItem data-index={index} key={index} onClick={() => handleListItemClick(item.id)}>
+                <ListItem data-index={index} key={index} onClick={() => handleListItemClick(item.id, index)}>
                     <span className='proposal-id'>#{item.id}</span>
                     <span className='proposal-title'>{item.data.title}</span>
                 </ListItem>
             ))}
         </List>) :
-        (isLoaded ? <div className={NoProposalsClass}>
+        (isLoaded ? <div className={EmptyListClass}>
             <IconNoProposals/>
             <div className='title-class'>There are no proposals</div>
         </div> : null)

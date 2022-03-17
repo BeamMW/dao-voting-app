@@ -16,6 +16,7 @@ css`
       --color-gray: #8196a4;
       --color-white: white;
       --color-disconnect: #ff746b;
+      --color-vote-red: #de3155;
 
       --color-popup: rgba(13, 77, 118);
       --color-select: #184469;

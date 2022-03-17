@@ -2,7 +2,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { styled } from '@linaria/react';
 import { Button, Input, Popup, Toggle } from '@app/shared/components';
-import { IconCancel, IconCreateProposal } from '@app/shared/icons';
+import { IconCancel, IconCreateProposal, IconBeamx } from '@app/shared/icons';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { selectAppParams, selectTotalsView } from '@app/containers/Main/store/selectors';
@@ -11,7 +11,6 @@ import { useFormik } from 'formik';
 import { fromGroths } from '@core/appUtils';
 import { AddProposal, UserDeposit } from '@core/api';
 import { css } from '@linaria/core';
-import { IconBeamx } from '@app/shared/icons';
 import { ProposalData } from '@app/core/types';
 
 interface NewProposalPopupProps {
@@ -155,8 +154,6 @@ const ErrorLineClass = css`
 `;
 
 const NewProposalPopup: React.FC<NewProposalPopupProps> = ({ visible, onCancel }) => {
-    const inputRef = useRef<HTMLInputElement>();
-    const [warned, setWarned] = useState(false);
     const dispatch = useDispatch();
     const error = useSelector(selectErrorMessage());
     const appParams = useSelector(selectAppParams());

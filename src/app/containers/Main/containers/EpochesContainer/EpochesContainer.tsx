@@ -6,7 +6,7 @@ import {
   EpochesBase,
   EpochsFuture,
   EpochsPrevious,
-  EpochPage
+  ProposalPage
 } from '@app/containers/Main/containers';
 
 const routes = [
@@ -26,8 +26,8 @@ const routes = [
     exact: true,
   },
   {
-    path: ROUTES_PATH.MAIN.EPOCH_PAGE,
-    element: <EpochPage />,
+    path: ROUTES_PATH.MAIN.PROPOSAL_PAGE,
+    element: <ProposalPage />,
     exact: true,
   }
 ];
