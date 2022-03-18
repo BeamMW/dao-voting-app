@@ -7,7 +7,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Window, Button } from '@app/shared/components';
 import { EpochStatsSection, ProposalsList } from '@app/containers/Main/components';
 import { selectFutureProposals } from '../../store/selectors';
-import { DepositPopup, WithdrawPopup } from '../../components/EpochesBase';
 import { PROPOSALS, ROUTES } from '@app/shared/constants';
 
 const StatsSectionClass = css`
@@ -17,10 +16,6 @@ const StatsSectionClass = css`
 const EpochsFuture: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
-  const [isDepositVisible, setIsDepositVisible] = useState(false);
-  const [isWithdrawVisible, setIsWithdrawVisible] = useState(false);
-
   const futureProposals = useSelector(selectFutureProposals());
 
   const handlePrevious: React.MouseEventHandler = () => {
@@ -30,17 +25,10 @@ const EpochsFuture: React.FC = () => {
   return (
     <>
       <Window onPrevious={handlePrevious}>
-        <EpochStatsSection
-          isWithProgress={false}
-          isDepositVisible={isDepositVisible}
-          depositPopupUpdate={(state: boolean)=>setIsDepositVisible(state)}
-          isWithdrawVisible={isDepositVisible}
-          withdrawPopupUpdate={(state: boolean)=>setIsWithdrawVisible(state)}
+        <EpochStatsSection isWithProgress={false}
           className={StatsSectionClass} data={true}></EpochStatsSection>
         <ProposalsList type={PROPOSALS.FUTURE} title='Future proposals' data={futureProposals.items}></ProposalsList>
       </Window>
-      <DepositPopup visible={isDepositVisible} onCancel={()=>{setIsDepositVisible(false)}}/>
-      <WithdrawPopup visible={isWithdrawVisible} onCancel={()=>{setIsWithdrawVisible(false)}}/>
     </>
   );
 };

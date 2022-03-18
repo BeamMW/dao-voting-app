@@ -8,6 +8,7 @@ export const setTotals = createAction('@@MAIN/SET_TOTALS')<UserViewParams>();
 export const setIsModerator = createAction('@@MAIN/SET_IS_MODERATOR')<boolean>();
 export const setPublicKey = createAction('@@MAIN/SET_PUBLIC_KEY')<string>();
 export const setProposalsState = createAction('@@MAIN/SET_PROPOSALS_STATE')<{is_active: boolean, type: string}>();
+export const setPopupState = createAction('@@MAIN/SET_POPUP_STATE')<{type: string, state: boolean}>();
 
 export const loadAppParams = createAsyncAction(
     '@@MAIN/LOAD_PARAMS',

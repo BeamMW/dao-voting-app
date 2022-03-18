@@ -9,17 +9,14 @@ import ExpiresTimer  from './ExpiresTimer';
 import { useDispatch, useSelector } from 'react-redux';
 import { Window, Button, ProgressBar } from '@app/shared/components';
 import { selectSystemState } from '@app/shared/store/selectors';
-import { selectAppParams, selectTotalsView, selectCurrentProposals,
+import { selectAppParams, selectTotalsView, selectCurrentProposals, selectPopupsState,
   selectContractHeight, selectUserView } from '@app/containers/Main/store/selectors';
 import { fromGroths } from '@core/appUtils';
+import { setPopupState } from '@app/containers/Main/store/actions';
 
 interface SeedListProps {
   data: any;
   className?: string;
-  depositPopupUpdate: (state: boolean)=>void;
-  isDepositVisible: boolean;
-  withdrawPopupUpdate: (state: boolean)=>void;
-  isWithdrawVisible: boolean;
   isWithProgress?: boolean;
 }
 
@@ -151,10 +148,6 @@ const WithdrawClass = css`
 
 const EpochStatsSection: React.FC<SeedListProps> = ({
   data,
-  depositPopupUpdate,
-  isDepositVisible,
-  withdrawPopupUpdate,
-  isWithdrawVisible,
   className,
   isWithProgress = true
 }) => {
@@ -166,9 +159,9 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
     const cHeight = useSelector(selectContractHeight());
     const userViewData = useSelector(selectUserView());
     const totalsView = useSelector(selectTotalsView());
+    const popupsState = useSelector(selectPopupsState());
 
     const currentProposals = useSelector(selectCurrentProposals());
-
     const [votes, setVotes] = useState(0);
     
     useEffect(() => {
@@ -185,12 +178,16 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
     }, [userViewData]);
 
     const handleDeposit = () => {
-        depositPopupUpdate(!isDepositVisible);
+      dispatch(setPopupState({type: 'deposit', state: !popupsState.deposit}));
     };
 
     const handleWithdraw = () => {
-        withdrawPopupUpdate(!isWithdrawVisible);
+      dispatch(setPopupState({type: 'withdraw', state: !popupsState.withdraw}));
     };
+
+    const handlePkey = () => {
+      dispatch(setPopupState({type: 'pkey', state: !popupsState.pkey}));
+    }
 
     return (
         <StyledStats className={className}>
@@ -204,18 +201,19 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
                         <SubSectionTitle>Total value locked</SubSectionTitle>
                         <SubSectionValue>
                             <IconBeamx/>
-                            <span>{fromGroths(totalsView.stake_active)} BEAMX</span>
+                            <span>{fromGroths(totalsView.stake_active + totalsView.stake_passive)} BEAMX</span>
                         </SubSectionValue>
                     </StyledTotalLocked>
                     <StyledStaked>
                         <SubSectionTitle>Your staked</SubSectionTitle>
                         <SubSectionValue>
                             <IconBeamx/>
-                            <span>{fromGroths(userViewData.stake_active)} BEAMX</span>
+                            <span>{fromGroths(userViewData.stake_active + userViewData.stake_passive)} BEAMX</span>
                         </SubSectionValue>
                         { totalsView.stake_active > 0 ?
                         (<div className='voting-power-class'>
-                          Voting power is {parseInt(userViewData.stake_active / totalsView.stake_active * 100 + '')}%
+                          Voting power is {parseInt((userViewData.stake_active + userViewData.stake_passive) 
+                            / (totalsView.stake_active + totalsView.stake_passive )* 100 + '')}%
                         </div>)
                         : null }
                     </StyledStaked>
@@ -235,7 +233,12 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
                         withdraw
                     </Button>
                 </MiddleStats>
-                <Button className={ButtonLinkClass} pallete='green' variant='link'>Show my public key</Button>
+                <Button className={ButtonLinkClass}
+                onClick={handlePkey}
+                pallete='green'
+                variant='link'>
+                  Show my public key
+                </Button>
             </StyledSection>
 
             { isWithProgress ?

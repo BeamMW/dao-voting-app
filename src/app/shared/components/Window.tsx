@@ -4,9 +4,10 @@ import Utils from '@core/utils.js';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@app/shared/constants';
 import { IconBackWindow, IconAddProposal } from '@app/shared/icons';
-import { useSelector } from 'react-redux';
-import { selectAppParams, selectIsModerator } from '@app/containers/Main/store/selectors';
-import { NewProposalPopup, Button } from './';
+import { useSelector, useDispatch } from 'react-redux';
+import { selectAppParams, selectIsModerator, selectPopupsState } from '@app/containers/Main/store/selectors';
+import { NewProposalPopup, Button, DepositPopup, WithdrawPopup, PublicKeyPopup } from './';
+import { setPopupState } from '@app/containers/Main/store/actions';
 
 interface WindowProps {
   onPrevious?: React.MouseEventHandler | undefined;
@@ -59,10 +60,12 @@ const Window: React.FC<WindowProps> = ({
 }) => {
   const navigate = useNavigate();
   const rootRef = useRef();
+  const dispatch = useDispatch();
 
   const [isNewProposalVisible, setIsNewProposalVisible] = useState(false);
   const appParams = useSelector(selectAppParams());
   const isModerator = useSelector(selectIsModerator());
+  const popupsState = useSelector(selectPopupsState());
 
   const titleClicked = () => {
     navigate(ROUTES.MAIN.EPOCHS);
@@ -77,24 +80,36 @@ const Window: React.FC<WindowProps> = ({
   };
   
   return (
-    <Container bgColor={Utils.getStyles().background_main} ref={rootRef}>
-      <StyledTitle>
-        <TitleValue onClick={titleClicked}>Voting</TitleValue>
-        {appParams.is_admin || isModerator ?
-        <Button className='new-button-class' variant='ghostBordered' pallete='green'
-        onClick={()=>handleNewProposal()}
-        icon={IconAddProposal}>create new proposal</Button> : null}
-      </StyledTitle>
-      { onPrevious ? (
-      <BackStyled>
-        <div className='control' onClick={onPrevious}>
-          <IconBackWindow/>
-          <span className='control-text'>back</span>
-        </div>
-      </BackStyled>) : null}
-      { children }
-      <NewProposalPopup visible={isNewProposalVisible} onCancel={()=>{hideNewProposalPopup()}}/>
-    </Container>
+    <>
+      <Container bgColor={Utils.getStyles().background_main} ref={rootRef}>
+        <StyledTitle>
+          <TitleValue onClick={titleClicked}>Voting</TitleValue>
+          {appParams.is_admin || isModerator ?
+          <Button className='new-button-class' variant='ghostBordered' pallete='green'
+          onClick={()=>handleNewProposal()}
+          icon={IconAddProposal}>create new proposal</Button> : null}
+        </StyledTitle>
+        { onPrevious ? (
+        <BackStyled>
+          <div className='control' onClick={onPrevious}>
+            <IconBackWindow/>
+            <span className='control-text'>back</span>
+          </div>
+        </BackStyled>) : null}
+        { children }
+        <NewProposalPopup visible={isNewProposalVisible} onCancel={()=>{hideNewProposalPopup()}}/>
+      </Container>
+
+      <DepositPopup visible={popupsState.deposit} onCancel={()=>{
+       dispatch(setPopupState({type: 'deposit', state: false}));
+      }}/>
+      <WithdrawPopup visible={popupsState.withdraw} onCancel={()=>{
+       dispatch(setPopupState({type: 'withdraw', state: false}));
+      }}/>
+      <PublicKeyPopup visible={popupsState.pkey} onCancel={()=>{
+       dispatch(setPopupState({type: 'pkey', state: false}));
+      }}/>
+    </>
   );
 };
 

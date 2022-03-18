@@ -13,4 +13,9 @@ export interface EpochesStateType {
   userView: UserViewParams;
   totalsView: UserViewParams;
   rate: number;
+  popupsState: {
+    deposit: boolean;
+    withdraw: boolean;
+    pkey: boolean;
+  }
 }

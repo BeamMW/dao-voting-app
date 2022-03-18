@@ -47,6 +47,11 @@ const initialState: EpochesStateType = {
     stake_passive: 0
   },
   rate: 0,
+  popupsState: {
+    withdraw: false,
+    deposit: false,
+    pkey: false
+  }
 };
 
 const reducer = createReducer<EpochesStateType, Action>(initialState)
@@ -85,6 +90,9 @@ const reducer = createReducer<EpochesStateType, Action>(initialState)
   }))
   .handleAction(actions.loadContractInfo.success, (state, action) => produce(state, (nexState) => {
     nexState.contractHeight = action.payload;
+  }))
+  .handleAction(actions.setPopupState, (state, action) => produce(state, (nexState) => {
+    nexState.popupsState[action.payload.type] = action.payload.state;
   }));
 
 export { reducer as MainReducer };

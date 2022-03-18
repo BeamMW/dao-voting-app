@@ -16,7 +16,6 @@ import {
   IconVotedNo,
   IconChangeDecision,
 } from '@app/shared/icons';
-import { DepositPopup, WithdrawPopup } from '../../components/EpochesBase';
 import { useParams } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import { PROPOSALS, ROUTES } from '@app/shared/constants';
@@ -117,8 +116,6 @@ const ProposalPage: React.FC = () => {
     }
   }, [dispatch, rate]);
 
-  const [isDepositVisible, setIsDepositVisible] = useState(false);
-  const [isWithdrawVisible, setIsWithdrawVisible] = useState(false);
   const params = useParams();
   const state = location.state as { id: number, type: string, index: number};
   const proposal = useSelector(selectProposal(state.id, state.type));
@@ -170,10 +167,6 @@ const ProposalPage: React.FC = () => {
       <Window onPrevious={handlePrevious}>
         <EpochStatsSection
           isWithProgress={false}
-          isDepositVisible={isDepositVisible}
-          depositPopupUpdate={(state: boolean)=>setIsDepositVisible(state)}
-          isWithdrawVisible={isDepositVisible}
-          withdrawPopupUpdate={(state: boolean)=>setIsWithdrawVisible(state)}
           className={StatsSectionClass} data={true}></EpochStatsSection>
         <Proposal>
           <HeaderStyled>
@@ -213,8 +206,6 @@ const ProposalPage: React.FC = () => {
           </ContentStyled>
         </Proposal>
       </Window>
-      <DepositPopup visible={isDepositVisible} onCancel={()=>{setIsDepositVisible(false)}}/>
-      <WithdrawPopup visible={isWithdrawVisible} onCancel={()=>{setIsWithdrawVisible(false)}}/>
     </>
   );
 };

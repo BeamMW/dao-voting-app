@@ -8,3 +8,6 @@ export { default as AmountInput } from './AmountInput';
 export { default as Rate } from './Rate';
 export { default as NewProposalPopup } from './NewProposalPopup';
 export { default as Toggle } from './Toggle';
+export { default as DepositPopup } from './DepositPopup';
+export { default as WithdrawPopup } from './WithdrawPopup';
+export { default as PublicKeyPopup } from './PublicKeyPopup';

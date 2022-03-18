@@ -17,3 +17,5 @@ export const selectPrevProposals = () => createSelector(selectMain, (state) => s
 export const selectCurrentProposals= () => createSelector(selectMain, (state) => state.proposals.current);
 export const selectFutureProposals = () => createSelector(selectMain, (state) => state.proposals.future);
 export const selectRate = () => createSelector(selectMain, (state) => state.rate);
+export const selectPopupsState = () => createSelector(selectMain, 
+    (state) => state.popupsState);
