@@ -1,8 +1,8 @@
 import IconBack from './icon-back.svg';
 import IconReceive from './icon-receive-blue.svg';
 import IconSend from './icon-send-blue.svg';
-import IconCopy from './icon-copy-blue.svg';
-import IconCopyWhite from './icon-copy.svg';
+import IconCopyBlue from './icon-copy-blue.svg';
+import IconCopyWhite from './icon-copy-white.svg';
 import IconReceived from './icon-received.svg';
 import IconLogout from './icon-logout.svg';
 import IconCancel from './icon-cancel.svg';
@@ -34,7 +34,7 @@ export {
   IconBack,
   IconReceive,
   IconSend,
-  IconCopy,
+  IconCopyBlue,
   IconCopyWhite,
   IconReceived,
   IconLogout,

@@ -19,3 +19,5 @@ export const selectFutureProposals = () => createSelector(selectMain, (state) =>
 export const selectRate = () => createSelector(selectMain, (state) => state.rate);
 export const selectPopupsState = () => createSelector(selectMain, 
     (state) => state.popupsState);
+export const selectPublicKey = () => createSelector(selectMain, 
+    (state) => state.public_key);

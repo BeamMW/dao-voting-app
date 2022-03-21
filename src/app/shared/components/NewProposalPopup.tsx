@@ -390,7 +390,7 @@ const NewProposalPopup: React.FC<NewProposalPopupProps> = ({ visible, onCancel }
                     <InputTitle>Total value locked</InputTitle>
                     <div className='beamx'>
                         <IconBeamx/>
-                        <span>{fromGroths(totals.stake_passive)} BEAMX</span>
+                        <span>{fromGroths(totals.stake_passive + totals.stake_active)} BEAMX</span>
                     </div>
                 </div>
             </div>
