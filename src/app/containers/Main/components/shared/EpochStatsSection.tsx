@@ -9,8 +9,14 @@ import ExpiresTimer  from './ExpiresTimer';
 import { useDispatch, useSelector } from 'react-redux';
 import { Window, Button, ProgressBar } from '@app/shared/components';
 import { selectSystemState } from '@app/shared/store/selectors';
-import { selectAppParams, selectTotalsView, selectCurrentProposals, selectPopupsState,
-  selectContractHeight, selectUserView } from '@app/containers/Main/store/selectors';
+import {
+  selectAppParams,
+  selectTotalsView,
+  selectCurrentProposals,
+  selectPopupsState,
+  selectContractHeight,
+  selectBlocksLeft,
+  selectUserView } from '@app/containers/Main/store/selectors';
 import { fromGroths } from '@core/appUtils';
 import { setPopupState } from '@app/containers/Main/store/actions';
 
@@ -160,9 +166,11 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
     const userViewData = useSelector(selectUserView());
     const totalsView = useSelector(selectTotalsView());
     const popupsState = useSelector(selectPopupsState());
+    const blocksLeft = useSelector(selectBlocksLeft());
 
     const currentProposals = useSelector(selectCurrentProposals());
     const [votes, setVotes] = useState(0);
+    const [nextEpochDate, setNextEpochStartDate] = useState(null);
     
     useEffect(() => {
       let count = 0;
@@ -176,6 +184,18 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
       }
       setVotes(count);
     }, [userViewData]);
+
+    useEffect(() => {
+      let timestamp = systemState.current_state_timestamp * 1000 + blocksLeft * 60000;
+      const currentTime = new Date(timestamp);
+      const dateFromString = ('0' + currentTime.getDate()).slice(-2) + '.' 
+        + ('0' + (currentTime.getMonth()+1)).slice(-2) + '.' + currentTime.getFullYear();
+      timestamp = timestamp + appParams.epoch_dh * 60000;
+      const currentPlusOne = new Date(timestamp);
+      const dateToString = ('0' + currentPlusOne.getDate()).slice(-2) + '.'
+      + ('0' + (currentPlusOne.getMonth()+1)).slice(-2) + '.' + currentPlusOne.getFullYear();
+      setNextEpochStartDate(`${dateFromString} - ${dateToString}`);
+    }, [blocksLeft]);
 
     const handleDeposit = () => {
       dispatch(setPopupState({type: 'deposit', state: !popupsState.deposit}));
@@ -262,7 +282,7 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
                     </LeftStatsProgress>
                     <MiddleStats>
                         <div className='next-epoch-title'>NEXT EPOCH #{appParams.current.iEpoch + 1}</div>
-                        {/* <div className='next-epoch-date'>05.02.2022 - 23.04.2022</div> */}
+                        <div className='next-epoch-date'>{nextEpochDate}</div>
                     </MiddleStats>
                     <Button className={ButtonBottomLinkClass}
                     onClick={() => navigate(ROUTES.MAIN.FUTURE_EPOCHS)}

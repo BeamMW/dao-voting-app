@@ -33,8 +33,8 @@ export function* loadParamsSaga(
         const userView = (yield call(LoadUserView)) as UserViewParams;
         yield put(actions.setUserView(userView));
         
-        const appParams = (yield select()) as {main: EpochesStateType, shared: SharedStateType};
-        if (!appParams.shared.isLoaded) {
+        const state = (yield select()) as {main: EpochesStateType, shared: SharedStateType};
+        if (!state.shared.isLoaded) {
           yield put(navigate(ROUTES.MAIN.EPOCHS));
         }
 
@@ -151,6 +151,14 @@ export function* loadContractInfoSaga(
         const contract = managerViewData.contracts.find((item)=>item.cid === CID);
         if (contract) {
             yield put(actions.loadContractInfo.success(contract.Height));
+        }
+
+        const state = (yield select()) as {main: EpochesStateType, shared: SharedStateType};
+        const blocksLeft = state.main.appParams.epoch_dh * state.main.appParams.current.iEpoch 
+          + contract.Height - state.shared.systemState.current_height;
+
+        if (blocksLeft > 0) {
+          yield put(actions.setBlocksLeft(blocksLeft));
         }
     } catch (e) {
       yield put(actions.loadContractInfo.failure(e));

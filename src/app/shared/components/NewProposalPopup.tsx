@@ -49,7 +49,7 @@ const NewProposalForm = styled.form`
         width: 100%;
 
         > .epoch-part {
-            width: 14%;
+            width: 16%;
 
             > .epoch-number {
                 padding: 13px;

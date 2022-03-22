@@ -7,6 +7,7 @@ export interface EpochesStateType {
     current: ProposalState,
     future: ProposalState
   };
+  blocks_left: number;
   is_moderator: boolean;
   public_key: string;
   contractHeight: number;

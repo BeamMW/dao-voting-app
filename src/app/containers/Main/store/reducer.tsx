@@ -23,6 +23,7 @@ const initialState: EpochesStateType = {
   },
   is_moderator: false,
   public_key: '',
+  blocks_left: null,
   proposals: {
     prev: {
       items: [],
@@ -93,6 +94,9 @@ const reducer = createReducer<EpochesStateType, Action>(initialState)
   }))
   .handleAction(actions.setPopupState, (state, action) => produce(state, (nexState) => {
     nexState.popupsState[action.payload.type] = action.payload.state;
+  }))
+  .handleAction(actions.setBlocksLeft, (state, action) => produce(state, (nexState) => {
+    nexState.blocks_left = action.payload;
   }));
 
 export { reducer as MainReducer };

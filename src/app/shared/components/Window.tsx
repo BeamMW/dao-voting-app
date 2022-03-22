@@ -27,6 +27,7 @@ const StyledTitle = styled.div`
   margin-bottom: 20px;
 
   > .new-button-class {
+    max-width: 270px !important;
     position: absolute !important;
     right: 20px !important;
     top: 30px !important;

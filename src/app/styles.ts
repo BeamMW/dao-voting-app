@@ -103,7 +103,7 @@ css`
     }
 
     html * {
-      font-family: 'ProximaNova', sans-serif;
+      font-family: 'SFProDisplay', sans-serif;
     }
 
     body {

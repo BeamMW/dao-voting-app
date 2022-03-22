@@ -21,3 +21,4 @@ export const selectPopupsState = () => createSelector(selectMain,
     (state) => state.popupsState);
 export const selectPublicKey = () => createSelector(selectMain, 
     (state) => state.public_key);
+export const selectBlocksLeft = () => createSelector(selectMain, (state) => state.blocks_left);

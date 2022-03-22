@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { styled } from '@linaria/react';
 import { ClockCircular, ClockCircularExpires } from '@app/shared/icons';
 import { SystemState, VotingAppParams } from '@app/core/types';
+import { selectBlocksLeft } from '@app/containers/Main/store/selectors';
+import { useSelector } from 'react-redux';
 
 interface SitesProps {
   appParams: VotingAppParams;
@@ -34,11 +36,11 @@ const ExpiresTimer: React.FC<SitesProps> = ({
 }) => {
     const [expiresData, setExpiresData] = useState('');
     const [timeLeft, setTimeLeft] = useState({h: null, m: null});
+    const blocksLeft = useSelector(selectBlocksLeft());
 
     useEffect(
       () => {
-        const blocksLeft = appParams.epoch_dh * appParams.current.iEpoch + cHeight - 1 - systemState.current_height;
-        if (blocksLeft > 0) {
+        if (blocksLeft) {
           const d = Math.floor(blocksLeft / (60*24));
           const h = Math.floor(blocksLeft % (60*24) / 60);
           const m = Math.floor(blocksLeft % 60);
@@ -47,7 +49,7 @@ const ExpiresTimer: React.FC<SitesProps> = ({
           setExpiresData(`${d} d ${h} h ${m} m`);
         }
       },
-      [cHeight, systemState],
+      [blocksLeft],
     );
 
     return expiresData.length ? (
