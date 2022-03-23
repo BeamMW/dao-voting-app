@@ -49,7 +49,7 @@ const NewProposalForm = styled.form`
         width: 100%;
 
         > .epoch-part {
-            width: 16%;
+            width: 20%;
 
             > .epoch-number {
                 padding: 13px;
@@ -174,12 +174,13 @@ const NewProposalPopup: React.FC<NewProposalPopupProps> = ({ visible, onCancel }
         onSubmit: (value) => {
             submitHandle();
             onCancel();
+            resetForm();
         },
         validate: (e) => validate(e),
     });
 
     const {
-        values, setFieldValue, errors, submitForm,
+        values, setFieldValue, errors, submitForm, resetForm,
     } = formik;
 
     const validate = async (formValues: NewProposalFormData) => {
@@ -202,7 +203,7 @@ const NewProposalPopup: React.FC<NewProposalPopupProps> = ({ visible, onCancel }
         } else {
             const quorumValue = parseInt(quorum_limit);
             if (quorumValue > 0) {
-                if ((!activeToggle && quorumValue > fromGroths(totals.stake_passive)) ||
+                if ((!activeToggle && quorumValue > fromGroths(totals.stake_active)) ||
                 (activeToggle && (quorumValue > 100 || quorumValue < 0))) {
                     errorsValidation.quorum_limit = 'Incorrect amount.'
                 }
@@ -216,14 +217,11 @@ const NewProposalPopup: React.FC<NewProposalPopupProps> = ({ visible, onCancel }
         if (forum_link.length === 0) {
             errorsValidation.forum_link = 'Required field.';
         }
-        if (!REG_URL.test(forum_link)) {
+        if (!REG_URL.test(forum_link) && forum_link.length > 0) {
             errorsValidation.forum_link = 'Incorrect link format.';
         }
 
-        if (ref_link.length === 0) {
-            errorsValidation.ref_link = 'Required field.';
-        }
-        if (!REG_URL.test(ref_link)) {
+        if (!REG_URL.test(ref_link) && ref_link.length > 0) {
             errorsValidation.ref_link = 'Incorrect link format.';
         }
 
@@ -324,17 +322,25 @@ const NewProposalPopup: React.FC<NewProposalPopupProps> = ({ visible, onCancel }
       visible={visible}
       title="New proposal"
       cancelButton={(
-        <Button className={NewProposalButtonsClass} variant="ghost" icon={IconCancel} onClick={onCancel}>
+        <Button className={NewProposalButtonsClass} variant="ghost" icon={IconCancel} onClick={() => {
+            onCancel();
+            resetForm();
+        }}>
           cancel
         </Button>
       )}
       confirmButton={(
         <Button className={NewProposalButtonsClass} variant="regular"
-        pallete='green' icon={IconCreateProposal} disabled={isFormDisabled()} onClick={submitForm}>
+        pallete='green' icon={IconCreateProposal} disabled={isFormDisabled()} onClick={() => {
+            submitForm();
+        }}>
           create
         </Button>
       )}
-      onCancel={onCancel}
+      onCancel={() => {
+        onCancel();
+        resetForm();
+    }}
     >
         <NewProposalForm onSubmit={submitForm}>
             <div className='title-segment'>
@@ -390,7 +396,7 @@ const NewProposalPopup: React.FC<NewProposalPopupProps> = ({ visible, onCancel }
                     <InputTitle>Total value locked</InputTitle>
                     <div className='beamx'>
                         <IconBeamx/>
-                        <span>{fromGroths(totals.stake_passive + totals.stake_active)} BEAMX</span>
+                        <span>{fromGroths(totals.stake_active)} BEAMX</span>
                     </div>
                 </div>
             </div>

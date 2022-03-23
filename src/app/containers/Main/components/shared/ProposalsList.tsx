@@ -71,11 +71,21 @@ const EpochSelector = styled.span`
 `;
 
 const ListItem = styled.li`
-    padding: 20px;
     background-color: rgba(255, 255, 255, .05);
     margin-top: 10px;
     border-radius: 10px;
     cursor: pointer;
+    overflow: hidden;
+`;
+
+const StyledItemHeader = styled.div`
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, .05);
+    display: flex;
+    flex-direction: row;
+    width: 100%;
 
     > .proposal-id {
         font-size: 12px;
@@ -85,6 +95,7 @@ const ListItem = styled.li`
     > .proposal-title {
         margin-left: 20px;
         font-size: 16px;
+        font-weight: 700;
     }
 `;
 
@@ -99,6 +110,17 @@ const EmptyListClass = css`
         font-size: 14px;
         color: rgba(255, 255, 255, .5);
     }
+`;
+
+const PendingVote = styled.div`
+    margin-left: auto;
+    width: 96px;
+    height: 19px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 14px;
+    padding: 1px 10px;
+    font-weight: 400;
+    font-size: 14px;
 `;
 
 const ProposalsList: React.FC<ListProps> = ({ 
@@ -122,6 +144,8 @@ const ProposalsList: React.FC<ListProps> = ({
             title: 'YOUR VOTES'
         }
     ];
+
+    console.log(data);
 
     const [selectorActiveItem, setSelectorItem] = useState(selectorData[0]);
     const handleSelectorClick: React.MouseEventHandler<HTMLLIElement> = ({ currentTarget }) => {
@@ -159,8 +183,12 @@ const ProposalsList: React.FC<ListProps> = ({
         (<List>
             {data.map((item, index) => (
                 <ListItem data-index={index} key={index} onClick={() => handleListItemClick(item.id, index)}>
-                    <span className='proposal-id'>#{item.id}</span>
-                    <span className='proposal-title'>{item.data.title}</span>
+                    <StyledItemHeader>
+                        <span className='proposal-id'>#{item.id}</span>
+                        <span className='proposal-title'>{item.data.title}</span>
+
+                        <PendingVote>pending vote</PendingVote>
+                    </StyledItemHeader>
                 </ListItem>
             ))}
         </List>) :

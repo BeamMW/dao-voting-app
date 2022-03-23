@@ -175,7 +175,6 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
     useEffect(() => {
       let count = 0;
       if (userViewData.current_votes !== undefined) {
-        console.log(userViewData.current_votes)
         for (let item of userViewData.current_votes) {
           if (item < 255) {
             count += 1;
@@ -221,19 +220,19 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
                         <SubSectionTitle>Total value locked</SubSectionTitle>
                         <SubSectionValue>
                             <IconBeamx/>
-                            <span>{fromGroths(totalsView.stake_active + totalsView.stake_passive)} BEAMX</span>
+                            <span>{fromGroths(totalsView.stake_active)} BEAMX</span>
                         </SubSectionValue>
                     </StyledTotalLocked>
                     <StyledStaked>
                         <SubSectionTitle>Your staked</SubSectionTitle>
                         <SubSectionValue>
                             <IconBeamx/>
-                            <span>{fromGroths(userViewData.stake_active + userViewData.stake_passive)} BEAMX</span>
+                            <span>{fromGroths(userViewData.stake_active)} BEAMX</span>
                         </SubSectionValue>
                         { totalsView.stake_active > 0 ?
                         (<div className='voting-power-class'>
-                          Voting power is {parseInt((userViewData.stake_active + userViewData.stake_passive) 
-                            / (totalsView.stake_active + totalsView.stake_passive )* 100 + '')}%
+                          Voting power is {parseInt((userViewData.stake_active) 
+                            / (totalsView.stake_active)* 100 + '')}%
                         </div>)
                         : null }
                     </StyledStaked>

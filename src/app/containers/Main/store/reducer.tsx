@@ -27,7 +27,7 @@ const initialState: EpochesStateType = {
   proposals: {
     prev: {
       items: [],
-      is_active: true,
+      is_active: false,
     },
     current: {
       items: [],
