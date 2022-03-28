@@ -1,16 +1,16 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Button, AmountInput, Popup, Rate } from '@app/shared/components';
 import { IconCancel, IconWithdrawBlue, IconAddMax } from '@app/shared/icons';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectErrorMessage } from '@app/shared/store/selectors';
+import { selectErrorMessage, selectSystemState } from '@app/shared/store/selectors';
 import { useFormik } from 'formik';
 import { toGroths, fromGroths } from '@core/appUtils';
 import { UserWithdraw } from '@core/api';
 import { styled } from '@linaria/react';
 import { css } from '@linaria/core';
 import { selectUserView } from '@app/containers/Main/store/selectors';
-
+import { selectAppParams, selectBlocksLeft } from '@app/containers/Main/store/selectors';
 interface WithdrawPopupProps {
   visible?: boolean;
   onCancel?: ()=>void;
@@ -99,6 +99,22 @@ const WithdrawPopup: React.FC<WithdrawPopupProps> = ({ visible, onCancel }) => {
   const dispatch = useDispatch();
   const error = useSelector(selectErrorMessage());
   const userViewData = useSelector(selectUserView());
+  const appParams = useSelector(selectAppParams());
+  const [nextEpochDate, setNextEpochStartDate] = useState(null);
+  const systemState = useSelector(selectSystemState());
+  const blocksLeft = useSelector(selectBlocksLeft());
+
+  useEffect(() => {
+    let timestamp = systemState.current_state_timestamp * 1000 - (appParams.epoch_dh - blocksLeft) * 60000;
+    const currentTime = new Date(timestamp);
+    const dateFromString = currentTime.getDate() + ' '
+    + currentTime.toLocaleString('default', { month: 'short' });
+    timestamp = timestamp + appParams.epoch_dh * 60000;
+    const currentPlusOne = new Date(timestamp);
+    const dateToString = currentPlusOne.getDate() + ' '
+      + currentPlusOne.toLocaleString('default', { month: 'short' });
+    setNextEpochStartDate(`${dateFromString} - ${dateToString}, ${currentPlusOne.getFullYear().toString().substr(-2)}`);
+  }, [blocksLeft]);
 
   const formik = useFormik<WithdrawFormData>({
     initialValues: {
@@ -165,8 +181,8 @@ const WithdrawPopup: React.FC<WithdrawPopupProps> = ({ visible, onCancel }) => {
             <Rate value={0.0011} className='fee-rate'/>
         </FeeContainer>
         <InfoContainer>
-            <div>Withdrawing will decrease your voting power in current epoch #16</div>
-            <div>(17 Jan - 1 Feb, 22)</div>
+            <div>Withdrawing will decrease your voting power in current epoch #{appParams.current.iEpoch}</div>
+            <div>({nextEpochDate})</div>
         </InfoContainer>
     </Popup>
   );

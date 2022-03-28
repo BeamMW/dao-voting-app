@@ -1,15 +1,16 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { styled } from '@linaria/react';
 import { Button, AmountInput, Popup, Rate } from '@app/shared/components';
 import { IconCancel, IconDepositBlue } from '@app/shared/icons';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { selectErrorMessage } from '@app/shared/store/selectors';
+import { selectErrorMessage, selectSystemState } from '@app/shared/store/selectors';
 import { useFormik } from 'formik';
 import { toGroths } from '@core/appUtils';
 import { UserDeposit } from '@core/api';
 import { css } from '@linaria/core';
+import { selectAppParams, selectBlocksLeft } from '@app/containers/Main/store/selectors';
 
 interface DepositPopupProps {
   visible?: boolean;
@@ -65,6 +66,22 @@ const DepositPopup: React.FC<DepositPopupProps> = ({ visible, onCancel }) => {
   const [warned, setWarned] = useState(false);
   const dispatch = useDispatch();
   const error = useSelector(selectErrorMessage());
+  const appParams = useSelector(selectAppParams());
+  const [nextEpochDate, setNextEpochStartDate] = useState(null);
+  const systemState = useSelector(selectSystemState());
+  const blocksLeft = useSelector(selectBlocksLeft());
+
+  useEffect(() => {
+    let timestamp = systemState.current_state_timestamp * 1000 + blocksLeft * 60000;
+    const currentTime = new Date(timestamp);
+    const dateFromString = currentTime.getDate() + ' '
+    + currentTime.toLocaleString('default', { month: 'short' });
+    timestamp = timestamp + appParams.epoch_dh * 60000;
+    const currentPlusOne = new Date(timestamp);
+    const dateToString = currentPlusOne.getDate() + ' '
+      + currentPlusOne.toLocaleString('default', { month: 'short' });
+    setNextEpochStartDate(`${dateFromString} - ${dateToString}, ${currentPlusOne.getFullYear().toString().substr(-2)}`);
+  }, [blocksLeft]);
 
   const formik = useFormik<DepositFormData>({
     initialValues: {
@@ -116,8 +133,8 @@ const DepositPopup: React.FC<DepositPopupProps> = ({ visible, onCancel }) => {
                 <Rate value={0.0011} className='fee-rate'/>
             </FeeContainer>
             <InfoContainer>
-                <div>Depositing will increase your voting power in next epoch #16</div>
-                <div>(17 Jan - 1 Feb, 22)</div>
+                <div>Depositing will increase your voting power in next epoch #{appParams.current.iEpoch + 1}</div>
+                <div>({nextEpochDate})</div>
             </InfoContainer>
         </form>
     </Popup>
