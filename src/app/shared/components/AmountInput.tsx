@@ -11,8 +11,8 @@ import Rate from './Rate';
 export const AMOUNT_MAX = 253999999.9999999;
 
 const ContainerStyled = styled.div`
-  position: relative;
   display: flex;
+  flex-direction: column;
   margin-bottom: 20px;
 `;
 
@@ -41,10 +41,9 @@ interface AmountInputProps {
 const REG_AMOUNT = /^(?!0\d)(\d+)(\.)?(\d+)?$/;
 
 const rateStyle = css`
-  position: absolute;
-  top: 43px;
-  left: 15px;
   font-size: 12px;
+  align-self: start;
+  margin-left: 15px;
 `;
 
 const AmountInput: React.FC<AmountInputProps> = ({
@@ -72,6 +71,7 @@ const AmountInput: React.FC<AmountInputProps> = ({
         placeholder="0"
         className={containerStyle}
         onInput={handleInput}
+        is_beamx={true}
       />
       {!error && <Rate value={parseFloat(value)} className={rateStyle} />}
     </ContainerStyled>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { styled } from '@linaria/react';
+import { css } from '@linaria/core';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -7,6 +8,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   variant?: 'regular' | 'gray' | 'proposal';
   pallete?: 'purple' | 'blue';
   margin?: 'none' | 'large';
+  is_beamx?: boolean;
 }
 
 const ContainerStyled = styled.div<InputProps>`
@@ -52,10 +54,8 @@ const InputProposalStyled = styled(InputGrayStyled)<{ pallete: string }>`
   font-weight: normal;
   color: ${({ pallete }) => `var(--color-${pallete})`};
   height: 45px;
-  background-color: ${({ valid }) => (valid ? 'rgba(255, 255, 255, .05)' : 'rgb(255, 116, 107, .15)')};
   border: none;
   padding: 0 15px;
-  border-radius: 10px;
 
   &::placeholder {
     font-size: 16px;
@@ -71,9 +71,22 @@ const LabelStyled = styled.div<InputProps>`
   color: ${({ valid }) => (valid ? 'rgba(255, 255, 255, .7)' : 'var(--color-red)')};
 `;
 
+const StyledInput = styled.div<InputProps>`
+  background-color: ${({ valid }) => (valid ? 'rgba(255, 255, 255, .05)' : 'rgb(255, 116, 107, .15)')};
+  border-radius: 10px;
+  display: flex;
+
+  > .beamx-label {
+    align-self: center;
+    margin: 0 15px;
+    font-weight: 400;
+    font-size: 16px;
+  }
+`;
+
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({
-    label, valid = true, variant = 'regular', margin = 'none', pallete, className, ...rest
+    label, is_beamx = false,  valid = true, variant = 'regular', margin = 'none', pallete, className, ...rest
   }, ref) => {
     const InputComponent = {
       regular: InputRegularStyled,
@@ -83,7 +96,10 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
     return (
       <ContainerStyled className={className} margin={margin}>
-        <InputComponent ref={ref} valid={valid} pallete={pallete} {...rest} />
+        <StyledInput valid={valid}>
+          <InputComponent ref={ref} valid={valid} pallete={pallete} {...rest} />
+          {!!is_beamx && <span className='beamx-label'>BEAMX</span>}
+        </StyledInput>
         {!!label && <LabelStyled valid={valid}>{valid ? label : ''}</LabelStyled>}
       </ContainerStyled>
     );
