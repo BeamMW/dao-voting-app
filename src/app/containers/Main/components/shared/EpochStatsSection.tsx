@@ -88,7 +88,7 @@ const LeftStatsProgress = styled(LeftStats)`
 `;
 
 const MiddleStats = styled.span`
-  margin-left: 50px;
+  margin-left: 40px;
 
   > .next-epoch-title {
     font-weight: bold;

@@ -138,7 +138,7 @@ const ProposalPage: React.FC = () => {
     let votes = [];
 
     if (userViewData.current_votes !== undefined) {
-      votes = userViewData.current_votes;
+      votes = [...userViewData.current_votes];
     } else {
       votes = new Array(currentProposals.items.length).fill(255);
     }

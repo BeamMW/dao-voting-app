@@ -23,7 +23,7 @@ const CloseButtonClass = css`
 `;
 
 const CopyButtonClass = css`
-  max-width: 186px !important;
+  max-width: 190px !important;
 `;
 
 const CopyIconClass = css`

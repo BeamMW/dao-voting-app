@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { css } from '@linaria/core';
 import { styled } from '@linaria/react';
-import { IconEpochSelector, IconSearch, IconNoProposals } from '@app/shared/icons';
+import { IconEpochSelector, IconSearch, IconNoProposals, IconVotedYes, IconVotedNo } from '@app/shared/icons';
 import { ProcessedProposal } from '@app/core/types';
 import { useNavigate } from 'react-router-dom';
 import { PROPOSALS, ROUTES } from '@app/shared/constants';
 import { useSelector } from 'react-redux';
 import { selectIsLoaded } from '@app/shared/store/selectors';
+import { fromGroths } from '@core/appUtils';
+import { selectAppParams } from '../../store/selectors';
 
 interface ListProps {
   data: ProcessedProposal[];
@@ -76,15 +78,19 @@ const ListItem = styled.li`
     border-radius: 10px;
     cursor: pointer;
     overflow: hidden;
+
+    > .voted {
+        background-color: rgba(255, 255, 255, .05);
+    }
 `;
 
 const StyledItemHeader = styled.div`
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
     padding: 20px;
-    background-color: rgba(255, 255, 255, .05);
     display: flex;
     flex-direction: row;
+    align-items: center;
     width: 100%;
 
     > .proposal-id {
@@ -97,6 +103,34 @@ const StyledItemHeader = styled.div`
         font-size: 16px;
         font-weight: 700;
     }
+`;
+
+const StyledItemContent = styled.div`
+    display: flex;
+    align-items: center;
+    width: 100%
+    padding: 10px 20px 20px 75px;
+
+    > .voted-no {
+        margin-left: 50px;
+    }
+    
+    > .voted-icon {
+        margin-top: 15px;
+        margin-left: auto;
+    }
+`;
+
+const StyledVotedTitle = styled.div`
+    font-weight: 400;
+    font-size: 12px;
+    color: rgba(255, 255, 255, .5);
+`;
+
+const StyledVotedValue = styled.div`
+    margin-top: 5px;
+    font-weight: 400;
+    font-size: 14px;
 `;
 
 const EmptyListClass = css`
@@ -114,13 +148,22 @@ const EmptyListClass = css`
 
 const PendingVote = styled.div`
     margin-left: auto;
-    width: 96px;
     height: 19px;
     background: rgba(255, 255, 255, 0.3);
     border-radius: 14px;
     padding: 1px 10px;
     font-weight: 400;
     font-size: 14px;
+`;
+
+const StyledEpochTitle = styled.div`
+    font-weight: 700;
+    font-size: 14px;
+    color: rgba(255, 255, 255, .5);
+    text-transform: uppercase;
+    letter-spacing: 3.11px;
+    margin-top: 20px;
+    margin-bottom: 10px;
 `;
 
 const ProposalsList: React.FC<ListProps> = ({ 
@@ -130,6 +173,7 @@ const ProposalsList: React.FC<ListProps> = ({
 }) => {
     const navigate = useNavigate();
     const isLoaded = useSelector(selectIsLoaded());
+    const appParams = useSelector(selectAppParams());
     const selectorData = [
         {
             id: 0,
@@ -145,8 +189,6 @@ const ProposalsList: React.FC<ListProps> = ({
         }
     ];
 
-    console.log(data);
-
     const [selectorActiveItem, setSelectorItem] = useState(selectorData[0]);
     const handleSelectorClick: React.MouseEventHandler<HTMLLIElement> = ({ currentTarget }) => {
         setSelectorItem(selectorData[currentTarget.dataset.index]);
@@ -158,6 +200,16 @@ const ProposalsList: React.FC<ListProps> = ({
 
     const handleListItemClick = (id: number, index: number) => {
         navigate(ROUTES.MAIN.PROPOSAL_PAGE, {state: {id, type, index}});
+    }
+
+    const getProposalId = (id: number) => {
+        if (id < 10) {
+            return '000' + id;
+        } else if (id < 100) {
+            return '00' + id;
+        } else if (id < 1000) {
+            return '0' + id;
+        } 
     }
 
     return (<div>
@@ -179,16 +231,33 @@ const ProposalsList: React.FC<ListProps> = ({
                 <IconEpochSelector className='epoches-selector-icon'/>
             </EpochSelector>
         </ProposalsHeader>
+
+        { type === PROPOSALS.CURRENT ? <StyledEpochTitle>
+            Epoch #{appParams.current.iEpoch} (current)
+        </StyledEpochTitle> : null}
+
         { data.length > 0 ?
         (<List>
             {data.map((item, index) => (
                 <ListItem data-index={index} key={index} onClick={() => handleListItemClick(item.id, index)}>
-                    <StyledItemHeader>
-                        <span className='proposal-id'>#{item.id}</span>
+                    <StyledItemHeader className={item.voted !== undefined && item.voted < 255 ? 'voted' : ''}>
+                        <span className='proposal-id'>#{getProposalId(item.id)}</span>
                         <span className='proposal-title'>{item.data.title}</span>
 
-                        <PendingVote>pending vote</PendingVote>
+                        {item.voted === undefined || item.voted !== undefined && item.voted == 255 ? 
+                            <PendingVote>pending vote</PendingVote> : null}
                     </StyledItemHeader>
+                    {item.voted !== undefined && item.voted < 255 ? (<StyledItemContent>
+                        <span className='voted-yes'>
+                            <StyledVotedTitle>Voted YES</StyledVotedTitle>
+                            <StyledVotedValue>{fromGroths(item.stats.variants[1])} BEAMX</StyledVotedValue>
+                        </span>
+                        <span className='voted-no'>
+                            <StyledVotedTitle>Voted NO</StyledVotedTitle>
+                            <StyledVotedValue>{fromGroths(item.stats.variants[0])} BEAMX</StyledVotedValue>
+                        </span>
+                        <span className='voted-icon'>{item.voted !== undefined && item.voted === 1 ? <IconVotedYes/> : <IconVotedNo/>}</span>
+                    </StyledItemContent>) : null}
                 </ListItem>
             ))}
         </List>) :

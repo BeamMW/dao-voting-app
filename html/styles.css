@@ -99,7 +99,7 @@
   \*******************************************************************************************************************************************************************************************/
 .p1u29hix{width:760px;}
 .c11dc23x{max-width:125px !important;}
-.c1athi1r{max-width:186px !important;}
+.c1athi1r{max-width:190px !important;}
 .cx7lh3g{margin-left:10px;cursor:pointer;}
 .s188osh0{margin:10px 0;display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-pack:center;-webkit-justify-content:center;-ms-flex-pack:center;justify-content:center;}
 
@@ -117,7 +117,7 @@
 .s143o227{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-flex-direction:row;-ms-flex-direction:row;flex-direction:row;-webkit-align-items:stretch;-webkit-box-align:stretch;-ms-flex-align:stretch;align-items:stretch;}
 .lxb4hiq{min-width:400px;display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-flex-direction:row;-ms-flex-direction:row;flex-direction:row;}
 .l1k4hoh2.lxb4hiq{-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;}.l1k4hoh2.lxb4hiq > .progress{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-flex-direction:row;-ms-flex-direction:row;flex-direction:row;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;}.l1k4hoh2.lxb4hiq > .progress .progress-percentage{margin-left:10px;font-size:12px;color:rgba(255,255,255,.5);}.l1k4hoh2.lxb4hiq > .progress-title{margin-bottom:10px;font-size:12px;color:rgba(255,255,255,.5);}
-.m1f2kekr{margin-left:50px;}.m1f2kekr > .next-epoch-title{font-weight:bold;font-size:14px;-webkit-letter-spacing:3.11111px;-moz-letter-spacing:3.11111px;-ms-letter-spacing:3.11111px;letter-spacing:3.11111px;color:rgba(255,255,255,.5);}.m1f2kekr > .next-epoch-date{font-size:14px;margin-top:22px;}
+.m1f2kekr{margin-left:40px;}.m1f2kekr > .next-epoch-title{font-weight:bold;font-size:14px;-webkit-letter-spacing:3.11111px;-moz-letter-spacing:3.11111px;-ms-letter-spacing:3.11111px;letter-spacing:3.11111px;color:rgba(255,255,255,.5);}.m1f2kekr > .next-epoch-date{font-size:14px;margin-top:22px;}
 .s1qoxu2i{font-size:12px;opacity:0.5;margin-bottom:6px;}
 .svlaqa8{-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;font-weight:bold;font-size:16px;text-transform:uppercase;}.svlaqa8 > span{margin-left:8px;}
 
@@ -134,10 +134,14 @@
 .p17doydd{margin-left:20px;text-transform:uppercase;font-size:14px;font-weight:700;-webkit-letter-spacing:3.11111px;-moz-letter-spacing:3.11111px;-ms-letter-spacing:3.11111px;letter-spacing:3.11111px;}
 .s1bpza4e{padding:4px 16px;border-bottom:var(--s1bpza4e-0);cursor:var(--s1bpza4e-1);color:var(--s1bpza4e-2);}
 .e1tiuc9r{margin-left:30px;}.e1tiuc9r > .epoches-selector-title{font-size:14px;color:rgba(255,255,255,.5);}.e1tiuc9r > .epoches-selected-item{margin-left:10px;font-size:14px;font-weigth:700;color:rgba(255,255,255,.7);}.e1tiuc9r > .epoches-selector-icon{margin-left:10px;}
-.l1j7zopz{background-color:rgba(255,255,255,.05);margin-top:10px;border-radius:10px;cursor:pointer;overflow:hidden;}
-.s1sr8bew{border-top-left-radius:10px;border-top-right-radius:10px;padding:20px;background-color:rgba(255,255,255,.05);display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-flex-direction:row;-ms-flex-direction:row;flex-direction:row;width:100%;}.s1sr8bew > .proposal-id{font-size:12px;color:rgba(255,255,255,.5);}.s1sr8bew > .proposal-title{margin-left:20px;font-size:16px;font-weight:700;}
-.evgqr2g{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;margin-top:80px;}.evgqr2g > .title-class{margin-top:30px;font-size:14px;color:rgba(255,255,255,.5);}
-.p1b9701d{margin-left:auto;width:96px;height:19px;background:rgba(255,255,255,0.3);border-radius:14px;padding:1px 10px;font-weight:400;font-size:14px;}
+.l1j7zopz{background-color:rgba(255,255,255,.05);margin-top:10px;border-radius:10px;cursor:pointer;overflow:hidden;}.l1j7zopz > .voted{background-color:rgba(255,255,255,.05);}
+.s1sr8bew{border-top-left-radius:10px;border-top-right-radius:10px;padding:20px;display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-flex-direction:row;-ms-flex-direction:row;flex-direction:row;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;width:100%;}.s1sr8bew > .proposal-id{font-size:12px;color:rgba(255,255,255,.5);}.s1sr8bew > .proposal-title{margin-left:20px;font-size:16px;font-weight:700;}
+.svgqr2g{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;width:100%;padding:10px 20px 20px 75px;}.svgqr2g > .voted-no{margin-left:50px;}.svgqr2g > .voted-icon{margin-top:15px;margin-left:auto;}
+.s1b9701d{font-weight:400;font-size:12px;color:rgba(255,255,255,.5);}
+.sm93lu9{margin-top:5px;font-weight:400;font-size:14px;}
+.e1c8moc{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;margin-top:80px;}.e1c8moc > .title-class{margin-top:30px;font-size:14px;color:rgba(255,255,255,.5);}
+.pr352h2{margin-left:auto;height:19px;background:rgba(255,255,255,0.3);border-radius:14px;padding:1px 10px;font-weight:400;font-size:14px;}
+.s1ymjzgs{font-weight:700;font-size:14px;color:rgba(255,255,255,.5);text-transform:uppercase;-webkit-letter-spacing:3.11px;-moz-letter-spacing:3.11px;-ms-letter-spacing:3.11px;letter-spacing:3.11px;margin-top:20px;margin-bottom:10px;}
 
 /*!*************************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/@linaria/webpack5-loader/lib/outputCssLoader.js!./src/app/containers/Main/containers/EpochesBase/EpochesBase.tsx ***!

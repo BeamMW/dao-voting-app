@@ -412,7 +412,7 @@ const NewProposalPopup: React.FC<NewProposalPopupProps> = ({ visible, onCancel }
                 <div className={ErrorLineClass}>{errors.forum_link}</div>
             </div>
             <div className='full-segment'>
-                <InputTitle>Reference link *</InputTitle>
+                <InputTitle>Reference link</InputTitle>
                 <Input
                     variant="proposal"
                     valid={isRefLinkValid()}
