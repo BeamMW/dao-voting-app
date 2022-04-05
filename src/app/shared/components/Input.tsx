@@ -9,6 +9,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   pallete?: 'purple' | 'blue';
   margin?: 'none' | 'large';
   is_beamx?: boolean;
+  from?: 'deposit' | 'withdraw';
 }
 
 const ContainerStyled = styled.div<InputProps>`
@@ -28,8 +29,7 @@ const InputStyled = styled.input<InputProps>`
   color: white;
 
   &::placeholder {
-    color: white;
-    opacity: 0.5;
+    color: ${({ from }) => (from === 'deposit' ? 'var(--color-purple)' : from === 'withdraw' ? 'var(--color-blue)' : 'var(--color-white)')};
     font-size: 14px;
     transform: translateX(1px);
   }

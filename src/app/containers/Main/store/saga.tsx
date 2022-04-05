@@ -1,6 +1,6 @@
 import { call, put, takeLatest, select } from 'redux-saga/effects';
 import { navigate, setError } from '@app/shared/store/actions';
-import { ROUTES, CID } from '@app/shared/constants';
+import { ROUTES, CID, PROPOSALS } from '@app/shared/constants';
 import { LoadViewParams, LoadProposals, LoadProposalData, LoadTotals, LoadPublicKey, LoadVotes,
   LoadManagerView, LoadUserView, LoadModeratorsView } from '@core/api';
 
@@ -67,76 +67,50 @@ export function* loadProposalsSaga(
         const state = (yield select()) as {main: EpochesStateType, shared: SharedStateType};
         
         let proposalsData = {
-          prev: [],
           current: [],
-          next: []
+          future: [],
+          prev: [],
         };
         const nextEpochProps = state.main.appParams.next.proposals;
         const currentEpochProps = state.main.appParams.current.proposals;
 
-        if (nextEpochProps > 0) {
-          proposalsData.next = initProposals.splice(initProposals.length - nextEpochProps, nextEpochProps);
+        proposalsData.future = nextEpochProps > 0 ? initProposals.splice(initProposals.length - nextEpochProps, nextEpochProps) : [];
+        proposalsData.current = currentEpochProps > 0 ? initProposals.splice(initProposals.length - currentEpochProps, currentEpochProps) : [];
+        proposalsData.prev = initProposals.length > 0 ? initProposals : [];
 
-          if (state.main.proposals.future.is_active) {
-            for ( let item of proposalsData.next ) {
-              const proposalRes = (yield call(LoadProposalData, item.id)) as ProposalStats;
-              item['stats'] = proposalRes;
-              item['data'] = {};
-              try {
-                item['data'] = JSON.parse(window.atob(Base64DecodeUrl(item.text)));
-              } catch (e) {
-                console.log(e)
-              }
+        for (const key in proposalsData) {
+          const proposals = proposalsData[key];
+          for (let i = 0; i < proposals.length; i++) {
+            let item = proposals[i];
+            const proposalRes = (yield call(LoadProposalData, item.id)) as ProposalStats;
+            item['stats'] = proposalRes;
+            item['data'] = {};
+            try {
+              item['data'] = JSON.parse(window.atob(Base64DecodeUrl(item.text)));
+            } catch (e) {
+              console.log(e)
             }
-          }
-        }
-        yield put(actions.setFutureProposals(proposalsData.next));
 
-        if (currentEpochProps > 0) {
-          proposalsData.current = initProposals.splice(initProposals.length - currentEpochProps, currentEpochProps);
-
-          if (state.main.proposals.current.is_active) {
-            for (let i = 0; i < proposalsData.current.length; i++) {
-              let item = proposalsData.current[i];
-              const proposalRes = (yield call(LoadProposalData, item.id)) as ProposalStats;
-              item['stats'] = proposalRes;
-              item['data'] = {};
-              try {
-                item['data'] = JSON.parse(window.atob(Base64DecodeUrl(item.text)));
-              } catch (e) {
-                console.log(e)
-              }
-
+            if (key === PROPOSALS.CURRENT) {
               const userViewData = state.main.userView;
               if (userViewData.current_votes !== undefined && userViewData.current_votes.length > 0) {
                 item['voted'] = state.main.userView.current_votes[i];
               }
             }
           }
-        }
-        yield put(actions.setCurrentProposals(proposalsData.current));
 
-        if (!state.shared.isLoaded) {
-          store.dispatch(setIsLoaded(true));
-        }
-
-        if (initProposals.length > 0) {
-          proposalsData.prev = initProposals;
-
-          if (state.main.proposals.future.is_active) {
-            for ( let item of proposalsData.prev ) {
-              const proposalRes = (yield call(LoadProposalData, item.id)) as ProposalStats;
-              item['stats'] = proposalRes;
-              item['data'] = {};
-              try {
-                item['data'] = JSON.parse(window.atob(Base64DecodeUrl(item.text)));
-              } catch (e) {
-                console.log(e)
-              }
+          if (key === PROPOSALS.CURRENT) {
+            yield put(actions.setCurrentProposals(proposalsData.current));
+            if (!state.shared.isLoaded) {
+              store.dispatch(setIsLoaded(true));
             }
+          } else if (key === PROPOSALS.FUTURE) {
+            yield put(actions.setFutureProposals(proposalsData.future));
+          } else if (key === PROPOSALS.PREV) {
+            yield put(actions.setPrevProposals(proposalsData.prev));
           }
-        }
-        yield put(actions.setPrevProposals(proposalsData.prev));
+        } 
+
         yield put(actions.loadPoposals.success(true));
     } catch (e) {
       yield put(actions.loadPoposals.failure(e));

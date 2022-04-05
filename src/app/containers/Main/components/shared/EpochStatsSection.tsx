@@ -89,6 +89,7 @@ const LeftStatsProgress = styled(LeftStats)`
 
 const MiddleStats = styled.span`
   margin-left: 40px;
+  align-self: center;
 
   > .next-epoch-title {
     font-weight: bold;
@@ -116,8 +117,20 @@ const SubSectionValue = styled.div`
   font-size: 16px;
   text-transform: uppercase;
 
-  > span {
-    margin-left: 8px;
+  @media screen and (max-width : 1024px) {
+    > span {
+      margin-left: 8px;
+      max-width: 140px;
+      word-wrap: break-word;
+    }
+  }
+
+  @media screen and (min-width : 1024px) {
+    > span {
+      margin-left: 8px;
+      max-width: 240px;
+      word-wrap: break-word;
+    }
   }
 `;
 

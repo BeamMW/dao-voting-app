@@ -50,6 +50,10 @@ const FeeContainer = styled.div`
     }
 `;
 
+const DepositPopupClass = css`
+    width: 450px !important;
+`;
+
 const InfoContainer = styled.div`
     font-size: 12px;
     color: rgba(255, 255, 255, .7);
@@ -75,11 +79,11 @@ const DepositPopup: React.FC<DepositPopupProps> = ({ visible, onCancel }) => {
     let timestamp = systemState.current_state_timestamp * 1000 + blocksLeft * 60000;
     const currentTime = new Date(timestamp);
     const dateFromString = currentTime.getDate() + ' '
-    + currentTime.toLocaleString('default', { month: 'short' });
+    + currentTime.toLocaleString('en-US', { month: 'short' });
     timestamp = timestamp + appParams.epoch_dh * 60000;
     const currentPlusOne = new Date(timestamp);
     const dateToString = currentPlusOne.getDate() + ' '
-      + currentPlusOne.toLocaleString('default', { month: 'short' });
+      + currentPlusOne.toLocaleString('en-US', { month: 'short' });
     setNextEpochStartDate(`${dateFromString} - ${dateToString}, ${currentPlusOne.getFullYear().toString().substr(-2)}`);
   }, [blocksLeft]);
 
@@ -92,11 +96,12 @@ const DepositPopup: React.FC<DepositPopupProps> = ({ visible, onCancel }) => {
     onSubmit: (value) => {
         UserDeposit(toGroths(parseFloat(value.send_amount)));
         onCancel();
+        resetForm();
     },
   });
 
   const {
-    values, setFieldValue, errors, submitForm,
+    values, setFieldValue, errors, submitForm, resetForm
   } = formik;
 
   const handleAssetChange = (e: string) => {
@@ -105,10 +110,14 @@ const DepositPopup: React.FC<DepositPopupProps> = ({ visible, onCancel }) => {
 
   return (
     <Popup
+      className={DepositPopupClass}
       visible={visible}
       title="Deposit"
       cancelButton={(
-        <Button className={DepositButtonsClass} variant="ghost" icon={IconCancel} onClick={onCancel}>
+        <Button className={DepositButtonsClass} variant="ghost" icon={IconCancel} onClick={()=>{
+          onCancel();
+          resetForm();
+        }}>
           cancel
         </Button>
       )}
@@ -117,20 +126,24 @@ const DepositPopup: React.FC<DepositPopupProps> = ({ visible, onCancel }) => {
           deposit
         </Button>
       )}
-      onCancel={onCancel}
+      onCancel={()=>{
+        onCancel();
+        resetForm();
+      }}
     >
         <form onSubmit={submitForm}>
             <AmountInput
-                value={values.send_amount}
-                error={errors.send_amount?.toString()}
-                onChange={(e) => handleAssetChange(e)}
+              from='deposit'
+              value={values.send_amount}
+              error={errors.send_amount?.toString()}
+              onChange={(e) => handleAssetChange(e)}
             />
             <FeeContainer>
                 <div className='fee-head'>
                     <span className='title'>Fee</span>
-                    <span className='value'>0.0011 BEAM</span>
+                    <span className='value'>0.011 BEAM</span>
                 </div>
-                <Rate value={0.0011} className='fee-rate'/>
+                <Rate value={0.011} className='fee-rate'/>
             </FeeContainer>
             <InfoContainer>
                 <div>Depositing will increase your voting power in next epoch #{appParams.current.iEpoch + 1}</div>

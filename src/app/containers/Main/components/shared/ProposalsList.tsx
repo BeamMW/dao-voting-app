@@ -9,6 +9,7 @@ import { useSelector } from 'react-redux';
 import { selectIsLoaded } from '@app/shared/store/selectors';
 import { fromGroths } from '@core/appUtils';
 import { selectAppParams } from '../../store/selectors';
+import { getProposalId } from '@core/appUtils';
 
 interface ListProps {
   data: ProcessedProposal[];
@@ -99,6 +100,7 @@ const StyledItemHeader = styled.div`
     }
 
     > .proposal-title {
+        padding-right: 10px;
         margin-left: 20px;
         font-size: 16px;
         font-weight: 700;
@@ -149,6 +151,8 @@ const EmptyListClass = css`
 const PendingVote = styled.div`
     margin-left: auto;
     height: 19px;
+    min-width: 120px;
+    text-align: center;
     background: rgba(255, 255, 255, 0.3);
     border-radius: 14px;
     padding: 1px 10px;
@@ -202,16 +206,6 @@ const ProposalsList: React.FC<ListProps> = ({
         navigate(ROUTES.MAIN.PROPOSAL_PAGE, {state: {id, type, index}});
     }
 
-    const getProposalId = (id: number) => {
-        if (id < 10) {
-            return '000' + id;
-        } else if (id < 100) {
-            return '00' + id;
-        } else if (id < 1000) {
-            return '0' + id;
-        } 
-    }
-
     return (<div>
         <ProposalsHeader>
             <PropTitle>{ title }</PropTitle>
@@ -238,16 +232,16 @@ const ProposalsList: React.FC<ListProps> = ({
 
         { data.length > 0 ?
         (<List>
-            {data.map((item, index) => (
-                <ListItem data-index={index} key={index} onClick={() => handleListItemClick(item.id, index)}>
+            { data.map((item, index) =>
+                !!item.data && <ListItem data-index={index} key={index} onClick={() => handleListItemClick(item.id, index)}>
                     <StyledItemHeader className={item.voted !== undefined && item.voted < 255 ? 'voted' : ''}>
                         <span className='proposal-id'>#{getProposalId(item.id)}</span>
                         <span className='proposal-title'>{item.data.title}</span>
 
-                        {item.voted === undefined || item.voted !== undefined && item.voted == 255 ? 
+                        { type === PROPOSALS.CURRENT && (item.voted === undefined || item.voted !== undefined && item.voted == 255) ? 
                             <PendingVote>pending vote</PendingVote> : null}
                     </StyledItemHeader>
-                    {item.voted !== undefined && item.voted < 255 ? (<StyledItemContent>
+                    { type === PROPOSALS.CURRENT && item.voted !== undefined && item.voted < 255 ? (<StyledItemContent>
                         <span className='voted-yes'>
                             <StyledVotedTitle>Voted YES</StyledVotedTitle>
                             <StyledVotedValue>{fromGroths(item.stats.variants[1])} BEAMX</StyledVotedValue>
@@ -256,10 +250,12 @@ const ProposalsList: React.FC<ListProps> = ({
                             <StyledVotedTitle>Voted NO</StyledVotedTitle>
                             <StyledVotedValue>{fromGroths(item.stats.variants[0])} BEAMX</StyledVotedValue>
                         </span>
-                        <span className='voted-icon'>{item.voted !== undefined && item.voted === 1 ? <IconVotedYes/> : <IconVotedNo/>}</span>
+                        <span className='voted-icon'>
+                            { item.voted !== undefined && item.voted === 1 ? <IconVotedYes/> : <IconVotedNo/> }
+                        </span>
                     </StyledItemContent>) : null}
                 </ListItem>
-            ))}
+            )}
         </List>) :
         (isLoaded ? <div className={EmptyListClass}>
             <IconNoProposals/>

@@ -21,7 +21,6 @@ interface WithdrawFormData {
 }
 
 const FeeContainer = styled.div`
-    margin-top: 20px;
     margin-left: 15px;
     display: flex;
     flex-direction: column;
@@ -57,7 +56,7 @@ const InfoContainer = styled.div`
 `;
 
 const WithdrawButtonsClass = css`
-    max-width: 138px !important;
+    max-width: 145px !important;
 `;
 
 const AmountContainer = styled.div`
@@ -65,7 +64,7 @@ const AmountContainer = styled.div`
     flex-align: row;
 
     > .amount-input-class {
-        max-width: 275px !important;
+        width: 340px !important;
     }
 
     > .amount-max-class {
@@ -93,6 +92,10 @@ const AddMaxStyled = styled.div`
     }
 `;
 
+const WithdrawPopupClass = css`
+    width: 450px !important;
+`;
+
 const WithdrawPopup: React.FC<WithdrawPopupProps> = ({ visible, onCancel }) => {
   const inputRef = useRef<HTMLInputElement>();
   const [warned, setWarned] = useState(false);
@@ -108,11 +111,11 @@ const WithdrawPopup: React.FC<WithdrawPopupProps> = ({ visible, onCancel }) => {
     let timestamp = systemState.current_state_timestamp * 1000 - (appParams.epoch_dh - blocksLeft) * 60000;
     const currentTime = new Date(timestamp);
     const dateFromString = currentTime.getDate() + ' '
-    + currentTime.toLocaleString('default', { month: 'short' });
+    + currentTime.toLocaleString('en-US', { month: 'short' });
     timestamp = timestamp + appParams.epoch_dh * 60000;
     const currentPlusOne = new Date(timestamp);
     const dateToString = currentPlusOne.getDate() + ' '
-      + currentPlusOne.toLocaleString('default', { month: 'short' });
+      + currentPlusOne.toLocaleString('en-US', { month: 'short' });
     setNextEpochStartDate(`${dateFromString} - ${dateToString}, ${currentPlusOne.getFullYear().toString().substr(-2)}`);
   }, [blocksLeft]);
 
@@ -125,11 +128,12 @@ const WithdrawPopup: React.FC<WithdrawPopupProps> = ({ visible, onCancel }) => {
     onSubmit: (value) => {
         UserWithdraw(toGroths(parseFloat(value.withdraw_amount)));
         onCancel();
+        resetForm();
     },
   });
 
   const {
-    values, setFieldValue, errors, submitForm,
+    values, setFieldValue, errors, submitForm, resetForm
   } = formik;
 
   const handleAssetChange = (e: string) => {
@@ -142,10 +146,14 @@ const WithdrawPopup: React.FC<WithdrawPopupProps> = ({ visible, onCancel }) => {
 
   return (
     <Popup
+      className={WithdrawPopupClass}
       visible={visible}
       title="Withdraw"
       cancelButton={(
-        <Button variant='ghost' className={WithdrawButtonsClass} icon={IconCancel} onClick={onCancel}>
+        <Button variant='ghost' className={WithdrawButtonsClass} icon={IconCancel} onClick={()=>{
+            onCancel();
+            resetForm();
+          }}>
           cancel
         </Button>
       )}
@@ -155,11 +163,15 @@ const WithdrawPopup: React.FC<WithdrawPopupProps> = ({ visible, onCancel }) => {
           withdraw
         </Button>
       )}
-      onCancel={onCancel}
+      onCancel={()=> {
+        onCancel();
+        resetForm();
+      }}
     >
         <AmountContainer>
             <span className='amount-input-class'>
                 <AmountInput
+                    from='withdraw'
                     pallete='blue'
                     value={values.withdraw_amount}
                     error={errors.withdraw_amount?.toString()}
@@ -176,9 +188,9 @@ const WithdrawPopup: React.FC<WithdrawPopupProps> = ({ visible, onCancel }) => {
         <FeeContainer>
             <div className='fee-head'>
                 <span className='title'>Fee</span>
-                <span className='value'>0.0011 BEAM</span>
+                <span className='value'>0.011 BEAM</span>
             </div>
-            <Rate value={0.0011} className='fee-rate'/>
+            <Rate value={0.011} className='fee-rate'/>
         </FeeContainer>
         <InfoContainer>
             <div>Withdrawing will decrease your voting power in current epoch #{appParams.current.iEpoch}</div>

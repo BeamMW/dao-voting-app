@@ -34,7 +34,7 @@ export function toUSD(amount: number, rate: number): string {
   switch (true) {
     case amount === 0 || Number.isNaN(amount):
       return '0 USD';
-    case amount > 0.01: {
+    case amount > 0.011: {
       const value = amount * rate;
       return `${value.toFixed(2)} USD`;
     }
@@ -61,6 +61,22 @@ export function Base64DecodeUrl(str){
   return str.replace(/-/g, '+').replace(/_/g, '/');
 }
 
+export function getProposalId (id: number) {
+  if (id < 10) {
+      return '000' + id;
+  } else if (id < 100) {
+      return '00' + id;
+  } else if (id < 1000) {
+      return '0' + id;
+  } 
+}
+
 export function Base64EncodeUrl(str){
   return str.replace(/\+/g, '-').replace(/\//g, '_').replace(/\=+$/, '');
 }
+
+
+export function openInNewTab (url) {
+  const newWindow = window.open(url, '_blank', 'noopener,noreferrer')
+  if (newWindow) newWindow.opener = null
+};

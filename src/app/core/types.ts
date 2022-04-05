@@ -33,7 +33,8 @@ export interface ProposalData {
     description: string;
     quorum?: Quorum;
     forum_link: string;
-    ref_link: string;
+    ref_link?: string;
+    timestamp?: number;
 }
 
 export interface ProcessedProposal extends InitialProposal{

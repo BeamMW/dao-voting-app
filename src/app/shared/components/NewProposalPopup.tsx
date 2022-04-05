@@ -100,8 +100,8 @@ const NewProposalForm = styled.form`
         }
 
         > .tvl-part {
-            margin-left: auto;
-            margin-right: 120px;
+            margin-left: 30px;
+            margin-right: auto;
 
             > .beamx {
                 display: flex;
@@ -111,6 +111,9 @@ const NewProposalForm = styled.form`
                     margin-left: 5px;
                     font-weight: 700;
                     font-size: 20px;
+                    max-width: 250px;
+                    text-align: start;
+                    word-wrap: break-word;
                 }
             }
         }
@@ -154,8 +157,6 @@ const ErrorLineClass = css`
 `;
 
 const NewProposalPopup: React.FC<NewProposalPopupProps> = ({ visible, onCancel }) => {
-    const dispatch = useDispatch();
-    const error = useSelector(selectErrorMessage());
     const appParams = useSelector(selectAppParams());
     const totals = useSelector(selectTotalsView());
 
@@ -175,6 +176,7 @@ const NewProposalPopup: React.FC<NewProposalPopupProps> = ({ visible, onCancel }
             submitHandle();
             onCancel();
             resetForm();
+            setActiveToggle(false);
         },
         validate: (e) => validate(e),
     });
@@ -242,7 +244,8 @@ const NewProposalPopup: React.FC<NewProposalPopupProps> = ({ visible, onCancel }
             title: values.voting_title,
             description: values.voting_descr,
             forum_link: values.forum_link,
-            ref_link: values.ref_link
+            ref_link: values.ref_link,
+            timestamp: new Date().getTime(),
         }
         const qLimit = parseInt(values.quorum_limit);
         if (qLimit > 0) {
@@ -325,6 +328,7 @@ const NewProposalPopup: React.FC<NewProposalPopupProps> = ({ visible, onCancel }
         <Button className={NewProposalButtonsClass} variant="ghost" icon={IconCancel} onClick={() => {
             onCancel();
             resetForm();
+            setActiveToggle(false);
         }}>
           cancel
         </Button>
@@ -340,6 +344,7 @@ const NewProposalPopup: React.FC<NewProposalPopupProps> = ({ visible, onCancel }
       onCancel={() => {
         onCancel();
         resetForm();
+        setActiveToggle(false);
     }}
     >
         <NewProposalForm onSubmit={submitForm}>

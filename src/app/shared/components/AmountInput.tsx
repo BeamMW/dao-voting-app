@@ -10,35 +10,25 @@ import Rate from './Rate';
 
 export const AMOUNT_MAX = 253999999.9999999;
 
+interface AmountInputProps {
+  value: string;
+  error?: string;
+  pallete?: 'purple' | 'blue';
+  from?: 'deposit' | 'withdraw'
+  onChange?: (value: string) => void; //TODO
+}
+
 const ContainerStyled = styled.div`
   display: flex;
   flex-direction: column;
   margin-bottom: 20px;
 `;
 
-const LabelStyled = styled.div`
-  display: inline-block;
-  vertical-align: bottom;
-  line-height: 26px;
-`;
-
-const selectClassName = css`
-  align-self: flex-start;
-  margin-top: 10px;
-`;
-
 const containerStyle = css`
   flex-grow: 1;
 `;
 
-interface AmountInputProps {
-  value: string;
-  error?: string;
-  pallete?: 'purple' | 'blue';
-  onChange?: (value: string) => void; //TODO
-}
-
-const REG_AMOUNT = /^(?!0\d)(\d+)(\.)?(\d+)?$/;
+const REG_AMOUNT = /^(?!0\d)(\d+)(\.)?(\d{0,8})?$/;
 
 const rateStyle = css`
   font-size: 12px;
@@ -47,7 +37,7 @@ const rateStyle = css`
 `;
 
 const AmountInput: React.FC<AmountInputProps> = ({
-  value, error, pallete = 'purple', onChange,
+  value, error, pallete = 'purple', onChange, from
 }) => {
   const handleInput: React.ChangeEventHandler<HTMLInputElement> = (event) => {
     const { value: raw } = event.target;
@@ -63,6 +53,7 @@ const AmountInput: React.FC<AmountInputProps> = ({
     <ContainerStyled>
       <Input
         variant="proposal"
+        from={from}
         valid={!error}
         label={error}
         value={value}
