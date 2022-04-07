@@ -21,7 +21,10 @@ import IconNoProposals from './icon-no-proposals.svg';
 import IconBackWindow from './icon-back-window.svg';
 import IconAddMax from './icon-add-max.svg';
 import IconAddProposal from './icon-add-proposal.svg';
+import IconAddWhite from './icon-add-white.svg';
 import IconCreateProposal from './icon-create-proposal.svg';
+import IconArrowGreenUp from './icon-arrow-green-up.svg';
+import IconArrowRedDown from './icon-arrow-red-down.svg';
 
 import IconExternalLink from './external-link-icon.svg';
 import IconVoteButtonNo from './icon-vote-no-button.svg';
@@ -54,7 +57,10 @@ export {
   IconBackWindow,
   IconAddMax,
   IconAddProposal,
+  IconAddWhite,
   IconCreateProposal,
+  IconArrowGreenUp,
+  IconArrowRedDown,
 
   IconVoteButtonNo,
   IconVoteButtonYes,

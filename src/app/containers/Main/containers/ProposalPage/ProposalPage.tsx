@@ -20,7 +20,7 @@ import {
 import { useParams } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import { PROPOSALS, ROUTES } from '@app/shared/constants';
-import { getProposalId } from '@core/appUtils';
+import { fromGroths, getProposalId } from '@core/appUtils';
 import { ProcessedProposal } from '@app/core/types';
 import { openInNewTab } from '@core/appUtils'; 
 
@@ -62,6 +62,8 @@ const HeaderStyled = styled.div`
   > .middle-section {
     margin-left: 20px;
     line-height: 18px;
+    max-width: 85%;
+    word-wrap: break-word;
 
     > .title {
       font-weight: 700;
@@ -152,6 +154,7 @@ const ContentStyled = styled.div`
 
     > .description {
       font-size: 14px;
+      word-wrap: break-word;
     }
 
     > .stake-info {
@@ -284,11 +287,11 @@ const FutureProposalContent: React.FC<ProposalContentProps> = (
           <div className='stake-info'>
             <span className='total'>
               <StyledStakeTitle>Total staked</StyledStakeTitle>
-              <div className='value'>{totalsView.stake_passive} BEAMX</div>
+              <div className='value'>{fromGroths(totalsView.stake_passive)} BEAMX</div>
             </span>
             <span className='other'>
               <StyledStakeTitle>Your staked</StyledStakeTitle>
-              <div className='value'>{userViewData.stake_passive} BEAMX</div>
+              <div className='value'>{fromGroths(userViewData.stake_passive)} BEAMX</div>
             </span>
             { proposal.data.quorum !== undefined && proposal.data.quorum.type === 'percent' ?
             <span className='other'>
@@ -358,8 +361,8 @@ const ProposalPage: React.FC = () => {
     <>
       <Window onPrevious={handlePrevious}>
         <EpochStatsSection
-          isWithProgress={false}
-          className={StatsSectionClass} data={true}></EpochStatsSection>
+          state='none'
+          className={StatsSectionClass}></EpochStatsSection>
         <Proposal>
           <HeaderStyled>
             <div className='id-section'>#{getProposalId(proposal.id)}</div>

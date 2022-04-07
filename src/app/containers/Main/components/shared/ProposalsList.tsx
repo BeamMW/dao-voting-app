@@ -104,6 +104,8 @@ const StyledItemHeader = styled.div`
         margin-left: 20px;
         font-size: 16px;
         font-weight: 700;
+        max-width: 80%;
+        word-wrap: break-word;
     }
 `;
 

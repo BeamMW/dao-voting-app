@@ -10,6 +10,7 @@ export const setPublicKey = createAction('@@MAIN/SET_PUBLIC_KEY')<string>();
 export const setProposalsState = createAction('@@MAIN/SET_PROPOSALS_STATE')<{is_active: boolean, type: string}>();
 export const setPopupState = createAction('@@MAIN/SET_POPUP_STATE')<{type: string, state: boolean}>();
 export const setBlocksLeft = createAction('@@MAIN/SET_BLOCKS_LEFT')<number>();
+export const setWithdrawedAmount = createAction('@@MAIN/SET_WITHDRAWED_AMOUNT')<number>();
 
 export const loadAppParams = createAsyncAction(
     '@@MAIN/LOAD_PARAMS',

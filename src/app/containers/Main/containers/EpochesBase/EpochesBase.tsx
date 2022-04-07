@@ -41,7 +41,7 @@ const EpochesBase: React.FC = () => {
   return (
     <>
       <Window>
-        <EpochStatsSection className={StatsSectionClass} data={true}></EpochStatsSection>
+        <EpochStatsSection state='progress' className={StatsSectionClass}></EpochStatsSection>
         <ProposalsList title='Proposals' type={PROPOSALS.CURRENT} data={currentProposals.items}></ProposalsList>
         { prevProposals.items.length > 0 ?
           <Button variant='ghost' icon={IconOldEpoches} className={OldButtonClass}>show old epochs</Button> : 

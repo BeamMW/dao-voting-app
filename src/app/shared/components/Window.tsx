@@ -8,6 +8,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { selectAppParams, selectIsModerator, selectPopupsState } from '@app/containers/Main/store/selectors';
 import { NewProposalPopup, Button, DepositPopup, WithdrawPopup, PublicKeyPopup } from './';
 import { setPopupState } from '@app/containers/Main/store/actions';
+import { css } from '@linaria/core';
 
 interface WindowProps {
   onPrevious?: React.MouseEventHandler | undefined;
@@ -26,11 +27,19 @@ const StyledTitle = styled.div`
   font-size: 36px;
   margin-bottom: 20px;
 
-  > .new-button-class {
-    max-width: 230px !important;
+  > .controls {
+    height: 36px;
     position: absolute !important;
-    right: 20px !important;
-    top: 30px !important;
+    right: 38px !important;
+    top: 37px !important;
+    display: flex;
+    align-items: flex-end;
+
+    > .new-button-class {
+      max-width: 230px !important;
+      margin-bottom: 0 !important;
+      margin-right: 30px !important;
+    }  
   }
 `;
 
@@ -55,6 +64,19 @@ const BackStyled = styled.div`
   }
 `;
 
+const PkeyButtonClass = css`
+  margin: 0 !important;
+  min-width: 140px;
+  font-weight: 400 !important;
+  display: flex;
+  font-size: 16px !important;
+`;
+
+const NewButtonClass = css`
+  margin-bottom: 0 !important;
+  margin-right: 30px !important;
+`;
+
 const Window: React.FC<WindowProps> = ({
   children,
   onPrevious
@@ -72,6 +94,10 @@ const Window: React.FC<WindowProps> = ({
     navigate(ROUTES.MAIN.EPOCHS);
   };
 
+  const handlePkey = () => {
+    dispatch(setPopupState({type: 'pkey', state: !popupsState.pkey}));
+  }
+
   const handleNewProposal = () => {
     setIsNewProposalVisible(true);
   };
@@ -85,10 +111,20 @@ const Window: React.FC<WindowProps> = ({
       <Container bgColor={Utils.getStyles().background_main} ref={rootRef}>
         <StyledTitle>
           <TitleValue onClick={titleClicked}>Voting</TitleValue>
-          {appParams.is_admin || isModerator ?
-          <Button className='new-button-class' variant='ghostBordered' pallete='green'
-          onClick={()=>handleNewProposal()}
-          icon={IconAddProposal}>create new proposal</Button> : null}
+          <span className='controls'>
+            { appParams.is_admin || isModerator ?
+              <Button className='new-button-class' variant='ghostBordered' pallete='green'
+              onClick={()=>handleNewProposal()}
+              icon={IconAddProposal}>
+                create new proposal
+              </Button> : null
+            }
+            <Button className={PkeyButtonClass}
+              onClick={() => handlePkey()}
+              pallete='green' variant='link'>
+                Show my public key
+            </Button>
+          </span>
         </StyledTitle>
         { onPrevious ? (
         <BackStyled>

@@ -128,11 +128,23 @@ export function* loadContractInfoSaga(
         }
 
         const state = (yield select()) as {main: EpochesStateType, shared: SharedStateType};
-        const blocksLeft = state.main.appParams.epoch_dh * state.main.appParams.current.iEpoch 
-          + contract.Height - state.shared.systemState.current_height;
+        const epochEndsHeight = state.main.appParams.epoch_dh * state.main.appParams.current.iEpoch 
+        + contract.Height;
+        const epochStartsHeight = epochEndsHeight - state.main.appParams.epoch_dh;
+        const blocksLeft = epochEndsHeight - state.shared.systemState.current_height;
 
         if (blocksLeft > 0) {
           yield put(actions.setBlocksLeft(blocksLeft));
+        }
+
+        let withdrawedAmount = 0;
+        for (let tr of state.shared.transactions) {
+          if (tr.comment === 'dao-vote move funds' && tr.income && tr.height >= epochStartsHeight && tr.height < epochEndsHeight) {
+            withdrawedAmount += tr.invoke_data[0].amounts[0].amount * -1;
+          }
+        }
+        if (withdrawedAmount > 0) {
+          yield put(actions.setWithdrawedAmount(withdrawedAmount));
         }
     } catch (e) {
       yield put(actions.loadContractInfo.failure(e));

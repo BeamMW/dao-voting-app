@@ -18,5 +18,6 @@ export interface EpochesStateType {
     deposit: boolean;
     withdraw: boolean;
     pkey: boolean;
-  }
+  },
+  withdrawedAmount: number;
 }

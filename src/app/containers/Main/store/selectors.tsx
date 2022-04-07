@@ -22,3 +22,4 @@ export const selectPopupsState = () => createSelector(selectMain,
 export const selectPublicKey = () => createSelector(selectMain, 
     (state) => state.public_key);
 export const selectBlocksLeft = () => createSelector(selectMain, (state) => state.blocks_left);
+export const selectWithdrawedAmount = () => createSelector(selectMain, (state) => state.withdrawedAmount);

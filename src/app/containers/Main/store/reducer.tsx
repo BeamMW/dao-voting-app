@@ -52,7 +52,8 @@ const initialState: EpochesStateType = {
     withdraw: false,
     deposit: false,
     pkey: false
-  }
+  },
+  withdrawedAmount: 0
 };
 
 const reducer = createReducer<EpochesStateType, Action>(initialState)
@@ -97,6 +98,9 @@ const reducer = createReducer<EpochesStateType, Action>(initialState)
   }))
   .handleAction(actions.setBlocksLeft, (state, action) => produce(state, (nexState) => {
     nexState.blocks_left = action.payload;
+  }))
+  .handleAction(actions.setWithdrawedAmount, (state, action) => produce(state, (nexState) => {
+    nexState.withdrawedAmount = action.payload;
   }));
 
 export { reducer as MainReducer };

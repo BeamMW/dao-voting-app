@@ -10,6 +10,7 @@ import { ROUTES, CID } from '@app/shared/constants';
 import store from '../../../index';
 import { SharedStateType } from '../interface';
 import { EpochesStateType } from '@app/containers/Main/interfaces';
+import { TxsEvent } from '@core/types';
 
 import Utils from '@core/utils.js';
 
@@ -44,6 +45,10 @@ export function remoteEventChannel() {
 }
 
 
+export function* handleTransactions(payload: TxsEvent) {
+  yield put(actions.setTransactions(payload.txs));
+}
+
 function* sharedSaga() {
   const remoteChannel = yield call(remoteEventChannel);
 
@@ -62,7 +67,7 @@ function* sharedSaga() {
           break;
         
         case 'ev_txs_changed':
-          //in case in progress transacions actions
+          yield fork(handleTransactions, payload.result);
 
         default:
           break;

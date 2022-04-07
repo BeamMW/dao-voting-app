@@ -27,8 +27,8 @@ const EpochsPrevious: React.FC = () => {
     <>
       <Window onPrevious={handlePrevious}>
         <EpochStatsSection
-          isWithProgress={false}
-          className={StatsSectionClass} data={true}></EpochStatsSection>
+          state='none'
+          className={StatsSectionClass}></EpochStatsSection>
         <ProposalsList isFuture={true} type={PROPOSALS.PREV} title='Future proposals' data={futureProposals.items}></ProposalsList>
       </Window>
     </>
