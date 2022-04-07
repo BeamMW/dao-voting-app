@@ -291,10 +291,6 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
       navigate(ROUTES.MAIN.STAKED_INFO);
     }
 
-    const calc = (p1, p2) => {
-      return p1 / p2
-    }
-
     return (
         <StyledStats className={className}>
             <div className='stats-title-class'>
@@ -369,7 +365,7 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
                         <div className='progress'>
                             <ProgressBar active={true} percent={
                               (votes / currentProposals.items.length) * 100
-                            }></ProgressBar>
+                            }/>
                             <span className='progress-percentage'>
                               {parseInt((votes / currentProposals.items.length) * 100 + '')}% ({votes} of {currentProposals.items.length})
                             </span>

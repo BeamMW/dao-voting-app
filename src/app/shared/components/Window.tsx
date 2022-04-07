@@ -66,7 +66,8 @@ const BackStyled = styled.div`
 
 const PkeyButtonClass = css`
   margin: 0 !important;
-  min-width: 140px;
+  min-width: 150px;
+  text-align: end;
   font-weight: 400 !important;
   display: flex;
   font-size: 16px !important;

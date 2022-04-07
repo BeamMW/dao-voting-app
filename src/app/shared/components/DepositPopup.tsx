@@ -18,7 +18,7 @@ interface DepositPopupProps {
 }
 
 interface DepositFormData {
-    send_amount: string;
+  send_amount: string;
 }
 
 const FeeContainer = styled.div`

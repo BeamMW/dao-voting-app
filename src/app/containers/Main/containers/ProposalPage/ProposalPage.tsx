@@ -4,7 +4,7 @@ import { css } from '@linaria/core';
 
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { Window, Button } from '@app/shared/components';
+import { Window, Button, VotingBar } from '@app/shared/components';
 import { VoteProposal } from '@core/api';
 import { EpochStatsSection, ProposalsList } from '@app/containers/Main/components';
 import { selectRate, selectProposal, selectUserView, selectCurrentProposals, selectFutureProposals, selectAppParams, selectTotalsView } from '../../store/selectors';
@@ -99,6 +99,7 @@ const ContentStyled = styled.div`
 
   > .controls {
     display: flex;
+    margin-bottom: 5px;
 
     > .button {
       max-width: none
@@ -113,6 +114,7 @@ const ContentStyled = styled.div`
   > .voted-controls {
     width: 100%;
     display: flex;
+    margin-bottom: 25px;
 
     > .change-button {
       margin: 0 0 0 auto;
@@ -134,7 +136,7 @@ const ContentStyled = styled.div`
     }
   }
 
-  > .future-content {
+  > .content {
     display: flex;
     flex-direction: column;
 
@@ -205,6 +207,13 @@ const StyledStakeTitle = styled.div`
   opacity: .5;
 `;
 
+const StyledHorSeparator = styled.div`
+  width: 100%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 20px 0 15px 0;
+`;
+
 const CurrentProposalContent: React.FC<ProposalContentProps> = (
   {proposal, state}
 ) => {
@@ -268,6 +277,29 @@ const CurrentProposalContent: React.FC<ProposalContentProps> = (
           </Button>
         </div>)
       }
+      <VotingBar active={proposal.voted !== undefined && proposal.voted < 255} 
+        value={proposal.stats.variants[1]}
+        percent={proposal.stats.variants[1] / proposal.stats.total * 100}
+        voteType='yes'/>
+      <VotingBar active={proposal.voted !== undefined && proposal.voted < 255}
+        value={proposal.stats.variants[0]}
+        percent={proposal.stats.variants[0] / proposal.stats.total * 100}
+        voteType='no'/>
+
+      <StyledHorSeparator/>
+      <div className='content'>
+        <div className='description'>{proposal.data.description}</div>
+        {
+          proposal.data.ref_link.length > 0 && 
+          <>
+            <div className='ref-title'>References</div>
+            <div className='ref-link' onClick={() => {openInNewTab(proposal.data.forum_link)}}>
+                <span>{proposal.data.ref_link}</span>
+                <IconExternalLink className='icon-link'/>
+            </div>
+          </>
+        }
+      </div>
     </ContentStyled>
   );
 };
@@ -281,38 +313,39 @@ const FutureProposalContent: React.FC<ProposalContentProps> = (
 
   return (
     <ContentStyled>
-      { proposal.data ?
-        <div className='future-content'>
+      { proposal.data &&
+        <div className='content'>
           <div className='epoch-comes'>The voting will be active when epoch #{appParams.current.iEpoch + 1} comes.</div>
           <div className='stake-info'>
             <span className='total'>
               <StyledStakeTitle>Total staked</StyledStakeTitle>
-              <div className='value'>{fromGroths(totalsView.stake_passive)} BEAMX</div>
+              <div className='value'>{fromGroths(totalsView.stake_passive + totalsView.stake_active)} BEAMX</div>
             </span>
             <span className='other'>
               <StyledStakeTitle>Your staked</StyledStakeTitle>
-              <div className='value'>{fromGroths(userViewData.stake_passive)} BEAMX</div>
+              <div className='value'>{fromGroths(userViewData.stake_passive + userViewData.stake_active)} BEAMX</div>
             </span>
-            { proposal.data.quorum !== undefined && proposal.data.quorum.type === 'percent' ?
-            <span className='other'>
-              <StyledStakeTitle>Votes quorum</StyledStakeTitle>
-              <div className='value'>{proposal.data.quorum.value} %</div>
-            </span> : null }
+            { 
+              proposal.data.quorum !== undefined && proposal.data.quorum.type === 'percent' &&
+              <span className='other'>
+                <StyledStakeTitle>Votes quorum</StyledStakeTitle>
+                <div className='value'>{proposal.data.quorum.value} %</div>
+              </span>
+            }
           </div>
           <div className='separator'></div>
           <div className='description'>{proposal.data.description}</div>
           {
-            proposal.data.ref_link.length > 0 ? 
+            proposal.data.ref_link.length > 0 && 
             <>
               <div className='ref-title'>References</div>
               <div className='ref-link' onClick={() => {openInNewTab(proposal.data.forum_link)}}>
                   <span>{proposal.data.ref_link}</span>
                   <IconExternalLink className='icon-link'/>
               </div>
-            </> : null
+            </>
           }
-        </div> :
-        null
+        </div>
       }
     </ContentStyled>
   );

@@ -143,9 +143,7 @@ export function* loadContractInfoSaga(
             withdrawedAmount += tr.invoke_data[0].amounts[0].amount * -1;
           }
         }
-        if (withdrawedAmount > 0) {
-          yield put(actions.setWithdrawedAmount(withdrawedAmount));
-        }
+        yield put(actions.setWithdrawedAmount(withdrawedAmount));
     } catch (e) {
       yield put(actions.loadContractInfo.failure(e));
     }
