@@ -32,6 +32,8 @@ import IconVoteButtonYes from './icon-vote-yes-button.svg';
 import IconVotedYes from './icon-voted-yes.svg';
 import IconVotedNo from './icon-voted-no.svg';
 import IconChangeDecision from './icon-change-decision.svg';
+import IconQuorumAlert from './icon-quorum-alert.svg';
+import IconQuorumApprove from './icon-quorum-approve.svg';
 
 export {
   IconBack,
@@ -68,4 +70,6 @@ export {
   IconVotedYes,
   IconExternalLink,
   IconChangeDecision,
+  IconQuorumAlert,
+  IconQuorumApprove
 }

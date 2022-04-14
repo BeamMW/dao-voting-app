@@ -7,7 +7,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Window, Button, VotingBar } from '@app/shared/components';
 import { VoteProposal } from '@core/api';
 import { EpochStatsSection, ProposalsList } from '@app/containers/Main/components';
-import { selectRate, selectProposal, selectUserView, selectCurrentProposals, selectFutureProposals, selectAppParams, selectTotalsView } from '../../store/selectors';
+import { selectRate, selectProposal, selectUserView,
+  selectCurrentProposals, selectFutureProposals,
+  selectAppParams, selectTotalsView } from '../../store/selectors';
 import { loadRate } from '@app/containers/Main/store/actions';
 import {
   IconVoteButtonNo,
@@ -15,12 +17,14 @@ import {
   IconVotedYes,
   IconVotedNo,
   IconChangeDecision,
-  IconExternalLink
+  IconExternalLink,
+  IconQuorumAlert,
+  IconQuorumApprove
 } from '@app/shared/icons';
 import { useParams } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import { PROPOSALS, ROUTES } from '@app/shared/constants';
-import { fromGroths, getProposalId } from '@core/appUtils';
+import { fromGroths, getProposalId, toGroths } from '@core/appUtils';
 import { ProcessedProposal } from '@app/core/types';
 import { openInNewTab } from '@core/appUtils'; 
 
@@ -195,11 +199,27 @@ const ContentStyled = styled.div`
       cursor: pointer;
       align-items: center;
 
-      > .icon-link {
-        margin-left: 5px;
-        margin-bottom: 2px;
-      }
+    > .icon-link {
+      margin-left: 5px;
+      margin-bottom: 2px;
+    }
   }
+`;
+
+const StyledStats = styled.div`
+  display: flex;
+  flex-direction: row;
+  margin-top: 20px;
+  align-items: center;
+
+  > .voted,
+  > .staked,
+  > .quorum,
+  > .voted-no {
+    margin-left: 20px;
+    max-width: 115px;
+  }
+
 `;
 
 const StyledStakeTitle = styled.div`
@@ -214,11 +234,42 @@ const StyledHorSeparator = styled.div`
   margin: 20px 0 15px 0;
 `;
 
+const StyledStatsValue = styled.div`
+  margin-top: 6px;
+  font-size: 14px;
+`;
+
+const VerticalSeparator = styled.div`
+  height: 37px;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 0 10px 0 35px;
+`;
+
+const QuorumIconClass = css`
+  margin-left: 5px;
+`;
+
 const CurrentProposalContent: React.FC<ProposalContentProps> = (
   {proposal, state}
 ) => {
   const userViewData = useSelector(selectUserView());
   const currentProposals = useSelector(selectCurrentProposals());
+  const totalsView = useSelector(selectTotalsView());
+  const [isVoted, setIsVoted] = useState(false);
+  const [isQuorumPassed, setQuorumPassed] = useState(false);
+
+  useEffect(() => {
+    if (proposal.voted !== undefined && proposal.voted < 255) {
+      setIsVoted(true);
+    }
+
+    if (proposal.data.quorum !== undefined && 
+      (proposal.data.quorum.type === 'beamx' ? proposal.stats.variants[1] >= toGroths(proposal.data.quorum.value) : 
+      ((proposal.stats.variants[1] / totalsView.stake_active) * 100 >= proposal.data.quorum.value))) {
+        setQuorumPassed(true);
+    }
+  }, [proposal]);
   
   const handleYesClick = () => {
     let votes = [];
@@ -228,6 +279,7 @@ const CurrentProposalContent: React.FC<ProposalContentProps> = (
     } else {
       votes = new Array(currentProposals.items.length).fill(255);
     }
+    votes = votes.reverse();
     votes[state.index] = 1;
     VoteProposal(votes);
   };
@@ -240,6 +292,7 @@ const CurrentProposalContent: React.FC<ProposalContentProps> = (
     } else {
       votes = new Array(currentProposals.items.length).fill(255);
     }
+    votes = votes.reverse();
     votes[state.index] = 0;
     VoteProposal(votes);
   };
@@ -277,7 +330,11 @@ const CurrentProposalContent: React.FC<ProposalContentProps> = (
           </Button>
         </div>)
       }
-      <VotingBar active={proposal.voted !== undefined && proposal.voted < 255} 
+      <VotingBar active={proposal.voted !== undefined && proposal.voted < 255}
+        quorum={proposal.data.quorum !== undefined ? 
+          (proposal.data.quorum.type === 'beamx' ? 
+            ((proposal.data.quorum.value / totalsView.stake_active) * 100)  : proposal.data.quorum.value ) : null}
+        qType={proposal.data.quorum.type}
         value={proposal.stats.variants[1]}
         percent={proposal.stats.variants[1] / proposal.stats.total * 100}
         voteType='yes'/>
@@ -285,7 +342,46 @@ const CurrentProposalContent: React.FC<ProposalContentProps> = (
         value={proposal.stats.variants[0]}
         percent={proposal.stats.variants[0] / proposal.stats.total * 100}
         voteType='no'/>
-
+      <StyledStats>
+        <span className='total'>
+          <StyledStakeTitle>Total staked</StyledStakeTitle>
+          <StyledStatsValue>{fromGroths(totalsView.stake_active)} BEAMX</StyledStatsValue>
+        </span>
+        {
+          isVoted &&
+          <span className='voted'>
+            <StyledStakeTitle>Voted</StyledStakeTitle>
+            <StyledStatsValue>{fromGroths(proposal.stats.total)} BEAMX</StyledStatsValue>
+          </span>
+        }
+        <span className='staked'>
+          <StyledStakeTitle>Your staked</StyledStakeTitle>
+          <StyledStatsValue>{fromGroths(userViewData.stake_active)} BEAMX</StyledStatsValue>
+        </span>
+        {
+          proposal.data.quorum !== undefined && 
+          <span className='quorum'>
+            <StyledStakeTitle>Quorum</StyledStakeTitle>
+            <StyledStatsValue>
+              { proposal.data.quorum.value + (proposal.data.quorum.type === 'beamx' ? ' BEAMX' : '%') }
+              { isQuorumPassed ? <IconQuorumApprove className={QuorumIconClass}/> : <IconQuorumAlert className={QuorumIconClass}/>}
+            </StyledStatsValue>
+          </span>
+        }
+        {
+          isVoted && <>
+            <VerticalSeparator/>
+            <span className='voted-yes'>
+              <StyledStakeTitle>Voted YES</StyledStakeTitle>
+              <StyledStatsValue>{fromGroths(proposal.stats.variants[1])}</StyledStatsValue>
+            </span>
+            <span className='voted-no'>
+              <StyledStakeTitle>Voted NO</StyledStakeTitle>
+              <StyledStatsValue>{fromGroths(proposal.stats.variants[0])}</StyledStatsValue>
+            </span>
+          </>
+        }
+      </StyledStats>
       <StyledHorSeparator/>
       <div className='content'>
         <div className='description'>{proposal.data.description}</div>

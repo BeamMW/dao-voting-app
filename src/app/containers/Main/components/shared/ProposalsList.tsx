@@ -13,6 +13,7 @@ import { getProposalId } from '@core/appUtils';
 
 interface ListProps {
   data: ProcessedProposal[];
+  extendedData?: ProcessedProposal[];
   title: string;
   type: string;
   isFuture?: boolean;
@@ -55,6 +56,8 @@ const SelectorItem = styled.span<{ active: boolean }>`
 
 const EpochSelector = styled.span`
     margin-left: 30px;
+    display: flex;
+    align-items: center;
 
     > .epoches-selector-title {
         font-size: 14px;
@@ -66,10 +69,12 @@ const EpochSelector = styled.span`
         font-size: 14px;
         font-weigth: 700;
         color: rgba(255, 255, 255, .7);
+        cursor: pointer;
     }
 
     > .epoches-selector-icon {
         margin-left: 10px;
+        cursor: pointer;
     }
 `;
 
@@ -174,6 +179,7 @@ const StyledEpochTitle = styled.div`
 
 const ProposalsList: React.FC<ListProps> = ({ 
   data,
+  extendedData = [],
   title,
   type
 }) => {
@@ -190,12 +196,38 @@ const ProposalsList: React.FC<ListProps> = ({
             title: 'AWAITING YOUR VOTE'
         },
         {
-            id: 3,
+            id: 2,
             title: 'YOUR VOTES'
         }
     ];
 
     const [selectorActiveItem, setSelectorItem] = useState(selectorData[0]);
+    const [items, setItems] = useState([]);
+    const [extendedEpochs, setExtendedEpochs] = useState([]);
+
+    useEffect(() => {
+        const fitleredData = data.filter((item) => {
+            if (selectorActiveItem.id === selectorData[0].id || 
+                (selectorActiveItem.id === selectorData[1].id && (item.voted === undefined || item.voted === 255)) ||
+                (selectorActiveItem.id === selectorData[2].id && (item.voted !== undefined && item.voted < 255))) {
+                return item;
+            }
+        })
+        setItems(fitleredData);
+    }, [data, selectorActiveItem]);
+
+    useEffect(() => {
+        let epochsIDs = [];
+        extendedData.map((item) => {
+            epochsIDs.push(item.epoch);
+        });
+        const onlyUnique = (value, index, self) => {
+            return self.indexOf(value) === index;
+        }
+        const unique = epochsIDs.filter(onlyUnique);
+        setExtendedEpochs(unique);
+    }, []);
+
     const handleSelectorClick: React.MouseEventHandler<HTMLLIElement> = ({ currentTarget }) => {
         setSelectorItem(selectorData[currentTarget.dataset.index]);
     };
@@ -211,7 +243,7 @@ const ProposalsList: React.FC<ListProps> = ({
     return (<div>
         <ProposalsHeader>
             <PropTitle>{ title }</PropTitle>
-            { type === PROPOSALS.CURRENT ?
+            { type !== PROPOSALS.FUTURE ?
             (<div className='selector-class'>
                 {selectorData.map((item, index) => (
                     <SelectorItem key={index} active={selectorActiveItem.id === item.id} 
@@ -228,41 +260,85 @@ const ProposalsList: React.FC<ListProps> = ({
             </EpochSelector>
         </ProposalsHeader>
 
-        { type === PROPOSALS.CURRENT ? <StyledEpochTitle>
-            Epoch #{appParams.current.iEpoch} (current)
-        </StyledEpochTitle> : null}
+        { (type === PROPOSALS.CURRENT || (type === PROPOSALS.PREV && items.length > 0)) && 
+            <StyledEpochTitle>
+                Epoch #{appParams.current.iEpoch} (current)
+            </StyledEpochTitle>
+        }
 
-        { data.length > 0 ?
-        (<List>
-            { data.map((item, index) =>
-                !!item.data && <ListItem data-index={index} key={index} onClick={() => handleListItemClick(item.id, index)}>
-                    <StyledItemHeader className={item.voted !== undefined && item.voted < 255 ? 'voted' : ''}>
-                        <span className='proposal-id'>#{getProposalId(item.id)}</span>
-                        <span className='proposal-title'>{item.data.title}</span>
+        { 
+            items.length > 0 ?
+            (<List>
+                { items.map((item, index) =>
+                    !!item.data && <ListItem data-index={index} key={index} onClick={() => handleListItemClick(item.id, index)}>
+                        <StyledItemHeader className={item.voted !== undefined && item.voted < 255 ? 'voted' : ''}>
+                            <span className='proposal-id'>#{getProposalId(item.id)}</span>
+                            <span className='proposal-title'>{item.data.title}</span>
 
-                        { type === PROPOSALS.CURRENT && (item.voted === undefined || item.voted !== undefined && item.voted == 255) ? 
-                            <PendingVote>pending vote</PendingVote> : null}
-                    </StyledItemHeader>
-                    { type === PROPOSALS.CURRENT && item.voted !== undefined && item.voted < 255 ? (<StyledItemContent>
-                        <span className='voted-yes'>
-                            <StyledVotedTitle>Voted YES</StyledVotedTitle>
-                            <StyledVotedValue>{fromGroths(item.stats.variants[1])} BEAMX</StyledVotedValue>
-                        </span>
-                        <span className='voted-no'>
-                            <StyledVotedTitle>Voted NO</StyledVotedTitle>
-                            <StyledVotedValue>{fromGroths(item.stats.variants[0])} BEAMX</StyledVotedValue>
-                        </span>
-                        <span className='voted-icon'>
-                            { item.voted !== undefined && item.voted === 1 ? <IconVotedYes/> : <IconVotedNo/> }
-                        </span>
-                    </StyledItemContent>) : null}
-                </ListItem>
-            )}
-        </List>) :
-        (isLoaded ? <div className={EmptyListClass}>
-            <IconNoProposals/>
-            <div className='title-class'>There are no proposals</div>
-        </div> : null)
+                            { type !== PROPOSALS.FUTURE && (item.voted === undefined || item.voted !== undefined && item.voted == 255) ? 
+                                <PendingVote>pending vote</PendingVote> : null}
+                        </StyledItemHeader>
+                        { type !== PROPOSALS.FUTURE && item.voted !== undefined && item.voted < 255 ? (<StyledItemContent>
+                            <span className='voted-yes'>
+                                <StyledVotedTitle>Voted YES</StyledVotedTitle>
+                                <StyledVotedValue>{fromGroths(item.stats.variants[1])} BEAMX</StyledVotedValue>
+                            </span>
+                            <span className='voted-no'>
+                                <StyledVotedTitle>Voted NO</StyledVotedTitle>
+                                <StyledVotedValue>{fromGroths(item.stats.variants[0])} BEAMX</StyledVotedValue>
+                            </span>
+                            <span className='voted-icon'>
+                                { item.voted !== undefined && item.voted === 1 ? <IconVotedYes/> : <IconVotedNo/> }
+                            </span>
+                        </StyledItemContent>) : null}
+                    </ListItem>
+                )}
+            </List>) :
+            (isLoaded && 
+                <div className={EmptyListClass}>
+                    <IconNoProposals/>
+                    <div className='title-class'>There are no proposals</div>
+                </div>
+            )
+        }
+
+        {   selectorActiveItem.id === selectorData[0].id &&
+            type === PROPOSALS.PREV && extendedData.length > 0 && 
+            extendedEpochs.map((extEpoch, extIndex) =>
+            <div key={extIndex}> 
+                <StyledEpochTitle>
+                    Epoch #{extEpoch}
+                </StyledEpochTitle>
+
+                <List>
+                    { extendedData.map((item, index) =>
+                        !!item.data && item.epoch === extEpoch && 
+                        <ListItem data-index={index} key={index} onClick={() => handleListItemClick(item.id, index)}>
+                            <StyledItemHeader className='voted'>
+                                <span className='proposal-id'>#{getProposalId(item.id)}</span>
+                                <span className='proposal-title'>{item.data.title}</span>
+                            </StyledItemHeader>
+                            <StyledItemContent>
+                                {item.stats.variants !== undefined && 
+                                    <>
+                                        <span className='voted-yes'>
+                                            <StyledVotedTitle>Voted YES</StyledVotedTitle>
+                                            <StyledVotedValue>{fromGroths(item.stats.variants[1])} BEAMX</StyledVotedValue>
+                                        </span>
+                                        <span className='voted-no'>
+                                            <StyledVotedTitle>Voted NO</StyledVotedTitle>
+                                            <StyledVotedValue>{fromGroths(item.stats.variants[0])} BEAMX</StyledVotedValue>
+                                        </span>
+                                    </>
+                                }
+                                {/* <span className='voted-icon'>
+                                    { item.voted !== undefined && item.voted === 1 ? <IconVotedYes/> : <IconVotedNo/> }
+                                </span> */}
+                            </StyledItemContent>
+                        </ListItem>
+                    )}
+                </List>
+            </div>)
         }
     </div>);
 };

@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Window, Button } from '@app/shared/components';
 import { EpochStatsSection, ProposalsList } from '@app/containers/Main/components';
-import { selectFutureProposals } from '../../store/selectors';
+import { selectCurrentProposals, selectPrevProposals } from '../../store/selectors';
 import { PROPOSALS, ROUTES } from '@app/shared/constants';
 
 const StatsSectionClass = css`
@@ -17,7 +17,8 @@ const EpochsPrevious: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const futureProposals = useSelector(selectFutureProposals());
+  const prevProposals = useSelector(selectPrevProposals());
+  const currProposals = useSelector(selectCurrentProposals());
 
   const handlePrevious: React.MouseEventHandler = () => {
     navigate(ROUTES.MAIN.EPOCHS);
@@ -29,7 +30,9 @@ const EpochsPrevious: React.FC = () => {
         <EpochStatsSection
           state='none'
           className={StatsSectionClass}></EpochStatsSection>
-        <ProposalsList isFuture={true} type={PROPOSALS.PREV} title='Future proposals' data={futureProposals.items}></ProposalsList>
+        <ProposalsList isFuture={true} type={PROPOSALS.PREV} 
+          title='Proposals' data={currProposals.items} extendedData={prevProposals.items}
+        ></ProposalsList>
       </Window>
     </>
   );

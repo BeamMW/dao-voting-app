@@ -65,7 +65,7 @@ export function* loadProposalsSaga(
     try {
         const initProposals = (yield call(LoadProposals)) as InitialProposal[];
         const state = (yield select()) as {main: EpochesStateType, shared: SharedStateType};
-        
+
         let proposalsData = {
           current: [],
           future: [],
@@ -74,19 +74,25 @@ export function* loadProposalsSaga(
         const nextEpochProps = state.main.appParams.next.proposals;
         const currentEpochProps = state.main.appParams.current.proposals;
 
-        proposalsData.future = nextEpochProps > 0 ? initProposals.splice(initProposals.length - nextEpochProps, nextEpochProps) : [];
-        proposalsData.current = currentEpochProps > 0 ? initProposals.splice(initProposals.length - currentEpochProps, currentEpochProps) : [];
-        proposalsData.prev = initProposals.length > 0 ? initProposals : [];
+        proposalsData.future = nextEpochProps > 0 ? 
+          initProposals.splice(initProposals.length - nextEpochProps, nextEpochProps).reverse() : [];
+        proposalsData.current = currentEpochProps > 0 ?
+          initProposals.splice(initProposals.length - currentEpochProps, currentEpochProps).reverse() : [];
+        proposalsData.prev = initProposals.length > 0 ? initProposals.reverse() : [];
 
         for (const key in proposalsData) {
           const proposals = proposalsData[key];
           for (let i = 0; i < proposals.length; i++) {
-            let item = proposals[i];
-            const proposalRes = (yield call(LoadProposalData, item.id)) as ProposalStats;
-            item['stats'] = proposalRes;
+            let item = proposals[i] as InitialProposal;
+            if (key !== PROPOSALS.PREV) {
+              const proposalRes = (yield call(LoadProposalData, item.id)) as ProposalStats;
+              item['stats'] = proposalRes;
+            } else {
+              item['stats'] = {};
+            }
             item['data'] = {};
             try {
-              item['data'] = JSON.parse(window.atob(Base64DecodeUrl(item.text)));
+              item['data'] = JSON.parse(window.atob(Base64DecodeUrl(item.text))) as ProposalData;
             } catch (e) {
               console.log(e)
             }
@@ -94,8 +100,12 @@ export function* loadProposalsSaga(
             if (key === PROPOSALS.CURRENT) {
               const userViewData = state.main.userView;
               if (userViewData.current_votes !== undefined && userViewData.current_votes.length > 0) {
-                item['voted'] = state.main.userView.current_votes[i];
+                item['voted'] = state.main.userView.current_votes[proposals.length - i - 1];
               }
+            }
+
+            if (key === PROPOSALS.PREV) {
+              item['epoch'] = Math.ceil((item.height - state.main.contractHeight) / state.main.appParams.epoch_dh) + 1;
             }
           }
 
@@ -109,7 +119,12 @@ export function* loadProposalsSaga(
           } else if (key === PROPOSALS.PREV) {
             yield put(actions.setPrevProposals(proposalsData.prev));
           }
-        } 
+        }
+
+        for (let i = 0; i < proposalsData.prev.length; i++) {
+          const stats = (yield call(LoadProposalData, proposalsData.prev[i].id)) as ProposalStats;
+          yield put(actions.loadPrevProposalStats({propId: i, stats}));
+        }
 
         yield put(actions.loadPoposals.success(true));
     } catch (e) {

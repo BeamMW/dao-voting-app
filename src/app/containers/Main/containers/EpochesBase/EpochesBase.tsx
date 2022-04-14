@@ -9,7 +9,7 @@ import { EpochStatsSection, ProposalsList } from '@app/containers/Main/component
 import { selectCurrentProposals, selectPrevProposals, selectRate } from '../../store/selectors';
 import { loadRate } from '@app/containers/Main/store/actions';
 import { IconOldEpoches } from '@app/shared/icons';
-import { PROPOSALS } from '@app/shared/constants';
+import { PROPOSALS, ROUTES } from '@app/shared/constants';
 
 const StatsSectionClass = css`
   margin-bottom: 40px;
@@ -38,13 +38,17 @@ const EpochesBase: React.FC = () => {
   const currentProposals = useSelector(selectCurrentProposals());
   const prevProposals = useSelector(selectPrevProposals());
 
+  const handleOldEpochs = () => {
+    navigate(ROUTES.MAIN.PREVIOUS_EPOCHS);
+  }
+
   return (
     <>
       <Window>
         <EpochStatsSection state='progress' className={StatsSectionClass}></EpochStatsSection>
         <ProposalsList title='Proposals' type={PROPOSALS.CURRENT} data={currentProposals.items}></ProposalsList>
         { prevProposals.items.length > 0 ?
-          <Button variant='ghost' icon={IconOldEpoches} className={OldButtonClass}>show old epochs</Button> : 
+          <Button variant='ghost' icon={IconOldEpoches} onClick={handleOldEpochs} className={OldButtonClass}>show old epochs</Button> : 
           null 
         }
       </Window>

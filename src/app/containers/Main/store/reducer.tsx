@@ -81,6 +81,9 @@ const reducer = createReducer<EpochesStateType, Action>(initialState)
   .handleAction(actions.setProposalsState, (state, action) => produce(state, (nexState) => {
     nexState.proposals[action.payload.type].is_active = action.payload.is_active;
   }))
+  .handleAction(actions.loadPrevProposalStats, (state, action) => produce(state, (nexState) => {
+    nexState.proposals.prev.items[action.payload.propId].stats = action.payload.stats;
+  }))
   .handleAction(actions.loadAppParams.success, (state, action) => produce(state, (nexState) => {
     nexState.appParams = action.payload;
   }))

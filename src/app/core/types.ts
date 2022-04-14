@@ -41,6 +41,7 @@ export interface ProcessedProposal extends InitialProposal{
     stats: ProposalStats;
     data: ProposalData;
     voted?: number;
+    epoch?: number;
 }
 
 export interface ProposalState {

@@ -1,6 +1,6 @@
 import { createAsyncAction, createAction } from 'typesafe-actions';
 import React from 'react';
-import { ProcessedProposal, UserViewParams, VotingAppParams } from '@core/types';
+import { ProcessedProposal, UserViewParams, VotingAppParams, ProposalStats } from '@core/types';
 
 export const setAppParams = createAction('@@MAIN/SET_PARAMS')<VotingAppParams>();
 export const setUserView = createAction('@@MAIN/SET_USER_VIEW')<UserViewParams>();
@@ -11,6 +11,7 @@ export const setProposalsState = createAction('@@MAIN/SET_PROPOSALS_STATE')<{is_
 export const setPopupState = createAction('@@MAIN/SET_POPUP_STATE')<{type: string, state: boolean}>();
 export const setBlocksLeft = createAction('@@MAIN/SET_BLOCKS_LEFT')<number>();
 export const setWithdrawedAmount = createAction('@@MAIN/SET_WITHDRAWED_AMOUNT')<number>();
+export const loadPrevProposalStats = createAction('@@MAIN/LOAD_PREV_PROPOSAL_STATS')<{propId: number, stats: ProposalStats}>();
 
 export const loadAppParams = createAsyncAction(
     '@@MAIN/LOAD_PARAMS',

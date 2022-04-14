@@ -1,12 +1,15 @@
 import React, {useRef, useEffect, useState} from 'react';
 import { styled } from '@linaria/react';
 import { fromGroths } from '@app/core/appUtils';
+import { Popover } from 'react-tiny-popover';
 
 interface ProgressBarProps {
   active: boolean;
   percent: number;
   voteType: 'yes' | 'no';
   value: number;
+  quorum?: number;
+  qType?: string;
 }
 
 const ContainerStyled = styled.div<{voteType: string, valueOffset: number;}>`
@@ -54,11 +57,40 @@ const Line = styled.div<{percent: number, voteType: string, active:boolean}>`
   width: ${({ percent }) => percent}%;
 `;
 
-const VotingBar: React.FC<ProgressBarProps> = ({ active, percent, value, voteType }) => {
+const QuorumLine = styled.div<{margin: number, percent: number}>`
+  position: absolute;
+  border-left: 2px dashed ${({ percent, margin }) => margin <= percent ? '#042548' : '#ffffff'};
+  height: 30px;
+  margin-left: calc(${({ margin }) => margin}% - 5px);
+`;
+
+const StyledPopover = styled.div`
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(30px);
+  border-radius: 5px;
+  margin-bottom: 9px;
+
+  :after {
+    content: '';
+    position: absolute;
+    left: 47%;
+    top: 47px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid rgba(255, 255, 255, 0.15);
+    clear: both;
+  }
+`;
+
+const VotingBar: React.FC<ProgressBarProps> = ({ active, percent, value, voteType, quorum, qType }) => {
   const valRef = useRef(null);
   const contRef = useRef(null);
   const progressRef = useRef(null);
   const [valueOffset, setValueOffset] = useState(0);
+  const [isPopoverOpen, setPopoverState] = useState(false);
   useEffect(() => {
     if (valRef.current && contRef.current && progressRef.current) {
       if (progressRef.current.offsetWidth > valRef.current.offsetWidth + 10) {
@@ -67,10 +99,28 @@ const VotingBar: React.FC<ProgressBarProps> = ({ active, percent, value, voteTyp
     }
 
   }, [valRef.current, contRef.current, progressRef.current]);
+
   return (
     <ContainerStyled ref={contRef} voteType={voteType} valueOffset={valueOffset}>
-      <Line ref={progressRef} percent={percent} active={active} voteType={voteType}/>
+      <Line percent={percent} active={active} voteType={voteType} ref={progressRef}/>
       {value > 0 && <div ref={valRef} className='value'>{fromGroths(value)} BEAMX</div>}
+      {voteType === 'yes' && quorum !== undefined && quorum && 
+        <Popover
+          isOpen={isPopoverOpen}
+          positions={['top', 'bottom', 'left', 'right']}
+          content={
+             qType === 'beamx' ?
+            <StyledPopover>
+              {fromGroths(value)} BEAMX required for approval
+            </StyledPopover> :
+            <StyledPopover>
+              {quorum}% YES votes required for approval
+            </StyledPopover>
+          }
+        >
+          <QuorumLine margin={quorum} percent={percent} onMouseEnter={()=>setPopoverState(true)} onMouseLeave={()=>setPopoverState(false)}/>
+        </Popover>
+      }
     </ContainerStyled>
   );
 };

@@ -30,7 +30,7 @@ const StyledTitle = styled.div`
   > .controls {
     height: 36px;
     position: absolute !important;
-    right: 38px !important;
+    right: 40px !important;
     top: 37px !important;
     display: flex;
     align-items: flex-end;
