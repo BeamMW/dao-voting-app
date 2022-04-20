@@ -23,7 +23,7 @@ import {
   selectBlocksLeft,
   selectWithdrawedAmount,
   selectUserView } from '@app/containers/Main/store/selectors';
-import { fromGroths } from '@core/appUtils';
+import { fromGroths, calcVotingPower } from '@core/appUtils';
 import { setPopupState } from '@app/containers/Main/store/actions';
 
 interface SeedListProps {
@@ -314,7 +314,7 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
                         </SubSectionValue>
                         { totalsView.stake_active > 0 && state !== 'stake' ?
                         (<div className='voting-power-class'>
-                          Voting power is {Number(Math.floor(100 / (totalsView.stake_active / userViewData.stake_active)).toFixed())}%
+                          Voting power is {calcVotingPower(userViewData.stake_active, totalsView.stake_active)}%
                         </div>)
                         : null }
                     </StyledStaked>
@@ -324,7 +324,7 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
                   <PowerStats>
                     <SubSectionTitle>Voting power</SubSectionTitle>
                     <div className='power-value'>
-                      { Number(Math.floor(100 / (totalsView.stake_active / userViewData.stake_active)).toFixed()) }%
+                      { calcVotingPower(userViewData.stake_active, totalsView.stake_active) }%
                     </div>
                     <div className='text'>At the epoch beginning</div>
                   </PowerStats>
@@ -409,7 +409,7 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
                       { totalsView.stake_active !== 0 && <PowerStats>
                         <SubSectionTitle>Voting power</SubSectionTitle>
                         <div className='power-value'>
-                          { Number(Math.floor(100 / ((totalsView.stake_active + withdrawedAmount) / withdrawedAmount)).toFixed()) }%
+                          { calcVotingPower(withdrawedAmount, totalsView.stake_active + withdrawedAmount) }%
                           <IconArrowRedDown className='power-up-icon'/>
                         </div>
                       </PowerStats> }
@@ -448,7 +448,7 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
                       { totalsView.stake_active !== 0 && <PowerStats>
                         <SubSectionTitle>Voting power</SubSectionTitle>
                         <div className='power-value'>
-                          { Number(Math.floor(100 / (totalsView.stake_active / userViewData.stake_passive)).toFixed()) }%
+                          { calcVotingPower(userViewData.stake_passive, totalsView.stake_active) }%
                           <IconArrowGreenUp className='power-up-icon'/>
                         </div>
                       </PowerStats> }

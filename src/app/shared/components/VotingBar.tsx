@@ -2,6 +2,8 @@ import React, {useRef, useEffect, useState} from 'react';
 import { styled } from '@linaria/react';
 import { fromGroths } from '@app/core/appUtils';
 import { Popover } from 'react-tiny-popover';
+import { useSelector } from 'react-redux';
+import { selectTotalsView } from '@app/containers/Main/store/selectors';
 
 interface ProgressBarProps {
   active: boolean;
@@ -91,6 +93,8 @@ const VotingBar: React.FC<ProgressBarProps> = ({ active, percent, value, voteTyp
   const progressRef = useRef(null);
   const [valueOffset, setValueOffset] = useState(0);
   const [isPopoverOpen, setPopoverState] = useState(false);
+  const totalsView = useSelector(selectTotalsView());
+
   useEffect(() => {
     if (valRef.current && contRef.current && progressRef.current) {
       if (progressRef.current.offsetWidth > valRef.current.offsetWidth + 10) {
@@ -111,14 +115,15 @@ const VotingBar: React.FC<ProgressBarProps> = ({ active, percent, value, voteTyp
           content={
              qType === 'beamx' ?
             <StyledPopover>
-              {fromGroths(value)} BEAMX required for approval
+              {quorum} BEAMX required for approval
             </StyledPopover> :
             <StyledPopover>
               {quorum}% YES votes required for approval
             </StyledPopover>
           }
         >
-          <QuorumLine margin={quorum} percent={percent} onMouseEnter={()=>setPopoverState(true)} onMouseLeave={()=>setPopoverState(false)}/>
+          <QuorumLine margin={qType === 'percent' ? quorum : (quorum / fromGroths(totalsView.stake_active) * 100)} 
+            percent={percent} onMouseEnter={()=>setPopoverState(true)} onMouseLeave={()=>setPopoverState(false)}/>
         </Popover>
       }
     </ContainerStyled>

@@ -13,6 +13,7 @@ export const AMOUNT_MAX = 253999999.9999999;
 interface AmountInputProps {
   value: string;
   error?: string;
+  valid?: boolean;
   pallete?: 'purple' | 'blue';
   from?: 'deposit' | 'withdraw'
   onChange?: (value: string) => void; //TODO
@@ -21,7 +22,6 @@ interface AmountInputProps {
 const ContainerStyled = styled.div`
   display: flex;
   flex-direction: column;
-  margin-bottom: 20px;
 `;
 
 const containerStyle = css`
@@ -37,7 +37,7 @@ const rateStyle = css`
 `;
 
 const AmountInput: React.FC<AmountInputProps> = ({
-  value, error, pallete = 'purple', onChange, from
+  value, error, pallete = 'purple', onChange, from, valid,
 }) => {
   const handleInput: React.ChangeEventHandler<HTMLInputElement> = (event) => {
     const { value: raw } = event.target;
@@ -54,7 +54,7 @@ const AmountInput: React.FC<AmountInputProps> = ({
       <Input
         variant="proposal"
         from={from}
-        valid={!error}
+        valid={valid}
         label={error}
         value={value}
         pallete={pallete}

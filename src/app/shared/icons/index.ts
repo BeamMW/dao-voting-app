@@ -34,6 +34,7 @@ import IconVotedNo from './icon-voted-no.svg';
 import IconChangeDecision from './icon-change-decision.svg';
 import IconQuorumAlert from './icon-quorum-alert.svg';
 import IconQuorumApprove from './icon-quorum-approve.svg';
+import IconChangeBlue from './icon-change-blue.svg';
 
 export {
   IconBack,
@@ -71,5 +72,6 @@ export {
   IconExternalLink,
   IconChangeDecision,
   IconQuorumAlert,
-  IconQuorumApprove
+  IconQuorumApprove,
+  IconChangeBlue
 }

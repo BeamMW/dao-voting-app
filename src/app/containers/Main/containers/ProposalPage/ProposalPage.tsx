@@ -4,7 +4,7 @@ import { css } from '@linaria/core';
 
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { Window, Button, VotingBar } from '@app/shared/components';
+import { Window, Button, VotingBar, ChangeDecisionPopup } from '@app/shared/components';
 import { VoteProposal } from '@core/api';
 import { EpochStatsSection, ProposalsList } from '@app/containers/Main/components';
 import { selectRate, selectProposal, selectUserView,
@@ -27,6 +27,7 @@ import { PROPOSALS, ROUTES } from '@app/shared/constants';
 import { fromGroths, getProposalId, toGroths } from '@core/appUtils';
 import { ProcessedProposal } from '@app/core/types';
 import { openInNewTab } from '@core/appUtils'; 
+import { selectTransactions } from '@app/shared/store/selectors';
 
 interface locationProps { 
   id: number,
@@ -36,7 +37,10 @@ interface locationProps {
 
 interface ProposalContentProps {
   proposal: ProcessedProposal,
-  state: locationProps
+  state: locationProps,
+  callback?: any,
+  isChangeProcessActive?: boolean,
+  onDisableChangeProcessState?: ()=>void
 }
 
 const StatsSectionClass = css`
@@ -210,7 +214,7 @@ const StyledStats = styled.div`
   display: flex;
   flex-direction: row;
   margin-top: 20px;
-  align-items: center;
+  align-items: start;
 
   > .voted,
   > .staked,
@@ -251,13 +255,15 @@ const QuorumIconClass = css`
 `;
 
 const CurrentProposalContent: React.FC<ProposalContentProps> = (
-  {proposal, state}
+  {proposal, state, callback, isChangeProcessActive, onDisableChangeProcessState}
 ) => {
   const userViewData = useSelector(selectUserView());
   const currentProposals = useSelector(selectCurrentProposals());
   const totalsView = useSelector(selectTotalsView());
   const [isVoted, setIsVoted] = useState(false);
   const [isQuorumPassed, setQuorumPassed] = useState(false);
+  const transactions = useSelector(selectTransactions());
+  const [isVoteInProgress, setVoteInProgress] = useState(false);
 
   useEffect(() => {
     if (proposal.voted !== undefined && proposal.voted < 255) {
@@ -269,9 +275,35 @@ const CurrentProposalContent: React.FC<ProposalContentProps> = (
       ((proposal.stats.variants[1] / totalsView.stake_active) * 100 >= proposal.data.quorum.value))) {
         setQuorumPassed(true);
     }
+
+    const activeVotes = localStorage.getItem('votes');
+    
+    if (activeVotes) {
+      const votes = [...(JSON.parse(activeVotes).votes)];
+
+      const currentProposal = votes.find((item) => {
+        return item.id === proposal.id;
+      });
+
+      if (currentProposal) {
+        const isInProgress = transactions.find((tx) => {
+          return tx.txId === currentProposal.txid && tx.status === 5;
+        });
+
+        setVoteInProgress(!!isInProgress);
+        
+        if (!isInProgress) {
+          const updatedVotes = votes.filter(function(item){ 
+            return item.id !== proposal.id;
+          });
+
+          localStorage.setItem('votes', JSON.stringify({votes: updatedVotes}));
+        }
+      }
+    }
   }, [proposal]);
   
-  const handleYesClick = () => {
+  const handleVoteClick = (vote: number) => {
     let votes = [];
 
     if (userViewData.current_votes !== undefined) {
@@ -280,34 +312,22 @@ const CurrentProposalContent: React.FC<ProposalContentProps> = (
       votes = new Array(currentProposals.items.length).fill(255);
     }
     votes = votes.reverse();
-    votes[state.index] = 1;
-    VoteProposal(votes);
-  };
-
-  const handleNoClick = () => {
-    let votes = [];
-
-    if (userViewData.current_votes !== undefined) {
-      votes = [...userViewData.current_votes];
-    } else {
-      votes = new Array(currentProposals.items.length).fill(255);
-    }
-    votes = votes.reverse();
-    votes[state.index] = 0;
-    VoteProposal(votes);
+    votes[state.index] = vote;
+    VoteProposal(votes, proposal.id);
+    onDisableChangeProcessState();
   };
 
   const handleChange = () => {
-
+    callback();
   };
 
   return (
     <ContentStyled>
-      { proposal.voted === undefined || proposal.voted === 255 ?
+      { isChangeProcessActive || (proposal.voted === undefined || proposal.voted === 255) ?
         (<div className='controls'>
-          <Button variant='regular' pallete='green' onClick={handleYesClick}
+          <Button variant='regular' pallete='green' onClick={()=>handleVoteClick(1)} disabled={isVoteInProgress}
             className='button yes' icon={IconVoteButtonYes} >YES</Button>
-          <Button variant='regular' pallete='vote-red' onClick={handleNoClick}
+          <Button variant='regular' pallete='vote-red' onClick={()=>handleVoteClick(0)} disabled={isVoteInProgress}
             className='button no' icon={IconVoteButtonNo} >NO</Button>
         </div>) :
         (<div className='voted-controls'>
@@ -331,10 +351,8 @@ const CurrentProposalContent: React.FC<ProposalContentProps> = (
         </div>)
       }
       <VotingBar active={proposal.voted !== undefined && proposal.voted < 255}
-        quorum={proposal.data.quorum !== undefined ? 
-          (proposal.data.quorum.type === 'beamx' ? 
-            ((proposal.data.quorum.value / totalsView.stake_active) * 100)  : proposal.data.quorum.value ) : null}
-        qType={proposal.data.quorum.type}
+        quorum={proposal.data.quorum !== undefined ?  proposal.data.quorum.value : null}
+        qType={proposal.data.quorum !== undefined ? proposal.data.quorum.type : null}
         value={proposal.stats.variants[1]}
         percent={proposal.stats.variants[1] / proposal.stats.total * 100}
         voteType='yes'/>
@@ -347,13 +365,10 @@ const CurrentProposalContent: React.FC<ProposalContentProps> = (
           <StyledStakeTitle>Total staked</StyledStakeTitle>
           <StyledStatsValue>{fromGroths(totalsView.stake_active)} BEAMX</StyledStatsValue>
         </span>
-        {
-          isVoted &&
-          <span className='voted'>
+       <span className='voted'>
             <StyledStakeTitle>Voted</StyledStakeTitle>
             <StyledStatsValue>{fromGroths(proposal.stats.total)} BEAMX</StyledStatsValue>
-          </span>
-        }
+        </span>
         <span className='staked'>
           <StyledStakeTitle>Your staked</StyledStakeTitle>
           <StyledStatsValue>{fromGroths(userViewData.stake_active)} BEAMX</StyledStatsValue>
@@ -368,19 +383,15 @@ const CurrentProposalContent: React.FC<ProposalContentProps> = (
             </StyledStatsValue>
           </span>
         }
-        {
-          isVoted && <>
-            <VerticalSeparator/>
-            <span className='voted-yes'>
-              <StyledStakeTitle>Voted YES</StyledStakeTitle>
-              <StyledStatsValue>{fromGroths(proposal.stats.variants[1])}</StyledStatsValue>
-            </span>
-            <span className='voted-no'>
-              <StyledStakeTitle>Voted NO</StyledStakeTitle>
-              <StyledStatsValue>{fromGroths(proposal.stats.variants[0])}</StyledStatsValue>
-            </span>
-          </>
-        }
+        <VerticalSeparator/>
+        <span className='voted-yes'>
+          <StyledStakeTitle>Voted YES</StyledStakeTitle>
+          <StyledStatsValue>{fromGroths(proposal.stats.variants[1])}</StyledStatsValue>
+        </span>
+        <span className='voted-no'>
+          <StyledStakeTitle>Voted NO</StyledStakeTitle>
+          <StyledStatsValue>{fromGroths(proposal.stats.variants[0])}</StyledStatsValue>
+        </span>
       </StyledStats>
       <StyledHorSeparator/>
       <div className='content'>
@@ -452,6 +463,8 @@ const ProposalPage: React.FC = () => {
   const dispatch = useDispatch();
   const rate = useSelector(selectRate());
   const location = useLocation();
+  const [isChangeVisible, setChangePopupState] = useState(false);
+  const [isChangeActive, setChangeProcessState] = useState(false);
 
   useEffect(() => {
     if (!rate) {
@@ -506,9 +519,14 @@ const ProposalPage: React.FC = () => {
               {getDate(proposal.data.timestamp)}
             </div> : null }
           </HeaderStyled>
-          <ContentComponent proposal={proposal} state={state}/>
+          <ContentComponent isChangeProcessActive={isChangeActive}
+            onDisableChangeProcessState={()=>setChangeProcessState(false)}
+            callback={()=>{setChangePopupState(true)}} proposal={proposal} state={state}/>
         </Proposal>
       </Window>
+      <ChangeDecisionPopup voted={proposal.voted !== undefined ? proposal.voted : null}
+        onChangeResult={(res)=>{setChangeProcessState(res)}}
+        visible={isChangeVisible} onCancel={()=>{setChangePopupState(false)}}/>
     </>
   );
 };

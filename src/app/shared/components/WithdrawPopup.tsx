@@ -21,6 +21,7 @@ interface WithdrawFormData {
 }
 
 const FeeContainer = styled.div`
+    margin-top: 20px;
     margin-left: 15px;
     display: flex;
     flex-direction: column;
@@ -96,6 +97,14 @@ const WithdrawPopupClass = css`
     width: 450px !important;
 `;
 
+const AmountErrorClass = css`
+  max-width: 320px;
+  text-align: start;
+  color: #ff746b;
+  font-style: italic;
+  margin-left: 15px;
+`;
+
 const WithdrawPopup: React.FC<WithdrawPopupProps> = ({ visible, onCancel }) => {
   const inputRef = useRef<HTMLInputElement>();
   const [warned, setWarned] = useState(false);
@@ -124,24 +133,47 @@ const WithdrawPopup: React.FC<WithdrawPopupProps> = ({ visible, onCancel }) => {
         withdraw_amount: '',
     },
     isInitialValid: false,
-    //validate: (e) => validate(e, setHint),
     onSubmit: (value) => {
         UserWithdraw(toGroths(parseFloat(value.withdraw_amount)));
         onCancel();
         resetForm();
     },
+    validate: (e) => validate(e),
   });
 
   const {
     values, setFieldValue, errors, submitForm, resetForm
   } = formik;
 
+  const validate = async (formValues: WithdrawFormData) => {
+    const errorsValidation: any = {};
+    const {
+        withdraw_amount
+    } = formValues;
+
+    const totalStake = fromGroths(userViewData.stake_active + userViewData.stake_passive);
+    if (Number(withdraw_amount) > totalStake) {
+      errorsValidation.withdraw_amount = `Insufficient funds to complete the transaction. Maximum amount is ${totalStake} BEAMX.`;
+    }
+
+    return errorsValidation;
+  };
+  
+  const isFormDisabled = () => {
+    if (!formik.isValid) return !formik.isValid;
+    return false;
+  };
+
+  const isWithdrawAmountValid = () => {
+    return !errors.withdraw_amount;
+  }
+
   const handleAssetChange = (e: string) => {
     setFieldValue('withdraw_amount', e, true);
   };
 
   const handleAddMax = () => {
-    setFieldValue('withdraw_amount', fromGroths(userViewData.stake_active), true)
+    setFieldValue('withdraw_amount', fromGroths(userViewData.stake_active + userViewData.stake_passive), true)
   }
 
   return (
@@ -158,7 +190,7 @@ const WithdrawPopup: React.FC<WithdrawPopupProps> = ({ visible, onCancel }) => {
         </Button>
       )}
       confirmButton={(
-        <Button variant='regular' className={WithdrawButtonsClass} pallete='blue'
+        <Button variant='regular' className={WithdrawButtonsClass} pallete='blue' disabled={isFormDisabled()}
         icon={IconWithdrawBlue} onClick={submitForm}>
           withdraw
         </Button>
@@ -168,34 +200,36 @@ const WithdrawPopup: React.FC<WithdrawPopupProps> = ({ visible, onCancel }) => {
         resetForm();
       }}
     >
-        <AmountContainer>
-            <span className='amount-input-class'>
-                <AmountInput
-                    from='withdraw'
-                    pallete='blue'
-                    value={values.withdraw_amount}
-                    error={errors.withdraw_amount?.toString()}
-                    onChange={(e) => handleAssetChange(e)}
-                />
-            </span>
-            <span className='amount-max-class'>
-                <AddMaxStyled onClick={handleAddMax}>
-                    <IconAddMax className='add-max-icon'/>
-                    <span className='add-max-text'>max</span>
-                </AddMaxStyled>
-            </span>
-        </AmountContainer>
-        <FeeContainer>
-            <div className='fee-head'>
-                <span className='title'>Fee</span>
-                <span className='value'>0.011 BEAM</span>
-            </div>
-            <Rate value={0.011} className='fee-rate'/>
-        </FeeContainer>
-        <InfoContainer>
-            <div>Withdrawing will decrease your voting power in current epoch #{appParams.current.iEpoch}</div>
-            <div>({nextEpochDate})</div>
-        </InfoContainer>
+      <AmountContainer>
+          <span className='amount-input-class'>
+              <AmountInput
+                  from='withdraw'
+                  pallete='blue'
+                  value={values.withdraw_amount}
+                  error={errors.withdraw_amount?.toString()}
+                  valid={isWithdrawAmountValid()}
+                  onChange={(e) => handleAssetChange(e)}
+              />
+              <div className={AmountErrorClass}>{errors.withdraw_amount}</div>
+          </span>
+          <span className='amount-max-class'>
+              <AddMaxStyled onClick={handleAddMax}>
+                  <IconAddMax className='add-max-icon'/>
+                  <span className='add-max-text'>max</span>
+              </AddMaxStyled>
+          </span>
+      </AmountContainer>
+      <FeeContainer>
+          <div className='fee-head'>
+              <span className='title'>Fee</span>
+              <span className='value'>0.011 BEAM</span>
+          </div>
+          <Rate value={0.011} className='fee-rate'/>
+      </FeeContainer>
+      <InfoContainer>
+          <div>Withdrawing will decrease your voting power in current epoch #{appParams.current.iEpoch}</div>
+          <div>({nextEpochDate})</div>
+      </InfoContainer>
     </Popup>
   );
 };

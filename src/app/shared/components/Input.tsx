@@ -49,10 +49,10 @@ const InputGrayStyled = styled(InputStyled)`
   border-color: ${({ valid }) => (valid ? 'rgba(255,255,255,0.3)' : 'var(--color-red)')};
 `;
 
-const InputProposalStyled = styled(InputGrayStyled)<{ pallete: string }>`
+const InputProposalStyled = styled(InputGrayStyled)<{ pallete: string, valid: boolean }>`
   font-size: 16px;
   font-weight: normal;
-  color: ${({ pallete }) => `var(--color-${pallete})`};
+  color: ${({ pallete, valid }) => valid ? `var(--color-${pallete})` : '#ff746b'};
   height: 45px;
   border: none;
   padding: 0 15px;

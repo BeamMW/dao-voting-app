@@ -152,7 +152,7 @@ const TextAreaProposalStyled = styled.textarea<TextAreaProps>`
 
 const ErrorLineClass = css`
     text-align: start;
-    color: #FF436A;
+    color: #ff746b;
     font-style: italic;
 `;
 
@@ -228,7 +228,7 @@ const NewProposalPopup: React.FC<NewProposalPopupProps> = ({ visible, onCancel }
         }
 
         return errorsValidation;
-      };
+    };
 
     const textareaRef = useRef(null);
     useEffect(() => {
@@ -354,7 +354,7 @@ const NewProposalPopup: React.FC<NewProposalPopupProps> = ({ visible, onCancel }
                     <div className='epoch-number'>#{appParams.current.iEpoch + 1}</div>
                 </span>
                 <span className='title-part'>
-                    <InputTitle>Voting title *</InputTitle>
+                    <InputTitle>Proposal title *</InputTitle>
                     <Input
                         variant="proposal"
                         label="50 words max."
@@ -367,7 +367,7 @@ const NewProposalPopup: React.FC<NewProposalPopupProps> = ({ visible, onCancel }
                 </span>
             </div>
             <div className='full-segment'>
-                <InputTitle>Voting description *</InputTitle>
+                <InputTitle>Proposal description *</InputTitle>
                 <ContainerStyled>
                     <TextAreaProposalStyled ref={textareaRef}
                         value={values.voting_descr}

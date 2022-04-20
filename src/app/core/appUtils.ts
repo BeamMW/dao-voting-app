@@ -43,6 +43,19 @@ export function toUSD(amount: number, rate: number): string {
   }
 }
 
+export function calcVotingPower(value: number, fullValue: number) {
+  if (!value || value == 0) {
+    return 0;
+  }
+
+  const power = Number((100 / (fullValue / value)).toFixed(2));
+  if (power < 1) {
+    return '< 1';
+  }
+
+  return power;
+}
+
 export function fromGroths(value: number): number {
   return value && value !== 0 ? value / GROTHS_IN_BEAM : 0;
 }

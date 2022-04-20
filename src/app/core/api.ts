@@ -78,7 +78,7 @@ export function AddProposal<T = any>(payload: ProposalData): Promise<T> {
     });
 }
 
-export function VoteProposal<T = any>(votes: number[]): Promise<T> {
+export function VoteProposal<T = any>(votes: number[], id: number): Promise<T> {
     return new Promise((resolve, reject) => {
         let votesParams = '';
         for (let i = 0; i < votes.length; i++) {
@@ -87,7 +87,7 @@ export function VoteProposal<T = any>(votes: number[]): Promise<T> {
 
         Utils.invokeContract("role=user,action=vote," + votesParams + "cid=" + CID, 
         (error, result, full) => {
-            onMakeTx(error, result, full);
+            onMakeTx(error, result, full, id);
             resolve(result);
         });
     });
@@ -131,13 +131,25 @@ export function UserWithdraw<T = any>(amount): Promise<T> {
     });
 }
 
-const onMakeTx = (err, sres, full) => {
+const onMakeTx = (err, sres, full, proposalId = null) => {
     if (err) {
         console.log(err, "Failed to generate transaction request")
     }
 
     Utils.callApi(
         'process_invoke_data', {data: full.result.raw_data}, 
-        (...args) => console.log(...args)
+        (error, result, full) => {
+            if (proposalId) {
+                const votes = localStorage.getItem('votes');
+                let updatedVotes = [];
+                if (votes) {
+                    updatedVotes = [...(JSON.parse(votes).votes)];
+                }
+
+                updatedVotes.push({id: proposalId, txid: result.txid});
+                
+                localStorage.setItem('votes', JSON.stringify({'votes': updatedVotes}));
+            }
+        }
     )
 }
