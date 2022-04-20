@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { ROUTES } from '@app/shared/constants';
+import { css } from '@linaria/core';
 
 import { actions as sharedActions, selectors as sharedSelectors } from '@app/shared/store';
 import 'react-toastify/dist/ReactToastify.css';
@@ -9,8 +10,15 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { EpochesContainer } from './containers/Main';
 import { ToastContainer } from 'react-toastify';
+import { Scrollbars } from 'react-custom-scrollbars';
 
 import './styles';
+
+const trackStyle = css`
+  z-index: 999;
+  border-radius: 3px;
+  background-color: rgba(255, 255, 255, 0.2);
+`;
 
 const routes = [
   {
@@ -37,7 +45,9 @@ const App = () => {
   }, [navigateURL, dispatch, navigate]);
   
   return (
-    <>
+    <Scrollbars
+        renderThumbVertical={(props) => <div {...props} className={trackStyle} />}
+      >
       {content}
       <ToastContainer
           position="bottom-right"
@@ -61,7 +71,7 @@ const App = () => {
             borderRadius: '10px',
           }}
         />
-    </>
+    </Scrollbars>
   );
 };
 
