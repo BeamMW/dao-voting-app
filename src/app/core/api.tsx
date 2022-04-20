@@ -3,6 +3,9 @@ import { CID } from '@app/shared/constants';
 import { ProposalData } from './types';
 import { Base64EncodeUrl } from '@core/appUtils';
 
+import React from 'react';
+import { toast } from 'react-toastify';
+
 export function LoadViewParams<T = any>(payload): Promise<T> {
     return new Promise((resolve, reject) => {
         Utils.invokeContract("role=manager,action=view_params,cid="+CID, 
@@ -72,7 +75,7 @@ export function AddProposal<T = any>(payload: ProposalData): Promise<T> {
         const proposal = Base64EncodeUrl(window.btoa(jsonData));
         Utils.invokeContract("role=manager,action=add_proposal,variants=2,text="+proposal+",cid=" + CID, 
         (error, result, full) => {
-            onMakeTx(error, result, full);
+            onMakeTx(error, result, full, null, payload.title);
             resolve(result);
         });
     });
@@ -131,7 +134,7 @@ export function UserWithdraw<T = any>(amount): Promise<T> {
     });
 }
 
-const onMakeTx = (err, sres, full, proposalId = null) => {
+const onMakeTx = (err, sres, full, proposalId: number = null, toasted: string = null) => {
     if (err) {
         console.log(err, "Failed to generate transaction request")
     }
@@ -149,6 +152,17 @@ const onMakeTx = (err, sres, full, proposalId = null) => {
                 updatedVotes.push({id: proposalId, txid: result.txid});
                 
                 localStorage.setItem('votes', JSON.stringify({'votes': updatedVotes}));
+            }
+
+            if (toasted) {
+                const CreatedProposalMsg = (text: string) => (
+                    <div>
+                      Voting <span style={{fontWeight: 'bold'}}>{text}</span> created
+                    </div>
+                );
+
+                const text = toasted.substring(0, 50) + '...';
+                toast(CreatedProposalMsg(text));
             }
         }
     )
