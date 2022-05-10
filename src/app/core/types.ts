@@ -21,6 +21,7 @@ export interface InitialProposal {
     height: number;
     text: string;
     variants: number;
+    data?: any;
 }
 
 export interface ProposalStats {
@@ -41,6 +42,7 @@ export interface ProcessedProposal extends InitialProposal{
     stats: ProposalStats;
     data: ProposalData;
     voted?: number;
+    prevVoted?: {value: number, stake: number};
     epoch?: number;
 }
 
@@ -82,13 +84,18 @@ export interface SystemState {
     tip_state_timestamp: number;
 }
 
-interface ManagetViewContract {
+interface ContractVersion {
+  Height: number,
+  version: number,
+}
+interface ManagerViewContract {
     cid: string,
     Height: number,
+    version_history: ContractVersion[]
 }
 
 export interface ManagerViewData {
-    contracts: ManagetViewContract[]
+    contracts: ManagerViewContract[]
 }
 
 export enum TxStatusString {
@@ -181,4 +188,10 @@ export enum TxStatusString {
   
   export interface TxsEvent extends WalletChangeEvent {
     txs: Transaction[];
+  }
+
+  export interface PrevEpochVote {
+    id1: number;
+    stake: number;
+    votes: number[];
   }

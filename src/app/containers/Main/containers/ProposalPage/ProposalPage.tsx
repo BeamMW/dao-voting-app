@@ -24,7 +24,7 @@ import {
 import { useParams } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import { PROPOSALS, ROUTES } from '@app/shared/constants';
-import { fromGroths, getProposalId, toGroths } from '@core/appUtils';
+import { fromGroths, getProposalId, toGroths, numFormatter, calcVotingPower } from '@core/appUtils';
 import { ProcessedProposal } from '@app/core/types';
 import { openInNewTab } from '@core/appUtils'; 
 import { selectTransactions } from '@app/shared/store/selectors';
@@ -119,6 +119,13 @@ const ContentStyled = styled.div`
     }
   }
 
+  > .voted-finished {
+    font-style: italic;
+    font-size: 14px;
+    opacity: 0.5;
+    margin-bottom: 25px;
+  }
+
   > .voted-controls {
     width: 100%;
     display: flex;
@@ -126,6 +133,12 @@ const ContentStyled = styled.div`
 
     > .change-button {
       margin: 0 0 0 auto;
+    }
+
+    > .voted-cant {
+      font-style: italic;
+      opacity: 0.5;
+      margin-left: auto;
     }
 
     > span {
@@ -218,10 +231,8 @@ const StyledStats = styled.div`
 
   > .voted,
   > .staked,
-  > .quorum,
-  > .voted-no {
-    margin-left: 20px;
-    max-width: 115px;
+  > .quorum {
+    margin-left: 60px;
   }
 
 `;
@@ -241,6 +252,15 @@ const StyledHorSeparator = styled.div`
 const StyledStatsValue = styled.div`
   margin-top: 6px;
   font-size: 14px;
+
+  > .yes {
+    font-weight: 700;
+  }
+
+  > .no {
+    margin-left: 20px;
+    font-weight: 700;
+  }
 `;
 
 const VerticalSeparator = styled.div`
@@ -311,7 +331,7 @@ const CurrentProposalContent: React.FC<ProposalContentProps> = (
     } else {
       votes = new Array(currentProposals.items.length).fill(255);
     }
-    votes = votes.reverse();
+
     votes[state.index] = vote;
     VoteProposal(votes, proposal.id);
     onDisableChangeProcessState();
@@ -351,8 +371,6 @@ const CurrentProposalContent: React.FC<ProposalContentProps> = (
         </div>)
       }
       <VotingBar active={proposal.voted !== undefined && proposal.voted < 255}
-        quorum={proposal.data.quorum !== undefined ?  proposal.data.quorum.value : null}
-        qType={proposal.data.quorum !== undefined ? proposal.data.quorum.type : null}
         value={proposal.stats.variants[1]}
         percent={proposal.stats.variants[1] / proposal.stats.total * 100}
         voteType='yes'/>
@@ -363,35 +381,172 @@ const CurrentProposalContent: React.FC<ProposalContentProps> = (
       <StyledStats>
         <span className='total'>
           <StyledStakeTitle>Total staked</StyledStakeTitle>
-          <StyledStatsValue>{fromGroths(totalsView.stake_active)} BEAMX</StyledStatsValue>
+          <StyledStatsValue>{numFormatter(fromGroths(totalsView.stake_active))} BEAMX</StyledStatsValue>
         </span>
        <span className='voted'>
             <StyledStakeTitle>Voted</StyledStakeTitle>
-            <StyledStatsValue>{fromGroths(proposal.stats.total)} BEAMX</StyledStatsValue>
+            <StyledStatsValue>{numFormatter(fromGroths(proposal.stats.total))} BEAMX</StyledStatsValue>
         </span>
         <span className='staked'>
           <StyledStakeTitle>Your staked</StyledStakeTitle>
-          <StyledStatsValue>{fromGroths(userViewData.stake_active)} BEAMX</StyledStatsValue>
+          <StyledStatsValue>{numFormatter(fromGroths(userViewData.stake_active))} BEAMX</StyledStatsValue>
         </span>
         {
           proposal.data.quorum !== undefined && 
           <span className='quorum'>
             <StyledStakeTitle>Quorum</StyledStakeTitle>
             <StyledStatsValue>
-              { proposal.data.quorum.value + (proposal.data.quorum.type === 'beamx' ? ' BEAMX' : '%') }
+              { proposal.data.quorum.type === 'beamx' ? 
+                (numFormatter(proposal.data.quorum.value) + ' BEAMX') :
+                (proposal.data.quorum.value + '%') }
               { isQuorumPassed ? <IconQuorumApprove className={QuorumIconClass}/> : <IconQuorumAlert className={QuorumIconClass}/>}
             </StyledStatsValue>
           </span>
         }
-        <VerticalSeparator/>
-        <span className='voted-yes'>
-          <StyledStakeTitle>Voted YES</StyledStakeTitle>
-          <StyledStatsValue>{fromGroths(proposal.stats.variants[1])}</StyledStatsValue>
+        {proposal.stats.total > 0 &&
+          <>
+            <VerticalSeparator/>
+            <span className='voted-yes'>
+              <StyledStakeTitle>Voting results</StyledStakeTitle>
+              <StyledStatsValue>
+                <span className='yes'>YES</span> ({calcVotingPower(proposal.stats.variants[1], proposal.stats.total)}%)
+                <span className='no'>NO</span> ({calcVotingPower(proposal.stats.variants[0], proposal.stats.total)}%)
+              </StyledStatsValue>
+            </span>
+          </> 
+        }
+      </StyledStats>
+      <StyledHorSeparator/>
+      <div className='content'>
+        <div className='description'>{proposal.data.description}</div>
+        {
+          proposal.data.ref_link.length > 0 && 
+          <>
+            <div className='ref-title'>References</div>
+            <div className='ref-link' onClick={() => {openInNewTab(proposal.data.forum_link)}}>
+                <span>{proposal.data.ref_link}</span>
+                <IconExternalLink className='icon-link'/>
+            </div>
+          </>
+        }
+      </div>
+    </ContentStyled>
+  );
+};
+
+const PrevProposalContent: React.FC<ProposalContentProps> = (
+  {proposal, state, callback, isChangeProcessActive, onDisableChangeProcessState}
+) => {
+  const userViewData = useSelector(selectUserView());
+  const totalsView = useSelector(selectTotalsView());
+  const [isVoted, setIsVoted] = useState(false);
+  const [isQuorumPassed, setQuorumPassed] = useState(false);
+  const transactions = useSelector(selectTransactions());
+  const [isVoteInProgress, setVoteInProgress] = useState(false);
+
+  useEffect(() => {
+    if (proposal.voted !== undefined && proposal.voted < 255) {
+      setIsVoted(true);
+    }
+
+    if (proposal.data.quorum !== undefined && 
+      (proposal.data.quorum.type === 'beamx' ? (proposal.stats.variants[1] >= toGroths(proposal.data.quorum.value)) : 
+      ((proposal.stats.variants[1] / totalsView.stake_active) * 100 >= proposal.data.quorum.value))) {
+        setQuorumPassed(true);
+    }
+
+    const activeVotes = localStorage.getItem('votes');
+    
+    if (activeVotes) {
+      const votes = [...(JSON.parse(activeVotes).votes)];
+
+      const currentProposal = votes.find((item) => {
+        return item.id === proposal.id;
+      });
+
+      if (currentProposal) {
+        const isInProgress = transactions.find((tx) => {
+          return tx.txId === currentProposal.txid && tx.status === 5;
+        });
+
+        setVoteInProgress(!!isInProgress);
+        
+        if (!isInProgress) {
+          const updatedVotes = votes.filter(function(item){ 
+            return item.id !== proposal.id;
+          });
+
+          localStorage.setItem('votes', JSON.stringify({votes: updatedVotes}));
+        }
+      }
+    }
+  }, [proposal]);
+
+  return (
+    <ContentStyled>
+      { proposal.prevVoted && proposal.prevVoted.value < 255 ?
+      <div className='voted-controls'>
+          { proposal.prevVoted.value === 1 ? 
+            (<span>
+              <IconVotedYes/>
+              <span className='voted-yes'>You voted YES</span>
+            </span>) : 
+            (<span>
+              <IconVotedNo/>
+              <span className='voted-no'>You voted NO</span>
+            </span>)
+          }
+          <div className='voted-cant'>The epoch #{proposal.epoch} is finished. You can’t change your decision.</div>
+      </div> : 
+      <div className='voted-finished'>
+        The epoch #{proposal.epoch} is finished. You hadn’t voted.
+      </div>
+      }
+      <VotingBar active={proposal.prevVoted && proposal.prevVoted.value < 255}
+        value={proposal.stats.variants[1]}
+        percent={proposal.stats.variants[1] / proposal.stats.total * 100}
+        voteType='yes'/>
+      <VotingBar active={proposal.prevVoted && proposal.prevVoted.value < 255}
+        value={proposal.stats.variants[0]}
+        percent={proposal.stats.variants[0] / proposal.stats.total * 100}
+        voteType='no'/>
+      <StyledStats>
+        <span className='total'>
+          <StyledStakeTitle>Total staked</StyledStakeTitle>
+          <StyledStatsValue>{numFormatter(fromGroths(totalsView.stake_active))} BEAMX</StyledStatsValue>
         </span>
-        <span className='voted-no'>
-          <StyledStakeTitle>Voted NO</StyledStakeTitle>
-          <StyledStatsValue>{fromGroths(proposal.stats.variants[0])}</StyledStatsValue>
+       <span className='voted'>
+            <StyledStakeTitle>Voted</StyledStakeTitle>
+            <StyledStatsValue>{numFormatter(fromGroths(proposal.stats.total))} BEAMX</StyledStatsValue>
         </span>
+        <span className='staked'>
+          <StyledStakeTitle>Your staked</StyledStakeTitle>
+          <StyledStatsValue>{numFormatter(fromGroths(userViewData.stake_active))} BEAMX</StyledStatsValue>
+        </span>
+        {
+          proposal.data.quorum !== undefined && 
+          <span className='quorum'>
+            <StyledStakeTitle>Quorum</StyledStakeTitle>
+            <StyledStatsValue>
+              { proposal.data.quorum.type === 'beamx' ? 
+                (numFormatter(proposal.data.quorum.value) + ' BEAMX') :
+                (proposal.data.quorum.value + '%') }
+              { isQuorumPassed ? <IconQuorumApprove className={QuorumIconClass}/> : <IconQuorumAlert className={QuorumIconClass}/>}
+            </StyledStatsValue>
+          </span>
+        }
+        {proposal.stats.total > 0 &&
+          <>
+            <VerticalSeparator/>
+            <span className='voted-yes'>
+              <StyledStakeTitle>Voting results</StyledStakeTitle>
+              <StyledStatsValue>
+                <span className='yes'>YES</span> ({calcVotingPower(proposal.stats.variants[1], proposal.stats.total)}%)
+                <span className='no'>NO</span> ({calcVotingPower(proposal.stats.variants[0], proposal.stats.total)}%)
+              </StyledStatsValue>
+            </span>
+          </> 
+        }
       </StyledStats>
       <StyledHorSeparator/>
       <div className='content'>
@@ -426,17 +581,25 @@ const FutureProposalContent: React.FC<ProposalContentProps> = (
           <div className='stake-info'>
             <span className='total'>
               <StyledStakeTitle>Total staked</StyledStakeTitle>
-              <div className='value'>{fromGroths(totalsView.stake_passive + totalsView.stake_active)} BEAMX</div>
+              <div className='value'>
+                {numFormatter(fromGroths(totalsView.stake_passive + totalsView.stake_active))} BEAMX
+              </div>
             </span>
             <span className='other'>
               <StyledStakeTitle>Your staked</StyledStakeTitle>
-              <div className='value'>{fromGroths(userViewData.stake_passive + userViewData.stake_active)} BEAMX</div>
+              <div className='value'>
+                {numFormatter(fromGroths(userViewData.stake_passive + userViewData.stake_active))} BEAMX
+              </div>
             </span>
             { 
-              proposal.data.quorum !== undefined && proposal.data.quorum.type === 'percent' &&
+              proposal.data.quorum !== undefined &&
               <span className='other'>
                 <StyledStakeTitle>Votes quorum</StyledStakeTitle>
-                <div className='value'>{proposal.data.quorum.value} %</div>
+                <div className='value'>
+                  { proposal.data.quorum.type === 'percent' ? 
+                    (proposal.data.quorum.value + '%') :
+                    (numFormatter(proposal.data.quorum.value) + ' BEAMX') }
+                </div>
               </span>
             }
           </div>
@@ -457,6 +620,7 @@ const FutureProposalContent: React.FC<ProposalContentProps> = (
     </ContentStyled>
   );
 }
+
 
 const ProposalPage: React.FC = () => {
   const navigate = useNavigate();
@@ -488,7 +652,8 @@ const ProposalPage: React.FC = () => {
 
   const ContentComponent = {
     current: CurrentProposalContent,
-    future: FutureProposalContent
+    future: FutureProposalContent,
+    prev: PrevProposalContent
   }[state.type];
 
   const getDate = (timestamp: number) => {

@@ -1,6 +1,6 @@
 import React, {useRef, useEffect, useState} from 'react';
 import { styled } from '@linaria/react';
-import { fromGroths } from '@app/core/appUtils';
+import { fromGroths, numFormatter } from '@app/core/appUtils';
 import { Popover } from 'react-tiny-popover';
 import { useSelector } from 'react-redux';
 import { selectTotalsView } from '@app/containers/Main/store/selectors';
@@ -107,7 +107,7 @@ const VotingBar: React.FC<ProgressBarProps> = ({ active, percent, value, voteTyp
   return (
     <ContainerStyled ref={contRef} voteType={voteType} valueOffset={valueOffset}>
       <Line percent={percent} active={active} voteType={voteType} ref={progressRef}/>
-      {value > 0 && <div ref={valRef} className='value'>{fromGroths(value)} BEAMX</div>}
+      {value > 0 && <div ref={valRef} className='value'>{numFormatter(fromGroths(value))} BEAMX</div>}
       {voteType === 'yes' && quorum !== undefined && quorum && 
         <Popover
           isOpen={isPopoverOpen}

@@ -7,9 +7,10 @@ import { useNavigate } from 'react-router-dom';
 import { PROPOSALS, ROUTES } from '@app/shared/constants';
 import { useSelector } from 'react-redux';
 import { selectIsLoaded } from '@app/shared/store/selectors';
-import { fromGroths } from '@core/appUtils';
-import { selectAppParams } from '../../store/selectors';
+import { fromGroths, numFormatter } from '@core/appUtils';
+import { selectAppParams, selectPrevEpoches } from '../../store/selectors';
 import { getProposalId } from '@core/appUtils';
+import Select, { Option } from '@app/shared/components/Select';
 
 interface ListProps {
   data: ProcessedProposal[];
@@ -17,11 +18,13 @@ interface ListProps {
   title: string;
   type: string;
   isFuture?: boolean;
+  filter?: number;
 }
 
 const ProposalsHeader = styled.div`
     display: flex;
     flex-direction: row;
+    align-items: center;
 
     > .icon-search-class {
         margin-left: auto;
@@ -91,8 +94,6 @@ const ListItem = styled.li`
 `;
 
 const StyledItemHeader = styled.div`
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
     padding: 20px;
     display: flex;
     flex-direction: row;
@@ -127,6 +128,13 @@ const StyledItemContent = styled.div`
     > .voted-icon {
         margin-top: 15px;
         margin-left: auto;
+        
+        > .text {
+            font-style: italic;
+            font-size: 14px;
+            color: #FFFFFF;
+            opacity: 0.5;
+        }
     }
 `;
 
@@ -175,17 +183,42 @@ const StyledEpochTitle = styled.div`
     letter-spacing: 3.11px;
     margin-top: 20px;
     margin-bottom: 10px;
+    margin-left: 20px;
+`;
+
+const StyledPrevStatus = styled.div<{status: boolean}>`
+    height: 14px;
+    width: 100%;
+    text-align: center;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 12px;
+    color: ${({ status }) => (status ? '#39FDF2' : '#FF746B')};
+    background-color: ${({ status }) => (status ? 'rgba(57, 253, 242, .2)' : 'rgba(255, 116, 107, .2)')};
+`;
+
+const LabelStyled = styled.div`
+  display: inline-block;
+  vertical-align: bottom;
+  line-height: 26px;
+`;
+
+const selectClassName = css`
+  align-self: flex-start;
 `;
 
 const ProposalsList: React.FC<ListProps> = ({ 
   data,
   extendedData = [],
   title,
-  type
+  type,
+  filter = null
 }) => {
     const navigate = useNavigate();
     const isLoaded = useSelector(selectIsLoaded());
     const appParams = useSelector(selectAppParams());
+    const prevEpoches = useSelector(selectPrevEpoches());
+
     const selectorData = [
         {
             id: 0,
@@ -201,18 +234,66 @@ const ProposalsList: React.FC<ListProps> = ({
         }
     ];
 
+    const [filterItems, setFilterItems] = useState([]);
+    const [activeFilter, setActiveFilter] = useState(null);
+    useEffect(() => {
+        if (type === PROPOSALS.CURRENT) {
+            setFilterItems([appParams.current.iEpoch]);
+            setActiveFilter(appParams.current.iEpoch); 
+        } else if (type === PROPOSALS.FUTURE) {
+            setFilterItems([appParams.current.iEpoch + 1]);
+            setActiveFilter(appParams.current.iEpoch + 1);
+        } else if (type === PROPOSALS.PREV) {
+            setFilterItems(prevEpoches);
+            setActiveFilter(prevEpoches[0]);
+        }
+    }, []);
+
     const [selectorActiveItem, setSelectorItem] = useState(selectorData[0]);
     const [items, setItems] = useState([]);
     const [extendedEpochs, setExtendedEpochs] = useState([]);
+    const [extendedFilteredEpochs, setExtendedFilteredEpochs] = useState([]);
+
+    useEffect(() => {
+        if (type === PROPOSALS.CURRENT) {
+            setFilterItems([appParams.current.iEpoch, ...prevEpoches]);
+        } else if (type === PROPOSALS.PREV) {
+            setFilterItems(prevEpoches);
+        }
+    }, [prevEpoches]);
+
+    useEffect(() => {
+        if (filter) {
+            setActiveFilter(filter);
+            const filteredExt = extendedEpochs.filter((item) => {
+                return item === filter;
+            });
+            setExtendedFilteredEpochs(filteredExt);
+        }
+    }, [filter]);
 
     useEffect(() => {
         const fitleredData = data.filter((item) => {
             if (selectorActiveItem.id === selectorData[0].id || 
-                (selectorActiveItem.id === selectorData[1].id && (item.voted === undefined || item.voted === 255)) ||
-                (selectorActiveItem.id === selectorData[2].id && (item.voted !== undefined && item.voted < 255))) {
+            (selectorActiveItem.id === selectorData[1].id && (item.voted === undefined || item.voted === 255)) ||
+            (selectorActiveItem.id === selectorData[2].id && (item.voted !== undefined && item.voted < 255))) {
                 return item;
             }
         })
+
+        if (type === PROPOSALS.CURRENT) {
+            fitleredData.sort(function (a, b) {
+                if (a.voted < b.voted) {
+                  return 1;
+                }
+                if (a.voted > b.voted) {
+                  return -1;
+                }
+                // a должно быть равным b
+                return 0;
+              });
+        }
+
         setItems(fitleredData);
     }, [data, selectorActiveItem]);
 
@@ -224,9 +305,18 @@ const ProposalsList: React.FC<ListProps> = ({
         const onlyUnique = (value, index, self) => {
             return self.indexOf(value) === index;
         }
-        const unique = epochsIDs.filter(onlyUnique);
+        let unique = epochsIDs.filter(onlyUnique);
         setExtendedEpochs(unique);
-    }, []);
+
+        if (filter) {
+            const filteredExt = unique.filter((item) => {
+                return item === filter;
+            });
+            setExtendedFilteredEpochs(filteredExt);
+        } else {
+            setExtendedFilteredEpochs(unique);
+        }
+    }, [appParams]);
 
     const handleSelectorClick: React.MouseEventHandler<HTMLLIElement> = ({ currentTarget }) => {
         setSelectorItem(selectorData[currentTarget.dataset.index]);
@@ -234,6 +324,11 @@ const ProposalsList: React.FC<ListProps> = ({
     
     const handleSearchClick = () => {
 
+    };
+
+    const handleSelect = (next: number) => {
+        setActiveFilter(next);
+        navigate(ROUTES.MAIN.PREVIOUS_EPOCHS, {state: {filter: next}});
     };
 
     const handleListItemClick = (id: number, index: number) => {
@@ -253,14 +348,20 @@ const ProposalsList: React.FC<ListProps> = ({
                 ))}
             </div>) : null}
             <IconSearch className='icon-search-class' onClick={handleSearchClick}/>
-            <EpochSelector>
-                <span className='epoches-selector-title'>Epoch</span>
-                <span className='epoches-selected-item'>#22</span>
-                <IconEpochSelector className='epoches-selector-icon'/>
-            </EpochSelector>
+            {
+                //fail on new epoch 
+                filterItems.length > 0 &&
+                <Select value={activeFilter} className={selectClassName} onSelect={handleSelect}>
+                    {filterItems.map((epoch) => (
+                        <Option key={epoch} value={epoch}>
+                            <LabelStyled>{epoch}</LabelStyled>
+                        </Option>
+                    ))}
+                </Select>
+            }
         </ProposalsHeader>
 
-        { (type === PROPOSALS.CURRENT || (type === PROPOSALS.PREV && items.length > 0)) && 
+        { type === PROPOSALS.CURRENT && 
             <StyledEpochTitle>
                 Epoch #{appParams.current.iEpoch} (current)
             </StyledEpochTitle>
@@ -270,7 +371,8 @@ const ProposalsList: React.FC<ListProps> = ({
             items.length > 0 ?
             (<List>
                 { items.map((item, index) =>
-                    !!item.data && <ListItem data-index={index} key={index} onClick={() => handleListItemClick(item.id, index)}>
+                    !!item.data && 
+                    <ListItem data-index={index} key={index} onClick={() => handleListItemClick(item.id, index)}>
                         <StyledItemHeader className={item.voted !== undefined && item.voted < 255 ? 'voted' : ''}>
                             <span className='proposal-id'>#{getProposalId(item.id)}</span>
                             <span className='proposal-title'>{item.data.title}</span>
@@ -281,11 +383,11 @@ const ProposalsList: React.FC<ListProps> = ({
                         { type !== PROPOSALS.FUTURE && item.voted !== undefined && item.voted < 255 ? (<StyledItemContent>
                             <span className='voted-yes'>
                                 <StyledVotedTitle>Voted YES</StyledVotedTitle>
-                                <StyledVotedValue>{fromGroths(item.stats.variants[1])} BEAMX</StyledVotedValue>
+                                <StyledVotedValue>{numFormatter(fromGroths(item.stats.variants[1]))} BEAMX</StyledVotedValue>
                             </span>
                             <span className='voted-no'>
                                 <StyledVotedTitle>Voted NO</StyledVotedTitle>
-                                <StyledVotedValue>{fromGroths(item.stats.variants[0])} BEAMX</StyledVotedValue>
+                                <StyledVotedValue>{numFormatter(fromGroths(item.stats.variants[0]))} BEAMX</StyledVotedValue>
                             </span>
                             <span className='voted-icon'>
                                 { item.voted !== undefined && item.voted === 1 ? <IconVotedYes/> : <IconVotedNo/> }
@@ -294,7 +396,7 @@ const ProposalsList: React.FC<ListProps> = ({
                     </ListItem>
                 )}
             </List>) :
-            (isLoaded && 
+            (isLoaded && (type !== PROPOSALS.PREV || (type === PROPOSALS.PREV && selectorActiveItem.id !== selectorData[0].id)) && 
                 <div className={EmptyListClass}>
                     <IconNoProposals/>
                     <div className='title-class'>There are no proposals</div>
@@ -304,7 +406,7 @@ const ProposalsList: React.FC<ListProps> = ({
 
         {   selectorActiveItem.id === selectorData[0].id &&
             type === PROPOSALS.PREV && extendedData.length > 0 && 
-            extendedEpochs.map((extEpoch, extIndex) =>
+            extendedFilteredEpochs.map((extEpoch, extIndex) =>
             <div key={extIndex}> 
                 <StyledEpochTitle>
                     Epoch #{extEpoch}
@@ -314,26 +416,36 @@ const ProposalsList: React.FC<ListProps> = ({
                     { extendedData.map((item, index) =>
                         !!item.data && item.epoch === extEpoch && 
                         <ListItem data-index={index} key={index} onClick={() => handleListItemClick(item.id, index)}>
+                            {
+                                type === PROPOSALS.PREV && 
+                                <StyledPrevStatus status={item['is_passed']}>
+                                    {item['is_passed'] ? 'Proposal successfully passed' : 'Proposal failed'}
+                                </StyledPrevStatus>
+                            }
                             <StyledItemHeader className='voted'>
                                 <span className='proposal-id'>#{getProposalId(item.id)}</span>
                                 <span className='proposal-title'>{item.data.title}</span>
                             </StyledItemHeader>
                             <StyledItemContent>
-                                {item.stats.variants !== undefined && 
+                                {item.stats && item.stats.variants !== undefined && 
                                     <>
                                         <span className='voted-yes'>
                                             <StyledVotedTitle>Voted YES</StyledVotedTitle>
-                                            <StyledVotedValue>{fromGroths(item.stats.variants[1])} BEAMX</StyledVotedValue>
+                                            <StyledVotedValue>{numFormatter(fromGroths(item.stats.variants[1]))} BEAMX</StyledVotedValue>
                                         </span>
                                         <span className='voted-no'>
                                             <StyledVotedTitle>Voted NO</StyledVotedTitle>
-                                            <StyledVotedValue>{fromGroths(item.stats.variants[0])} BEAMX</StyledVotedValue>
+                                            <StyledVotedValue>{numFormatter(fromGroths(item.stats.variants[0]))} BEAMX</StyledVotedValue>
                                         </span>
                                     </>
                                 }
-                                {/* <span className='voted-icon'>
-                                    { item.voted !== undefined && item.voted === 1 ? <IconVotedYes/> : <IconVotedNo/> }
-                                </span> */}
+                                <span className='voted-icon'>
+                                    {
+                                        item.prevVoted && item.prevVoted.value !== 255 ? 
+                                        (item.prevVoted.value === 1 ? <IconVotedYes/> : <IconVotedNo/>) :
+                                        <div className='text'>The epoch #{item.epoch} is finished. You hadn’t voted.</div>
+                                    }
+                                </span>
                             </StyledItemContent>
                         </ListItem>
                     )}

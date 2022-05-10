@@ -53,7 +53,9 @@ const initialState: EpochesStateType = {
     deposit: false,
     pkey: false
   },
-  withdrawedAmount: 0
+  prevEpoches: [],
+  withdrawedAmount: 0,
+  filterEpochSelected: 0
 };
 
 const reducer = createReducer<EpochesStateType, Action>(initialState)
@@ -70,7 +72,18 @@ const reducer = createReducer<EpochesStateType, Action>(initialState)
     nexState.public_key = action.payload;
   }))
   .handleAction(actions.setPrevProposals, (state, action) => produce(state, (nexState) => {
-    nexState.proposals.prev.items = action.payload;
+    if (state.proposals.prev.items.length) {
+      let proposals = state.proposals.prev.items;
+      action.payload.map((item) => {
+        const isPrev = state.proposals.prev.items.find((prev) => prev.id === item.id);
+        if (!isPrev) {
+          proposals = [item, ...proposals];
+        }
+      });
+      nexState.proposals.prev.items = proposals;
+    } else {
+      nexState.proposals.prev.items = action.payload;
+    }
   }))
   .handleAction(actions.setCurrentProposals, (state, action) => produce(state, (nexState) => {
     nexState.proposals.current.items = action.payload;
@@ -83,6 +96,12 @@ const reducer = createReducer<EpochesStateType, Action>(initialState)
   }))
   .handleAction(actions.loadPrevProposalStats, (state, action) => produce(state, (nexState) => {
     nexState.proposals.prev.items[action.payload.propId].stats = action.payload.stats;
+  }))
+  .handleAction(actions.setIsPassed, (state, action) => produce(state, (nexState) => {
+    nexState.proposals.prev.items[action.payload.propId]['is_passed'] = action.payload.isPassed;
+  }))
+  .handleAction(actions.setPrevEpoches, (state, action) => produce(state, (nexState) => {
+    nexState.prevEpoches = action.payload;
   }))
   .handleAction(actions.loadAppParams.success, (state, action) => produce(state, (nexState) => {
     nexState.appParams = action.payload;
@@ -104,6 +123,9 @@ const reducer = createReducer<EpochesStateType, Action>(initialState)
   }))
   .handleAction(actions.setWithdrawedAmount, (state, action) => produce(state, (nexState) => {
     nexState.withdrawedAmount = action.payload;
+  }))
+  .handleAction(actions.setFitlerEpoch, (state, action) => produce(state, (nexState) => {
+    nexState.filterEpochSelected = action.payload;
   }));
 
 export { reducer as MainReducer };

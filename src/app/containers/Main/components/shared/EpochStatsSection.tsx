@@ -23,7 +23,7 @@ import {
   selectBlocksLeft,
   selectWithdrawedAmount,
   selectUserView } from '@app/containers/Main/store/selectors';
-import { fromGroths, calcVotingPower } from '@core/appUtils';
+import { fromGroths, calcVotingPower, numFormatter } from '@core/appUtils';
 import { setPopupState } from '@app/containers/Main/store/actions';
 
 interface SeedListProps {
@@ -303,14 +303,14 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
                         <SubSectionTitle>Total value locked</SubSectionTitle>
                         <SubSectionValue>
                             <IconBeamx/>
-                            <span>{fromGroths(totalsView.stake_active)} BEAMX</span>
+                            <span>{numFormatter(fromGroths(totalsView.stake_active))} BEAMX</span>
                         </SubSectionValue>
                     </StyledTotalLocked>
                     <StyledStaked>
                         <SubSectionTitle>Your staked</SubSectionTitle>
                         <SubSectionValue>
                             <IconBeamx/>
-                            <span>{fromGroths(userViewData.stake_active)} BEAMX</span>
+                            <span>{numFormatter(fromGroths(userViewData.stake_active))} BEAMX</span>
                         </SubSectionValue>
                         { totalsView.stake_active > 0 && state !== 'stake' ?
                         (<div className='voting-power-class'>
@@ -320,7 +320,7 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
                     </StyledStaked>
                 </LeftStats>
                 {
-                  state === 'stake' && totalsView.stake_active &&
+                  state === 'stake' && totalsView.stake_active > 0 &&
                   <PowerStats>
                     <SubSectionTitle>Voting power</SubSectionTitle>
                     <div className='power-value'>
@@ -402,7 +402,7 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
                             <SubSectionTitle>Withdraw</SubSectionTitle>
                             <SubSectionValue>
                                 <IconBeamx/>
-                                <span>{fromGroths(withdrawedAmount)} BEAMX</span>
+                                <span>{numFormatter(fromGroths(withdrawedAmount))} BEAMX</span>
                             </SubSectionValue>
                         </StyledStaked>
                       </LeftStats>
@@ -434,7 +434,7 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
                             <SubSectionTitle>Deposit</SubSectionTitle>
                             <SubSectionValue>
                                 <IconBeamx/>
-                                <span>{fromGroths(totalsView.stake_passive)} BEAMX</span>
+                                <span>{numFormatter(fromGroths(totalsView.stake_passive))} BEAMX</span>
                             </SubSectionValue>
                         </StyledTotalLocked>
                         <StyledStaked>

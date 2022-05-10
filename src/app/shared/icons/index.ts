@@ -35,6 +35,8 @@ import IconChangeDecision from './icon-change-decision.svg';
 import IconQuorumAlert from './icon-quorum-alert.svg';
 import IconQuorumApprove from './icon-quorum-approve.svg';
 import IconChangeBlue from './icon-change-blue.svg';
+import IconAngleSmallUp from './icon-angle-small-up.svg';
+import IconSort from './icon-sort.svg';
 
 export {
   IconBack,
@@ -73,5 +75,7 @@ export {
   IconChangeDecision,
   IconQuorumAlert,
   IconQuorumApprove,
-  IconChangeBlue
+  IconChangeBlue,
+  IconAngleSmallUp,
+  IconSort
 }

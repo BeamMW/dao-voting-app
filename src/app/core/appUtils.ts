@@ -88,8 +88,17 @@ export function Base64EncodeUrl(str){
   return str.replace(/\+/g, '-').replace(/\//g, '_').replace(/\=+$/, '');
 }
 
-
 export function openInNewTab (url) {
   const newWindow = window.open(url, '_blank', 'noopener,noreferrer')
   if (newWindow) newWindow.opener = null
-};
+}
+
+export function numFormatter(num) {
+  if (num > 999 && num < 1000000) {
+      return parseFloat((num / 1000).toFixed(2)) + 'K';  
+  } else if(num > 1000000) {
+      return parseFloat((num / 1000000).toFixed(2)) + 'M';
+  }else if(num < 900){
+      return parseFloat(num.toFixed(2));
+  }
+}

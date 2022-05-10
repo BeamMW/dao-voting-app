@@ -85,7 +85,7 @@ export function VoteProposal<T = any>(votes: number[], id: number): Promise<T> {
     return new Promise((resolve, reject) => {
         let votesParams = '';
         for (let i = 0; i < votes.length; i++) {
-            votesParams += `vote_${i + 1}=${votes[i]},`
+            votesParams += `vote_${i + 1}=${votes[votes.length - i - 1]},`
         }
 
         Utils.invokeContract("role=user,action=vote," + votesParams + "cid=" + CID, 
@@ -154,14 +154,14 @@ const onMakeTx = (err, sres, full, proposalId: number = null, toasted: string = 
                 localStorage.setItem('votes', JSON.stringify({'votes': updatedVotes}));
             }
 
-            if (toasted) {
+            if (toasted && !error) {
                 const CreatedProposalMsg = (text: string) => (
                     <div>
                       Voting <span style={{fontWeight: 'bold'}}>{text}</span> created
                     </div>
                 );
 
-                const text = toasted.substring(0, 50) + '...';
+                const text = toasted.length > 50 ? toasted.substring(0, 50) + '...' : toasted;
                 toast(CreatedProposalMsg(text));
             }
         }

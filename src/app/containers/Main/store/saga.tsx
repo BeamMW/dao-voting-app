@@ -1,18 +1,20 @@
 import { call, put, takeLatest, select } from 'redux-saga/effects';
 import { navigate, setError } from '@app/shared/store/actions';
+import * as selectors from './selectors';
 import { ROUTES, CID, PROPOSALS } from '@app/shared/constants';
-import { LoadViewParams, LoadProposals, LoadProposalData, LoadTotals, LoadPublicKey, LoadVotes,
+import { LoadViewParams, LoadProposals, LoadProposalData, 
+  LoadTotals, LoadPublicKey, LoadVotes,
   LoadManagerView, LoadUserView, LoadModeratorsView } from '@core/api';
 
 import { actions } from '.';
 import store from '../../../../index';
 import { VotingAppParams, ManagerViewData, UserViewParams, 
-  ProposalData, InitialProposal, ProposalStats, Moderator } from '@app/core/types';
+  ProposalData, InitialProposal, ProposalStats, Moderator, PrevEpochVote, ProposalState } from '@app/core/types';
 
 import { SharedStateType } from '@app/shared/interface';
 import { setIsLoaded } from '@app/shared/store/actions';
 import { EpochesStateType, RateResponse } from '../interfaces';
-import { Base64DecodeUrl } from '@core/appUtils';
+import { Base64DecodeUrl, toGroths } from '@core/appUtils';
 
 const FETCH_INTERVAL = 310000;
 const API_URL = 'https://api.coingecko.com/api/v3/simple/price';
@@ -50,9 +52,6 @@ export function* loadParamsSaga(
         const totals = (yield call(LoadTotals)) as UserViewParams;
         yield put(actions.setTotals(totals));
 
-        const votes = yield call(LoadVotes);
-        console.log('VOTES:', votes)
-
         store.dispatch(actions.loadPoposals.request());
     } catch (e) {
       yield put(actions.loadAppParams.failure(e));
@@ -80,7 +79,16 @@ export function* loadProposalsSaga(
           initProposals.splice(initProposals.length - currentEpochProps, currentEpochProps).reverse() : [];
         proposalsData.prev = initProposals.length > 0 ? initProposals.reverse() : [];
 
-        for (const key in proposalsData) {
+        const prevVotes = (yield call(LoadVotes)) as PrevEpochVote[];
+        let prevEpochVotes = {};
+        for (let item of prevVotes) {
+          item.votes.forEach((value, index) => {
+            prevEpochVotes[item.id1 + index] = {value, stake: item.stake};
+          });
+        }
+
+        const prevEpoches = [];
+        for (let key in proposalsData) {
           const proposals = proposalsData[key];
           for (let i = 0; i < proposals.length; i++) {
             let item = proposals[i] as InitialProposal;
@@ -88,7 +96,7 @@ export function* loadProposalsSaga(
               const proposalRes = (yield call(LoadProposalData, item.id)) as ProposalStats;
               item['stats'] = proposalRes;
             } else {
-              item['stats'] = {};
+              item['stats'] = null;
             }
             item['data'] = {};
             try {
@@ -105,7 +113,13 @@ export function* loadProposalsSaga(
             }
 
             if (key === PROPOSALS.PREV) {
+              item['is_passed'] = null;
+              item['prevVoted'] = prevEpochVotes[item.id - 1] ? prevEpochVotes[item.id - 1] : null;
               item['epoch'] = Math.ceil((item.height - state.main.contractHeight) / state.main.appParams.epoch_dh) + 1;
+
+              if (prevEpoches.indexOf(item['epoch']) === -1) {
+                prevEpoches.push(item['epoch']);
+              }
             }
           }
 
@@ -120,10 +134,27 @@ export function* loadProposalsSaga(
             yield put(actions.setPrevProposals(proposalsData.prev));
           }
         }
+        yield put(actions.setPrevEpoches(prevEpoches));
 
-        for (let i = 0; i < proposalsData.prev.length; i++) {
-          const stats = (yield call(LoadProposalData, proposalsData.prev[i].id)) as ProposalStats;
-          yield put(actions.loadPrevProposalStats({propId: i, stats}));
+
+        const prevProposalsList = ((yield select(selectors.selectPrevProposals())) as ProposalState).items;
+        for (let i = 0; i < prevProposalsList.length; i++) {
+          const prevProposal = prevProposalsList[i];
+          if (!prevProposal['stats']) {
+            const stats = (yield call(LoadProposalData, prevProposal.id)) as ProposalStats;
+            yield put(actions.loadPrevProposalStats({propId: i, stats}));
+
+            if (prevProposal.data.quorum !== undefined) {
+              if (prevProposal.data.quorum.type === 'beamx') {
+                yield put(actions.setIsPassed({propId: i, isPassed: stats.variants[1] > toGroths(prevProposal.data.quorum.value)}));
+              } else if (prevProposal.data.quorum.type === 'percent') {
+                const isPassed = stats.variants[1] > (stats.total * (prevProposal.data.quorum.value / 100));
+                yield put(actions.setIsPassed({propId: i, isPassed: isPassed}));
+              }
+            } else {
+              yield put(actions.setIsPassed({propId: i, isPassed: stats.variants[1] > stats.variants[0]}));
+            }
+          }
         }
 
         yield put(actions.loadPoposals.success(true));
@@ -139,12 +170,12 @@ export function* loadContractInfoSaga(
         const managerViewData = (yield call(LoadManagerView)) as ManagerViewData;
         const contract = managerViewData.contracts.find((item)=>item.cid === CID);
         if (contract) {
-            yield put(actions.loadContractInfo.success(contract.Height));
+            yield put(actions.loadContractInfo.success(contract.version_history[0].Height));
         }
 
         const state = (yield select()) as {main: EpochesStateType, shared: SharedStateType};
         const epochEndsHeight = state.main.appParams.epoch_dh * state.main.appParams.current.iEpoch 
-        + contract.Height;
+          + contract.version_history[0].Height;
         const epochStartsHeight = epochEndsHeight - state.main.appParams.epoch_dh;
         const blocksLeft = epochEndsHeight - state.shared.systemState.current_height;
 

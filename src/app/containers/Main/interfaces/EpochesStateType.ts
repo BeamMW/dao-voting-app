@@ -19,5 +19,7 @@ export interface EpochesStateType {
     withdraw: boolean;
     pkey: boolean;
   },
+  prevEpoches: number[];
   withdrawedAmount: number;
+  filterEpochSelected: number;
 }

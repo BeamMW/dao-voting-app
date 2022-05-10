@@ -268,15 +268,19 @@ const NewProposalPopup: React.FC<NewProposalPopupProps> = ({ visible, onCancel }
     };
 
     const isQuorumLimitValid = () => {
-        const quorumValue = parseInt(values.quorum_limit);
-        if (quorumValue === 0 || quorumValue === NaN) return true;
-        
-        if ((!activeToggle && quorumValue <= fromGroths(totals.stake_passive)) ||
-        (activeToggle && quorumValue <= 100 && quorumValue > 0)) {
-            return true;
+        if (!REG_AMOUNT.test(values.quorum_limit) && values.quorum_limit !== '0' && values.quorum_limit !== '') {
+            return false;
+        } else {
+            const quorumValue = parseInt(values.quorum_limit);
+            if (quorumValue > 0) {
+                if ((!activeToggle && quorumValue > fromGroths(totals.stake_active)) ||
+                (activeToggle && (quorumValue > 100 || quorumValue < 0))) {
+                    return false;
+                }
+            }
         }
 
-        return !errors.quorum_limit;
+        return true;
     }
 
     const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

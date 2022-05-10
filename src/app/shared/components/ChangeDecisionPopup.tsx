@@ -1,12 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useRef, useState, useEffect } from 'react';
-import { Button, AmountInput, Popup, Rate } from '@app/shared/components';
+import React, { useState } from 'react';
+import { Button, Popup } from '@app/shared/components';
 import { IconCancel, IconChangeBlue } from '@app/shared/icons';
-import { useDispatch, useSelector } from 'react-redux';
-import { selectErrorMessage, selectSystemState } from '@app/shared/store/selectors';
-import { useFormik } from 'formik';
-import { toGroths, fromGroths } from '@core/appUtils';
-import { UserWithdraw } from '@core/api';
+import { useSelector } from 'react-redux';
+import { selectSystemState } from '@app/shared/store/selectors';
 import { styled } from '@linaria/react';
 import { css } from '@linaria/core';
 import { selectUserView } from '@app/containers/Main/store/selectors';

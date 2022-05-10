@@ -13,3 +13,4 @@ export { default as WithdrawPopup } from './WithdrawPopup';
 export { default as PublicKeyPopup } from './PublicKeyPopup';
 export { default as VotingBar } from './VotingBar';
 export { default as ChangeDecisionPopup } from './ChangeDecisionPopup';
+export { default as Select } from './Select';

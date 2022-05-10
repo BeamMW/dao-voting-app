@@ -63,11 +63,10 @@ const App = () => {
           icon={false}
           toastStyle={{
             textAlign: 'center',
-            background: 'rgba(0, 242, 207, 0.1)',
-            backdropFilter: 'blur(100px)',
+            background: '#22536C',
             color: 'white',
             width: '90%',
-            margin: '0 auto 16px',
+            margin: '0 auto 36px',
             borderRadius: '10px',
           }}
         />

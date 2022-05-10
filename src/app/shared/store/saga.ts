@@ -22,7 +22,9 @@ export function remoteEventChannel() {
       "headless": false,
       "apiResultHandler": (error, result, full) => {
         console.log('api result data: ', result, full);
-        emitter(full)
+        if (!result.error) {
+          emitter(full);
+        }
       }
     }, (err) => {
         Utils.download("./votingAppShader.wasm", (err, bytes) => {
