@@ -121,6 +121,10 @@ const StyledItemContent = styled.div`
     width: 100%
     padding: 10px 20px 20px 75px;
 
+    > .voted-yes {
+        min-width: 120px;
+    }
+
     > .voted-no {
         margin-left: 50px;
     }
@@ -198,9 +202,35 @@ const StyledPrevStatus = styled.div<{status: boolean}>`
 `;
 
 const LabelStyled = styled.div`
-  display: inline-block;
-  vertical-align: bottom;
-  line-height: 26px;
+    display: inline-block;
+    vertical-align: bottom;
+    line-height: 26px;
+`;
+
+const StyledSearch = styled.div`
+    width: 270px;
+    height: 32px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 170px;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    margin-left: auto;
+
+    > .search-input {
+        width: 100%;
+        border: none;
+        color: white;
+        background-color: transparent;
+
+        ::placeholder  {
+            font-style: italic;
+            font-weight: 400;
+            font-size: 12px;
+            line-height: 14px;
+            color: rgba(255, 255, 255, .3);
+        }
+    }
 `;
 
 const selectClassName = css`
@@ -347,7 +377,10 @@ const ProposalsList: React.FC<ListProps> = ({
                     </SelectorItem>
                 ))}
             </div>) : null}
-            <IconSearch className='icon-search-class' onClick={handleSearchClick}/>
+            <StyledSearch>
+                <input placeholder='Search by epoch, title, description, ID, date... ' className='search-input'></input>
+                <IconSearch className='icon-search-class' onClick={handleSearchClick}/>
+            </StyledSearch>
             {
                 //fail on new epoch 
                 filterItems.length > 0 &&

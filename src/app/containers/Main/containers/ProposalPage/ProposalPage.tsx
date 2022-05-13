@@ -23,7 +23,7 @@ import {
 } from '@app/shared/icons';
 import { useParams } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
-import { PROPOSALS, ROUTES } from '@app/shared/constants';
+import { PROPOSALS, ROUTES, BEAMX_TVL } from '@app/shared/constants';
 import { fromGroths, getProposalId, toGroths, numFormatter, calcVotingPower } from '@core/appUtils';
 import { ProcessedProposal } from '@app/core/types';
 import { openInNewTab } from '@core/appUtils'; 
@@ -292,7 +292,7 @@ const CurrentProposalContent: React.FC<ProposalContentProps> = (
 
     if (proposal.data.quorum !== undefined && 
       (proposal.data.quorum.type === 'beamx' ? proposal.stats.variants[1] >= toGroths(proposal.data.quorum.value) : 
-      ((proposal.stats.variants[1] / totalsView.stake_active) * 100 >= proposal.data.quorum.value))) {
+      ((fromGroths(proposal.stats.variants[1]) / BEAMX_TVL) * 100 >= proposal.data.quorum.value))) {
         setQuorumPassed(true);
     }
 
@@ -451,7 +451,7 @@ const PrevProposalContent: React.FC<ProposalContentProps> = (
 
     if (proposal.data.quorum !== undefined && 
       (proposal.data.quorum.type === 'beamx' ? (proposal.stats.variants[1] >= toGroths(proposal.data.quorum.value)) : 
-      ((proposal.stats.variants[1] / totalsView.stake_active) * 100 >= proposal.data.quorum.value))) {
+      ((fromGroths(proposal.stats.variants[1]) / BEAMX_TVL) * 100 >= proposal.data.quorum.value))) {
         setQuorumPassed(true);
     }
 

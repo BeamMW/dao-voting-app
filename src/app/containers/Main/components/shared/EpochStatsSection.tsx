@@ -294,7 +294,9 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
     return (
         <StyledStats className={className}>
             <div className='stats-title-class'>
-                <span className='stats-epoch-class'>EPOCH #{appParams.current.iEpoch}</span>
+                <span className='stats-epoch-class'>
+                  {state === 'stake' ? 'NEXT EPOCH #' + (appParams.current.iEpoch + 1) : 'EPOCH #' + appParams.current.iEpoch}
+                </span>
                 <ExpiresTimer appParams={appParams} systemState={systemState} cHeight={cHeight}></ExpiresTimer>
             </div>
             <StyledSection>
@@ -303,14 +305,18 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
                         <SubSectionTitle>Total value locked</SubSectionTitle>
                         <SubSectionValue>
                             <IconBeamx/>
-                            <span>{numFormatter(fromGroths(totalsView.stake_active))} BEAMX</span>
+                            <span>{numFormatter(fromGroths(
+                              state === 'stake' ? (totalsView.stake_active + totalsView.stake_passive) : totalsView.stake_active
+                            ))} BEAMX</span>
                         </SubSectionValue>
                     </StyledTotalLocked>
                     <StyledStaked>
                         <SubSectionTitle>Your staked</SubSectionTitle>
                         <SubSectionValue>
                             <IconBeamx/>
-                            <span>{numFormatter(fromGroths(userViewData.stake_active))} BEAMX</span>
+                            <span>{numFormatter(fromGroths(
+                              state === 'stake' ? (userViewData.stake_active + userViewData.stake_passive) : userViewData.stake_active
+                            ))} BEAMX</span>
                         </SubSectionValue>
                         { totalsView.stake_active > 0 && state !== 'stake' ?
                         (<div className='voting-power-class'>
@@ -324,7 +330,8 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
                   <PowerStats>
                     <SubSectionTitle>Voting power</SubSectionTitle>
                     <div className='power-value'>
-                      { calcVotingPower(userViewData.stake_active, totalsView.stake_active) }%
+                      { calcVotingPower(userViewData.stake_active + userViewData.stake_passive,
+                        totalsView.stake_active + totalsView.stake_passive) }%
                     </div>
                     <div className='text'>At the epoch beginning</div>
                   </PowerStats>
@@ -448,7 +455,7 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
                       { totalsView.stake_active !== 0 && <PowerStats>
                         <SubSectionTitle>Voting power</SubSectionTitle>
                         <div className='power-value'>
-                          { calcVotingPower(userViewData.stake_passive, totalsView.stake_active) }%
+                          { calcVotingPower(userViewData.stake_passive, totalsView.stake_active + totalsView.stake_passive) }%
                           <IconArrowGreenUp className='power-up-icon'/>
                         </div>
                       </PowerStats> }

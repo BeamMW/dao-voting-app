@@ -1,7 +1,7 @@
 import { call, put, takeLatest, select } from 'redux-saga/effects';
 import { navigate, setError } from '@app/shared/store/actions';
 import * as selectors from './selectors';
-import { ROUTES, CID, PROPOSALS } from '@app/shared/constants';
+import { ROUTES, CID, PROPOSALS, BEAMX_TVL } from '@app/shared/constants';
 import { LoadViewParams, LoadProposals, LoadProposalData, 
   LoadTotals, LoadPublicKey, LoadVotes,
   LoadManagerView, LoadUserView, LoadModeratorsView } from '@core/api';
@@ -14,7 +14,7 @@ import { VotingAppParams, ManagerViewData, UserViewParams,
 import { SharedStateType } from '@app/shared/interface';
 import { setIsLoaded } from '@app/shared/store/actions';
 import { EpochesStateType, RateResponse } from '../interfaces';
-import { Base64DecodeUrl, toGroths } from '@core/appUtils';
+import { Base64DecodeUrl, fromGroths, toGroths } from '@core/appUtils';
 
 const FETCH_INTERVAL = 310000;
 const API_URL = 'https://api.coingecko.com/api/v3/simple/price';
@@ -148,7 +148,7 @@ export function* loadProposalsSaga(
               if (prevProposal.data.quorum.type === 'beamx') {
                 yield put(actions.setIsPassed({propId: i, isPassed: stats.variants[1] > toGroths(prevProposal.data.quorum.value)}));
               } else if (prevProposal.data.quorum.type === 'percent') {
-                const isPassed = stats.variants[1] > (stats.total * (prevProposal.data.quorum.value / 100));
+                const isPassed = fromGroths(stats.variants[1]) > (BEAMX_TVL * (prevProposal.data.quorum.value / 100));
                 yield put(actions.setIsPassed({propId: i, isPassed: isPassed}));
               }
             } else {

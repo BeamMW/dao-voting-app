@@ -6,3 +6,5 @@ export const PROPOSALS = {
     PREV: 'prev',
     FUTURE: 'future'
 };
+export const BEAMX_TVL = 100000000;
+export const BEAMX_TVL_STR = '100 000 000';

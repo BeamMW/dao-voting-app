@@ -12,6 +12,7 @@ import { fromGroths } from '@core/appUtils';
 import { AddProposal, UserDeposit } from '@core/api';
 import { css } from '@linaria/core';
 import { ProposalData } from '@app/core/types';
+import { BEAMX_TVL, BEAMX_TVL_STR } from '@app/shared/constants/common'
 
 interface NewProposalPopupProps {
   visible?: boolean;
@@ -205,7 +206,7 @@ const NewProposalPopup: React.FC<NewProposalPopupProps> = ({ visible, onCancel }
         } else {
             const quorumValue = parseInt(quorum_limit);
             if (quorumValue > 0) {
-                if ((!activeToggle && quorumValue > fromGroths(totals.stake_active)) ||
+                if ((!activeToggle && quorumValue > BEAMX_TVL) ||
                 (activeToggle && (quorumValue > 100 || quorumValue < 0))) {
                     errorsValidation.quorum_limit = 'Incorrect amount.'
                 }
@@ -273,7 +274,7 @@ const NewProposalPopup: React.FC<NewProposalPopupProps> = ({ visible, onCancel }
         } else {
             const quorumValue = parseInt(values.quorum_limit);
             if (quorumValue > 0) {
-                if ((!activeToggle && quorumValue > fromGroths(totals.stake_active)) ||
+                if ((!activeToggle && quorumValue > BEAMX_TVL) ||
                 (activeToggle && (quorumValue > 100 || quorumValue < 0))) {
                     return false;
                 }
@@ -402,10 +403,10 @@ const NewProposalPopup: React.FC<NewProposalPopupProps> = ({ visible, onCancel }
                     <p className={`toggle-title ${activeToggle ? 'active' : ''}`}>% of TVL</p>
                 </span>
                 <div className='tvl-part'>
-                    <InputTitle>Total value locked</InputTitle>
+                    <InputTitle>Total supply</InputTitle>
                     <div className='beamx'>
                         <IconBeamx/>
-                        <span>{fromGroths(totals.stake_active)} BEAMX</span>
+                        <span>{BEAMX_TVL_STR} BEAMX</span>
                     </div>
                 </div>
             </div>
