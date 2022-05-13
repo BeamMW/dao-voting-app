@@ -5,12 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="theme-color" content="#000000" />
     <title></title>
-    
-    <link rel="stylesheet" media="all" href="styles.css" />
   </head>
+
+  <style>
+    @font-face {
+      font-family: 'SFProDisplay';
+      src: url('SFProDisplay-RegularItalic.ttf');
+      font-weight: 400;
+      font-style: italic;
+    }
+
+    html * {
+      font-family: 'SFProDisplay', sans-serif;
+    }
+  </style>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
-    <script src="index.js"></script>
+    <div id="root" style="display: flex;
+    flex-direction: column;">
+        <object
+        style="margin: 250px auto 40px auto;"
+        type="image/svg+xml"
+        data="voting-place-holder.svg">
+        </object>
+        <div style="font-style: italic;
+        font-weight: 400;
+        font-size: 14px;
+        text-align: center;
+        
+        color: #FFFFFF;
+        
+        opacity: 0.7;">Beam Voting is coming soon.</div>
+    </div>
   </body>
 </html>
