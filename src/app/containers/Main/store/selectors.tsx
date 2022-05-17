@@ -23,4 +23,5 @@ export const selectPublicKey = () => createSelector(selectMain,
     (state) => state.public_key);
 export const selectBlocksLeft = () => createSelector(selectMain, (state) => state.blocks_left);
 export const selectWithdrawedAmount = () => createSelector(selectMain, (state) => state.withdrawedAmount);
+export const selectDepositedAmount = () => createSelector(selectMain, (state) => state.depositedAmount);
 export const selectPrevEpoches = () => createSelector(selectMain, (state) => state.prevEpoches);

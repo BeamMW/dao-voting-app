@@ -21,5 +21,6 @@ export interface EpochesStateType {
   },
   prevEpoches: number[];
   withdrawedAmount: number;
+  depositedAmount: number;
   filterEpochSelected: number;
 }

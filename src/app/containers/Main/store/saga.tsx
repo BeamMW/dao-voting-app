@@ -184,12 +184,18 @@ export function* loadContractInfoSaga(
         }
 
         let withdrawedAmount = 0;
+        let depositedAmount = 0;
         for (let tr of state.shared.transactions) {
-          if (tr.comment === 'dao-vote move funds' && tr.income && tr.height >= epochStartsHeight && tr.height < epochEndsHeight) {
-            withdrawedAmount += tr.invoke_data[0].amounts[0].amount * -1;
+          if (tr.comment === 'dao-vote move funds' && tr.height >= epochStartsHeight && tr.height < epochEndsHeight) {
+            if (tr.income) {
+              withdrawedAmount += tr.invoke_data[0].amounts[0].amount * -1;
+            } else {
+              depositedAmount += tr.invoke_data[0].amounts[0].amount;
+            }
           }
         }
         yield put(actions.setWithdrawedAmount(withdrawedAmount));
+        yield put(actions.setDepositedAmount(depositedAmount));
     } catch (e) {
       yield put(actions.loadContractInfo.failure(e));
     }

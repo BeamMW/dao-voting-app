@@ -55,6 +55,7 @@ const initialState: EpochesStateType = {
   },
   prevEpoches: [],
   withdrawedAmount: 0,
+  depositedAmount: 0,
   filterEpochSelected: 0
 };
 
@@ -123,6 +124,9 @@ const reducer = createReducer<EpochesStateType, Action>(initialState)
   }))
   .handleAction(actions.setWithdrawedAmount, (state, action) => produce(state, (nexState) => {
     nexState.withdrawedAmount = action.payload;
+  }))
+  .handleAction(actions.setDepositedAmount, (state, action) => produce(state, (nexState) => {
+    nexState.depositedAmount = action.payload;
   }))
   .handleAction(actions.setFitlerEpoch, (state, action) => produce(state, (nexState) => {
     nexState.filterEpochSelected = action.payload;

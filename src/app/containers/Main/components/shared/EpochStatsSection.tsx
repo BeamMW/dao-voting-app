@@ -22,6 +22,7 @@ import {
   selectContractHeight,
   selectBlocksLeft,
   selectWithdrawedAmount,
+  selectDepositedAmount,
   selectUserView } from '@app/containers/Main/store/selectors';
 import { fromGroths, calcVotingPower, numFormatter } from '@core/appUtils';
 import { setPopupState } from '@app/containers/Main/store/actions';
@@ -248,6 +249,7 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
     const popupsState = useSelector(selectPopupsState());
     const blocksLeft = useSelector(selectBlocksLeft());
     const withdrawedAmount = useSelector(selectWithdrawedAmount());
+    const depositedAmount = useSelector(selectDepositedAmount());
 
     const currentProposals = useSelector(selectCurrentProposals());
     const [votes, setVotes] = useState(0);
@@ -409,7 +411,11 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
                             <SubSectionTitle>Withdraw</SubSectionTitle>
                             <SubSectionValue>
                                 <IconBeamx/>
-                                <span>{numFormatter(fromGroths(withdrawedAmount))} BEAMX</span>
+                                <span>{
+                                  numFormatter(fromGroths(withdrawedAmount > depositedAmount ?
+                                    (withdrawedAmount - depositedAmount) : 
+                                    withdrawedAmount))
+                                } BEAMX</span>
                             </SubSectionValue>
                         </StyledStaked>
                       </LeftStats>
@@ -424,13 +430,13 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
                     </div>
                   </StyledNextEpoch>
                 </> }
-                { userViewData.stake_passive === 0 && 
+                { depositedAmount === 0 && 
                 <>
                   <Separator/>
                   <StyledIncrease>To increase voting power in next epoch make a deposit.</StyledIncrease>
                 </>
                 }
-                { userViewData.stake_passive > 0 && 
+                { depositedAmount > 0 && 
                 <>
                   <Separator/>
                   <StyledNextEpoch>
@@ -441,14 +447,16 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
                             <SubSectionTitle>Deposit</SubSectionTitle>
                             <SubSectionValue>
                                 <IconBeamx/>
-                                <span>{numFormatter(fromGroths(totalsView.stake_passive))} BEAMX</span>
+                                <span>{numFormatter(fromGroths(depositedAmount))} BEAMX</span>
                             </SubSectionValue>
                         </StyledTotalLocked>
                         <StyledStaked>
                             <SubSectionTitle>Withdraw</SubSectionTitle>
                             <SubSectionValue>
                                 <IconBeamx/>
-                                <span>-</span>
+                                <span>{withdrawedAmount > depositedAmount ? 
+                                  numFormatter(fromGroths(depositedAmount)) : 
+                                  '-'} BEAMX</span>
                             </SubSectionValue>
                         </StyledStaked>
                       </LeftStats>
