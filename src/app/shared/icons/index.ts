@@ -37,6 +37,7 @@ import IconQuorumApprove from './icon-quorum-approve.svg';
 import IconChangeBlue from './icon-change-blue.svg';
 import IconAngleSmallUp from './icon-angle-small-up.svg';
 import IconSort from './icon-sort.svg';
+import IconSearchCancel from './icon-search-cancel.svg';
 
 export {
   IconBack,
@@ -77,5 +78,6 @@ export {
   IconQuorumApprove,
   IconChangeBlue,
   IconAngleSmallUp,
-  IconSort
+  IconSort,
+  IconSearchCancel
 }

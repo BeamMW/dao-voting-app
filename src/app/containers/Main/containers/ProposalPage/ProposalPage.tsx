@@ -11,6 +11,7 @@ import { selectRate, selectProposal, selectUserView,
   selectCurrentProposals, selectFutureProposals,
   selectAppParams, selectTotalsView } from '../../store/selectors';
 import { loadRate } from '@app/containers/Main/store/actions';
+import { Popover } from 'react-tiny-popover';
 import {
   IconVoteButtonNo,
   IconVoteButtonYes,
@@ -28,6 +29,7 @@ import { fromGroths, getProposalId, toGroths, numFormatter, calcVotingPower } fr
 import { ProcessedProposal } from '@app/core/types';
 import { openInNewTab } from '@core/appUtils'; 
 import { selectTransactions } from '@app/shared/store/selectors';
+import ReactMarkdown from 'react-markdown'
 
 interface locationProps { 
   id: number,
@@ -263,6 +265,28 @@ const StyledStatsValue = styled.div`
   }
 `;
 
+const StyledPopover = styled.div`
+  padding: 15px;
+  background: rgb(66, 89, 112);
+  border-radius: 5px;
+  margin-bottom: 9px;
+  margin-left: 60px;
+
+  :after {
+    content: '';
+    position: absolute;
+    margin-left: 30px;
+    left: 47%;
+    top: 45px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid rgba(66, 89, 112, 1);
+    clear: both;
+  }
+`;
+
 const VerticalSeparator = styled.div`
   height: 37px;
   width: 1px;
@@ -291,8 +315,8 @@ const CurrentProposalContent: React.FC<ProposalContentProps> = (
     }
 
     if (proposal.data.quorum !== undefined && 
-      (proposal.data.quorum.type === 'beamx' ? proposal.stats.variants[1] >= toGroths(proposal.data.quorum.value) : 
-      ((fromGroths(proposal.stats.variants[1]) / BEAMX_TVL) * 100 >= proposal.data.quorum.value))) {
+      (proposal.data.quorum.type === 'beamx' ? proposal.stats.result.variants[1] >= toGroths(proposal.data.quorum.value) : 
+      ((fromGroths(proposal.stats.result.variants[1]) / BEAMX_TVL) * 100 >= proposal.data.quorum.value))) {
         setQuorumPassed(true);
     }
 
@@ -332,7 +356,10 @@ const CurrentProposalContent: React.FC<ProposalContentProps> = (
       votes = new Array(currentProposals.items.length).fill(255);
     }
 
-    votes[state.index] = vote;
+    const index = currentProposals.items.findIndex((item) => {
+      item.id === proposal.id;
+    }); 
+    votes[index] = vote;
     VoteProposal(votes, proposal.id);
     onDisableChangeProcessState();
   };
@@ -371,12 +398,12 @@ const CurrentProposalContent: React.FC<ProposalContentProps> = (
         </div>)
       }
       <VotingBar active={proposal.voted !== undefined && proposal.voted < 255}
-        value={proposal.stats.variants[1]}
-        percent={proposal.stats.variants[1] / proposal.stats.total * 100}
+        value={proposal.stats.result.variants[1]}
+        percent={proposal.stats.result.variants[1] / proposal.stats.result.total * 100}
         voteType='yes'/>
       <VotingBar active={proposal.voted !== undefined && proposal.voted < 255}
-        value={proposal.stats.variants[0]}
-        percent={proposal.stats.variants[0] / proposal.stats.total * 100}
+        value={proposal.stats.result.variants[0]}
+        percent={proposal.stats.result.variants[0] / proposal.stats.result.total * 100}
         voteType='no'/>
       <StyledStats>
         <span className='total'>
@@ -385,7 +412,7 @@ const CurrentProposalContent: React.FC<ProposalContentProps> = (
         </span>
        <span className='voted'>
             <StyledStakeTitle>Voted</StyledStakeTitle>
-            <StyledStatsValue>{numFormatter(fromGroths(proposal.stats.total))} BEAMX</StyledStatsValue>
+            <StyledStatsValue>{numFormatter(fromGroths(proposal.stats.result.total))} BEAMX</StyledStatsValue>
         </span>
         <span className='staked'>
           <StyledStakeTitle>Your staked</StyledStakeTitle>
@@ -403,14 +430,14 @@ const CurrentProposalContent: React.FC<ProposalContentProps> = (
             </StyledStatsValue>
           </span>
         }
-        {proposal.stats.total > 0 &&
+        {proposal.stats.result.total > 0 &&
           <>
             <VerticalSeparator/>
             <span className='voted-yes'>
               <StyledStakeTitle>Voting results</StyledStakeTitle>
               <StyledStatsValue>
-                <span className='yes'>YES</span> ({calcVotingPower(proposal.stats.variants[1], proposal.stats.total)}%)
-                <span className='no'>NO</span> ({calcVotingPower(proposal.stats.variants[0], proposal.stats.total)}%)
+                <span className='yes'>YES</span> ({calcVotingPower(proposal.stats.result.variants[1], proposal.stats.result.total)}%)
+                <span className='no'>NO</span> ({calcVotingPower(proposal.stats.result.variants[0], proposal.stats.result.total)}%)
               </StyledStatsValue>
             </span>
           </> 
@@ -418,7 +445,20 @@ const CurrentProposalContent: React.FC<ProposalContentProps> = (
       </StyledStats>
       <StyledHorSeparator/>
       <div className='content'>
-        <div className='description'>{proposal.data.description}</div>
+        <div className='description'>
+          <ReactMarkdown 
+            components={{
+              a: ({node, ...props}) => <span style={{display: 'inline-flex', alignItems: 'center'}}><a style={{
+                color: '#00F6D2', 
+                textDecoration: 'none',
+                fontWeight: 700,
+                fontSize: '14px',
+                lineHeight: '15px'
+              }} {...props} /> 
+              <IconExternalLink style={{marginLeft: '5px'}} className='icon-link'/></span>
+            }}
+          >{proposal.data.description}</ReactMarkdown>
+        </div>
         {
           proposal.data.ref_link.length > 0 && 
           <>
@@ -443,6 +483,7 @@ const PrevProposalContent: React.FC<ProposalContentProps> = (
   const [isQuorumPassed, setQuorumPassed] = useState(false);
   const transactions = useSelector(selectTransactions());
   const [isVoteInProgress, setVoteInProgress] = useState(false);
+  const [isPopoverOpen, setPopoverState] = useState(false);
 
   useEffect(() => {
     if (proposal.voted !== undefined && proposal.voted < 255) {
@@ -450,8 +491,8 @@ const PrevProposalContent: React.FC<ProposalContentProps> = (
     }
 
     if (proposal.data.quorum !== undefined && 
-      (proposal.data.quorum.type === 'beamx' ? (proposal.stats.variants[1] >= toGroths(proposal.data.quorum.value)) : 
-      ((fromGroths(proposal.stats.variants[1]) / BEAMX_TVL) * 100 >= proposal.data.quorum.value))) {
+      (proposal.data.quorum.type === 'beamx' ? (proposal.stats.result.variants[1] >= toGroths(proposal.data.quorum.value)) : 
+      ((fromGroths(proposal.stats.result.variants[1]) / BEAMX_TVL) * 100 >= proposal.data.quorum.value))) {
         setQuorumPassed(true);
     }
 
@@ -503,46 +544,65 @@ const PrevProposalContent: React.FC<ProposalContentProps> = (
       </div>
       }
       <VotingBar active={proposal.prevVoted && proposal.prevVoted.value < 255}
-        value={proposal.stats.variants[1]}
-        percent={proposal.stats.variants[1] / proposal.stats.total * 100}
+        value={proposal.stats.result.variants[1]}
+        percent={proposal.stats.result.variants[1] / proposal.stats.result.total * 100}
         voteType='yes'/>
       <VotingBar active={proposal.prevVoted && proposal.prevVoted.value < 255}
-        value={proposal.stats.variants[0]}
-        percent={proposal.stats.variants[0] / proposal.stats.total * 100}
+        value={proposal.stats.result.variants[0]}
+        percent={proposal.stats.result.variants[0] / proposal.stats.result.total * 100}
         voteType='no'/>
       <StyledStats>
         <span className='total'>
           <StyledStakeTitle>Total staked</StyledStakeTitle>
-          <StyledStatsValue>{numFormatter(fromGroths(totalsView.stake_active))} BEAMX</StyledStatsValue>
+          <StyledStatsValue>{numFormatter(fromGroths(proposal.stats.result.stake_active))} BEAMX</StyledStatsValue>
         </span>
        <span className='voted'>
             <StyledStakeTitle>Voted</StyledStakeTitle>
-            <StyledStatsValue>{numFormatter(fromGroths(proposal.stats.total))} BEAMX</StyledStatsValue>
+            <StyledStatsValue>{numFormatter(fromGroths(proposal.stats.result.total))} BEAMX</StyledStatsValue>
         </span>
+        { proposal.prevVoted &&
         <span className='staked'>
           <StyledStakeTitle>Your staked</StyledStakeTitle>
-          <StyledStatsValue>{numFormatter(fromGroths(userViewData.stake_active))} BEAMX</StyledStatsValue>
-        </span>
+          <StyledStatsValue>{numFormatter(fromGroths(proposal.prevVoted.stake))} BEAMX</StyledStatsValue>
+        </span>}
         {
           proposal.data.quorum !== undefined && 
           <span className='quorum'>
             <StyledStakeTitle>Quorum</StyledStakeTitle>
-            <StyledStatsValue>
-              { proposal.data.quorum.type === 'beamx' ? 
-                (numFormatter(proposal.data.quorum.value) + ' BEAMX') :
-                (proposal.data.quorum.value + '%') }
-              { isQuorumPassed ? <IconQuorumApprove className={QuorumIconClass}/> : <IconQuorumAlert className={QuorumIconClass}/>}
-            </StyledStatsValue>
+            <Popover
+              isOpen={isPopoverOpen}
+              positions={['top', 'bottom', 'left', 'right']}
+              content={
+                <StyledPopover>
+                  {proposal.data.quorum.type === 'percent' ? 
+                    numFormatter(BEAMX_TVL * (proposal.data.quorum.value / 100)) :
+                    numFormatter(proposal.data.quorum.value)} BEAMX votes «YES» needed 
+                </StyledPopover>
+              }
+            >
+              <StyledStatsValue>
+                { proposal.data.quorum.type === 'beamx' ? 
+                  (numFormatter(proposal.data.quorum.value) + ' BEAMX') :
+                  (proposal.data.quorum.value + '%') }
+                { 
+                  isQuorumPassed ? 
+                  <IconQuorumApprove className={QuorumIconClass}/> : 
+                  <IconQuorumAlert className={QuorumIconClass}
+                    onMouseEnter={()=>setPopoverState(true)}
+                    onMouseLeave={()=>setPopoverState(false)}/>
+                }
+              </StyledStatsValue>
+            </Popover>
           </span>
         }
-        {proposal.stats.total > 0 &&
+        {proposal.stats.result.total > 0 &&
           <>
             <VerticalSeparator/>
             <span className='voted-yes'>
               <StyledStakeTitle>Voting results</StyledStakeTitle>
               <StyledStatsValue>
-                <span className='yes'>YES</span> ({calcVotingPower(proposal.stats.variants[1], proposal.stats.total)}%)
-                <span className='no'>NO</span> ({calcVotingPower(proposal.stats.variants[0], proposal.stats.total)}%)
+                <span className='yes'>YES</span> ({calcVotingPower(proposal.stats.result.variants[1], proposal.stats.result.total)}%)
+                <span className='no'>NO</span> ({calcVotingPower(proposal.stats.result.variants[0], proposal.stats.result.total)}%)
               </StyledStatsValue>
             </span>
           </> 
@@ -550,7 +610,20 @@ const PrevProposalContent: React.FC<ProposalContentProps> = (
       </StyledStats>
       <StyledHorSeparator/>
       <div className='content'>
-        <div className='description'>{proposal.data.description}</div>
+        <div className='description'>
+          <ReactMarkdown 
+            components={{
+              a: ({node, ...props}) => <span style={{display: 'inline-flex', alignItems: 'center'}}><a style={{
+                color: '#00F6D2', 
+                textDecoration: 'none',
+                fontWeight: 700,
+                fontSize: '14px',
+                lineHeight: '15px'
+              }} {...props} /> 
+              <IconExternalLink style={{marginLeft: '5px'}} className='icon-link'/></span>
+            }}
+          >{proposal.data.description}</ReactMarkdown>
+        </div>
         {
           proposal.data.ref_link.length > 0 && 
           <>
@@ -604,7 +677,20 @@ const FutureProposalContent: React.FC<ProposalContentProps> = (
             }
           </div>
           <div className='separator'></div>
-          <div className='description'>{proposal.data.description}</div>
+          <div className='description'>
+            <ReactMarkdown 
+              components={{
+                a: ({node, ...props}) => <span style={{display: 'inline-flex', alignItems: 'center'}}><a style={{
+                  color: '#00F6D2', 
+                  textDecoration: 'none',
+                  fontWeight: 700,
+                  fontSize: '14px',
+                  lineHeight: '15px'
+                }} {...props} /> 
+                <IconExternalLink style={{marginLeft: '5px'}} className='icon-link'/></span>
+              }}
+            >{proposal.data.description}</ReactMarkdown>
+          </div>
           {
             proposal.data.ref_link.length > 0 && 
             <>

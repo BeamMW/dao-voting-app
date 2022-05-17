@@ -10,7 +10,7 @@ import Angle from './Angle';
 const ContainerStyled = styled.div`
   display: inline-block;
   position: relative;
-  margin-left: 30px;
+  margin-left: 15px;
 `;
 
 const SelectStyled = styled.div`

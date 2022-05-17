@@ -25,8 +25,11 @@ export interface InitialProposal {
 }
 
 export interface ProposalStats {
-    total: number;
-    variants: number[];
+    result: {
+      total: number;
+      stake_active: number;
+      variants: number[];
+    }
 }
 
 export interface ProposalData {
