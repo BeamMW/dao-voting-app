@@ -21,6 +21,7 @@ interface ListProps {
   isFuture?: boolean;
   filter?: number;
 }
+let updateCounter = 0;
 
 const ProposalsHeader = styled.div`
     display: flex;
@@ -259,25 +260,20 @@ const ProposalsList: React.FC<ListProps> = ({
     const [extendedFilteredEpochs, setExtendedFilteredEpochs] = useState([]);
 
     useEffect(() => {
+        setFilterItems(appParams.next.proposals > 0 ? 
+            [appParams.current.iEpoch + 1, appParams.current.iEpoch, ...prevEpoches] : [appParams.current.iEpoch, ...prevEpoches]);
         if (type === PROPOSALS.CURRENT) {
-            setFilterItems(appParams.next.proposals > 0 ? 
-                [appParams.current.iEpoch + 1, appParams.current.iEpoch] : [appParams.current.iEpoch]);
             setActiveFilter(appParams.current.iEpoch);
         } else if (type === PROPOSALS.FUTURE) {
-            setFilterItems([appParams.current.iEpoch + 1]);
             setActiveFilter(appParams.current.iEpoch + 1);
         } else if (type === PROPOSALS.PREV) {
-            setFilterItems(appParams.next.proposals > 0 ? 
-                [appParams.current.iEpoch + 1, appParams.current.iEpoch, ...prevEpoches] : [appParams.current.iEpoch, ...prevEpoches]);
             setActiveFilter(prevEpoches[0]);
         }
     }, [appParams]);
 
     useEffect(() => {
-        if (type !== PROPOSALS.FUTURE) {
-            setFilterItems(appParams.next.proposals > 0 ? 
-                [appParams.current.iEpoch + 1, appParams.current.iEpoch, ...prevEpoches] : [appParams.current.iEpoch, ...prevEpoches]);
-        }
+        setFilterItems(appParams.next.proposals > 0 ? 
+            [appParams.current.iEpoch + 1, appParams.current.iEpoch, ...prevEpoches] : [appParams.current.iEpoch, ...prevEpoches]);
     }, [prevEpoches]);
 
     useEffect(() => {
@@ -300,9 +296,17 @@ const ProposalsList: React.FC<ListProps> = ({
             });
             setExtendedDataRes(fitleredData);
         } else {
-            setExtendedDataRes(extendedData)
+            setExtendedDataRes(extendedData);
         }
     }, [searchValue]);
+
+    useEffect(() => {
+        updateCounter++;
+        if (updateCounter > 5) {
+            setExtendedDataRes(extendedData);
+            updateCounter = 0;
+        }
+    }, [extendedData]);
 
     useEffect(() => {
         const fitleredData = data.filter((item) => {

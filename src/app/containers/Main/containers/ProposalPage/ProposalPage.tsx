@@ -356,11 +356,28 @@ const CurrentProposalContent: React.FC<ProposalContentProps> = (
       votes = new Array(currentProposals.items.length).fill(255);
     }
 
-    const index = currentProposals.items.findIndex((item) => {
-      item.id === proposal.id;
-    }); 
+    const index = currentProposals.items.indexOf(proposal);
     votes[index] = vote;
-    VoteProposal(votes, proposal.id);
+
+    const activeVotes = localStorage.getItem('votes');
+    
+    let voteIndex = null;
+    if (activeVotes) {
+      const votesInProgress = [...(JSON.parse(activeVotes).votes)];
+
+      for (let voteInProgress of votesInProgress) {
+        const voteItem = currentProposals.items.find((item) => {
+          return item.id === voteInProgress.id;
+        });
+
+        if (voteItem) {
+          voteIndex = currentProposals.items.indexOf(voteItem);
+          votes[voteIndex] = voteInProgress.vote;
+        }
+      }
+    }
+
+    VoteProposal(votes, proposal.id, vote);
     onDisableChangeProcessState();
   };
 
