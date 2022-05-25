@@ -17,6 +17,9 @@ export const setIsPassed = createAction('@@MAIN/SET_PROPOSAL_IS_PASSED')<{propId
 export const setPrevEpoches = createAction('@@MAIN/SET_PREV_EPOCHES')<number[]>();
 export const setFitlerEpoch = createAction('@@MAIN/SET_FILTER_EPOCH')<number>();
 
+export const setLocalVotes = createAction('@@MAIN/SET_LOCAL_VOTES')<number[]>();
+export const setLocalVoteCounter = createAction('@@MAIN/SET_LOCAL_VOTE_COUNTER')<number>();
+
 export const loadAppParams = createAsyncAction(
     '@@MAIN/LOAD_PARAMS',
     '@@MAIN/LOAD_PARAMS_SUCCESS',

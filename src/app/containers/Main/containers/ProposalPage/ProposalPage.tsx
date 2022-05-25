@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { styled } from '@linaria/react';
 import { css } from '@linaria/core';
-
+import remarkGfm from 'remark-gfm';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Window, Button, VotingBar, ChangeDecisionPopup } from '@app/shared/components';
@@ -9,8 +9,8 @@ import { VoteProposal } from '@core/api';
 import { EpochStatsSection, ProposalsList } from '@app/containers/Main/components';
 import { selectRate, selectProposal, selectUserView,
   selectCurrentProposals, selectFutureProposals,
-  selectAppParams, selectTotalsView } from '../../store/selectors';
-import { loadRate } from '@app/containers/Main/store/actions';
+  selectAppParams, selectTotalsView, selectVoteCounter } from '../../store/selectors';
+import { loadRate, setLocalVoteCounter } from '@app/containers/Main/store/actions';
 import { Popover } from 'react-tiny-popover';
 import {
   IconVoteButtonNo,
@@ -29,7 +29,8 @@ import { fromGroths, getProposalId, toGroths, numFormatter, calcVotingPower } fr
 import { ProcessedProposal } from '@app/core/types';
 import { openInNewTab } from '@core/appUtils'; 
 import { selectTransactions } from '@app/shared/store/selectors';
-import ReactMarkdown from 'react-markdown'
+import ReactMarkdown from 'react-markdown';
+
 
 interface locationProps { 
   id: number,
@@ -180,6 +181,27 @@ const ContentStyled = styled.div`
     > .description {
       font-size: 14px;
       word-wrap: break-word;
+
+      ul {
+        padding-left: 40px;
+      }
+
+      table, th, td {
+        border: 1px grey solid;
+      }
+
+      table {
+        margin: 10px 0;
+      }
+
+      th, td {
+        padding: 1px 5px;
+      }
+
+      code {
+        border: 1px solid;
+        padding: 1px 5px;
+      }
     }
 
     > .stake-info {
@@ -301,13 +323,16 @@ const QuorumIconClass = css`
 const CurrentProposalContent: React.FC<ProposalContentProps> = (
   {proposal, state, callback, isChangeProcessActive, onDisableChangeProcessState}
 ) => {
+  const dispatch = useDispatch();
   const userViewData = useSelector(selectUserView());
   const currentProposals = useSelector(selectCurrentProposals());
+  const voteCounter = useSelector(selectVoteCounter());
   const totalsView = useSelector(selectTotalsView());
   const [isVoted, setIsVoted] = useState(false);
   const [isQuorumPassed, setQuorumPassed] = useState(false);
   const transactions = useSelector(selectTransactions());
   const [isVoteInProgress, setVoteInProgress] = useState(false);
+  const [isPopoverOpen, setPopoverState] = useState(false);
 
   useEffect(() => {
     if (proposal.voted !== undefined && proposal.voted < 255) {
@@ -348,36 +373,43 @@ const CurrentProposalContent: React.FC<ProposalContentProps> = (
   }, [proposal]);
   
   const handleVoteClick = (vote: number) => {
-    let votes = [];
-
-    if (userViewData.current_votes !== undefined) {
-      votes = [...userViewData.current_votes];
-    } else {
-      votes = new Array(currentProposals.items.length).fill(255);
-    }
+    let votes = userViewData.current_votes !== undefined ? [...userViewData.current_votes] : 
+      new Array(currentProposals.items.length).fill(255);
 
     const index = currentProposals.items.indexOf(proposal);
     votes[index] = vote;
 
     const activeVotes = localStorage.getItem('votes');
     
-    let voteIndex = null;
     if (activeVotes) {
       const votesInProgress = [...(JSON.parse(activeVotes).votes)];
+        
+      let index = 0;
+      for (let voteInProgress of [...votesInProgress]) {
+        const voteTransaction = transactions.find((tx) => {
+          return tx.txId === voteInProgress.txid && tx.status === 5;
+        })
 
-      for (let voteInProgress of votesInProgress) {
-        const voteItem = currentProposals.items.find((item) => {
-          return item.id === voteInProgress.id;
-        });
-
-        if (voteItem) {
-          voteIndex = currentProposals.items.indexOf(voteItem);
-          votes[voteIndex] = voteInProgress.vote;
+        if (!voteTransaction) {
+          votesInProgress.splice(index, 1);
+        } else {
+          const voteItem = currentProposals.items.find((item) => {
+            return item.id === voteInProgress.id;
+          });
+  
+          if (voteItem) {
+            const voteIndex = currentProposals.items.indexOf(voteItem);
+            votes[voteIndex] = voteInProgress.vote;
+          }
         }
       }
+
+      localStorage.setItem('votes', JSON.stringify({votes: votesInProgress}));
     }
 
-    VoteProposal(votes, proposal.id, vote);
+    const counter = voteCounter + 1;
+    dispatch(setLocalVoteCounter(counter));
+    VoteProposal(votes, proposal.id, vote, counter);
     onDisableChangeProcessState();
   };
 
@@ -389,9 +421,11 @@ const CurrentProposalContent: React.FC<ProposalContentProps> = (
     <ContentStyled>
       { isChangeProcessActive || (proposal.voted === undefined || proposal.voted === 255) ?
         (<div className='controls'>
-          <Button variant='regular' pallete='green' onClick={()=>handleVoteClick(1)} disabled={isVoteInProgress}
+          <Button variant='regular' pallete='green' onClick={()=>handleVoteClick(1)}
+            disabled={isVoteInProgress || userViewData.stake_active === 0}
             className='button yes' icon={IconVoteButtonYes} >YES</Button>
-          <Button variant='regular' pallete='vote-red' onClick={()=>handleVoteClick(0)} disabled={isVoteInProgress}
+          <Button variant='regular' pallete='vote-red' onClick={()=>handleVoteClick(0)}
+            disabled={isVoteInProgress || userViewData.stake_active === 0}
             className='button no' icon={IconVoteButtonNo} >NO</Button>
         </div>) :
         (<div className='voted-controls'>
@@ -427,7 +461,7 @@ const CurrentProposalContent: React.FC<ProposalContentProps> = (
           <StyledStakeTitle>Total staked</StyledStakeTitle>
           <StyledStatsValue>{numFormatter(fromGroths(totalsView.stake_active))} BEAMX</StyledStatsValue>
         </span>
-       <span className='voted'>
+        <span className='voted'>
             <StyledStakeTitle>Voted</StyledStakeTitle>
             <StyledStatsValue>{numFormatter(fromGroths(proposal.stats.result.total))} BEAMX</StyledStatsValue>
         </span>
@@ -439,12 +473,30 @@ const CurrentProposalContent: React.FC<ProposalContentProps> = (
           proposal.data.quorum !== undefined && 
           <span className='quorum'>
             <StyledStakeTitle>Quorum</StyledStakeTitle>
-            <StyledStatsValue>
-              { proposal.data.quorum.type === 'beamx' ? 
-                (numFormatter(proposal.data.quorum.value) + ' BEAMX') :
-                (proposal.data.quorum.value + '%') }
-              { isQuorumPassed ? <IconQuorumApprove className={QuorumIconClass}/> : <IconQuorumAlert className={QuorumIconClass}/>}
-            </StyledStatsValue>
+            <Popover
+              isOpen={isPopoverOpen}
+              positions={['top', 'bottom', 'left', 'right']}
+              content={
+                <StyledPopover>
+                  {proposal.data.quorum.type === 'percent' ? 
+                    numFormatter(BEAMX_TVL * (proposal.data.quorum.value / 100)) :
+                    numFormatter(proposal.data.quorum.value)} BEAMX votes «YES» needed 
+                </StyledPopover>
+              }
+            >
+              <StyledStatsValue>
+                { proposal.data.quorum.type === 'beamx' ? 
+                  (numFormatter(proposal.data.quorum.value) + ' BEAMX') :
+                  (proposal.data.quorum.value + '%') }
+                { 
+                  isQuorumPassed ? 
+                  <IconQuorumApprove className={QuorumIconClass}/> : 
+                  <IconQuorumAlert className={QuorumIconClass}
+                    onMouseEnter={()=>setPopoverState(true)}
+                    onMouseLeave={()=>setPopoverState(false)}/>
+                }
+              </StyledStatsValue>
+            </Popover>
           </span>
         }
         {proposal.stats.result.total > 0 &&
@@ -463,9 +515,10 @@ const CurrentProposalContent: React.FC<ProposalContentProps> = (
       <StyledHorSeparator/>
       <div className='content'>
         <div className='description'>
-          <ReactMarkdown 
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
             components={{
-              a: ({node, ...props}) => <span style={{display: 'inline-flex', alignItems: 'center'}}><a style={{
+              a: ({node, ...props}) => <span style={{display: 'inline-flex', alignItems: 'center'}}><a target="_blank" style={{
                 color: '#00F6D2', 
                 textDecoration: 'none',
                 fontWeight: 700,
@@ -529,13 +582,13 @@ const PrevProposalContent: React.FC<ProposalContentProps> = (
 
         setVoteInProgress(!!isInProgress);
         
-        if (!isInProgress) {
-          const updatedVotes = votes.filter(function(item){ 
-            return item.id !== proposal.id;
-          });
+        // if (!isInProgress) {
+        //   const updatedVotes = votes.filter(function(item){ 
+        //     return item.id !== proposal.id;
+        //   });
 
-          localStorage.setItem('votes', JSON.stringify({votes: updatedVotes}));
-        }
+        //   localStorage.setItem('votes', JSON.stringify({votes: updatedVotes}));
+        // }
       }
     }
   }, [proposal]);
@@ -628,9 +681,10 @@ const PrevProposalContent: React.FC<ProposalContentProps> = (
       <StyledHorSeparator/>
       <div className='content'>
         <div className='description'>
-          <ReactMarkdown 
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
             components={{
-              a: ({node, ...props}) => <span style={{display: 'inline-flex', alignItems: 'center'}}><a style={{
+              a: ({node, ...props}) => <span style={{display: 'inline-flex', alignItems: 'center'}}><a target="_blank" style={{
                 color: '#00F6D2', 
                 textDecoration: 'none',
                 fontWeight: 700,
@@ -696,8 +750,9 @@ const FutureProposalContent: React.FC<ProposalContentProps> = (
           <div className='separator'></div>
           <div className='description'>
             <ReactMarkdown 
+              remarkPlugins={[remarkGfm]}
               components={{
-                a: ({node, ...props}) => <span style={{display: 'inline-flex', alignItems: 'center'}}><a style={{
+                a: ({node, ...props}) => <span style={{display: 'inline-flex', alignItems: 'center'}}><a target="_blank" style={{
                   color: '#00F6D2', 
                   textDecoration: 'none',
                   fontWeight: 700,

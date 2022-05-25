@@ -25,3 +25,4 @@ export const selectBlocksLeft = () => createSelector(selectMain, (state) => stat
 export const selectWithdrawedAmount = () => createSelector(selectMain, (state) => state.withdrawedAmount);
 export const selectDepositedAmount = () => createSelector(selectMain, (state) => state.depositedAmount);
 export const selectPrevEpoches = () => createSelector(selectMain, (state) => state.prevEpoches);
+export const selectVoteCounter = () => createSelector(selectMain, (state) => state.localVoteData.counter);

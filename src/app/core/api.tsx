@@ -81,14 +81,17 @@ export function AddProposal<T = any>(payload: ProposalData): Promise<T> {
     });
 }
 
-export function VoteProposal<T = any>(votes: number[], id: number, vote: number): Promise<T> {
+export function VoteProposal<T = any>(votes: number[], id: number, vote: number, counter: number): Promise<T> {
     return new Promise((resolve, reject) => {
+        localStorage.setItem('voteCounter', ''+counter);
         let votesParams = '';
         for (let i = 0; i < votes.length; i++) {
-            votesParams += `vote_${i + 1}=${votes[votes.length - i - 1]},`
+            votesParams += `vote_${i + 1}=${votes[i]},`
         }
 
-        Utils.invokeContract("role=user,action=vote," + votesParams + "cid=" + CID, 
+        const req = "role=user,action=vote," + votesParams + "voteCounter=" + counter + ",cid=" + CID;
+        console.log('VOTE PROCESS: ', req);
+        Utils.invokeContract(req, 
         (error, result, full) => {
             onMakeTx(error, result, full, {id, vote});
             resolve(result);

@@ -41,7 +41,8 @@ const initialState: EpochesStateType = {
   contractHeight: 0,
   userView: {
     stake_active: 0,
-    stake_passive: 0
+    stake_passive: 0,
+    voteCounter: 0
   },
   totalsView: {
     stake_active: 0,
@@ -56,7 +57,11 @@ const initialState: EpochesStateType = {
   prevEpoches: [],
   withdrawedAmount: 0,
   depositedAmount: 0,
-  filterEpochSelected: 0
+  filterEpochSelected: 0,
+  localVoteData: {
+    state: [],
+    counter: 0
+  }
 };
 
 const reducer = createReducer<EpochesStateType, Action>(initialState)
@@ -127,6 +132,9 @@ const reducer = createReducer<EpochesStateType, Action>(initialState)
   }))
   .handleAction(actions.setDepositedAmount, (state, action) => produce(state, (nexState) => {
     nexState.depositedAmount = action.payload;
+  }))
+  .handleAction(actions.setLocalVoteCounter, (state, action) => produce(state, (nexState) => {
+    nexState.localVoteData.counter = action.payload;
   }))
   .handleAction(actions.setFitlerEpoch, (state, action) => produce(state, (nexState) => {
     nexState.filterEpochSelected = action.payload;

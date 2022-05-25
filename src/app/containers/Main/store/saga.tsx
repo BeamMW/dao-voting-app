@@ -13,6 +13,7 @@ import { VotingAppParams, ManagerViewData, UserViewParams,
 
 import { SharedStateType } from '@app/shared/interface';
 import { setIsLoaded } from '@app/shared/store/actions';
+import { selectIsLoaded } from '@app/shared/store/selectors';
 import { EpochesStateType, RateResponse } from '../interfaces';
 import { Base64DecodeUrl, fromGroths, toGroths } from '@core/appUtils';
 
@@ -34,6 +35,13 @@ export function* loadParamsSaga(
 
         const userView = (yield call(LoadUserView)) as UserViewParams;
         yield put(actions.setUserView(userView));
+
+        const isLoaded = yield select(selectIsLoaded());
+        if (!isLoaded) {
+          const voteCounter = localStorage.getItem('voteCounter');
+          const parsedCounter = voteCounter.length > 0 ? parseInt(voteCounter) : 0;
+          yield put(actions.setLocalVoteCounter(parsedCounter > userView.voteCounter ? parsedCounter : userView.voteCounter));
+        }
         
         const state = (yield select()) as {main: EpochesStateType, shared: SharedStateType};
         if (!state.shared.isLoaded) {
@@ -124,8 +132,9 @@ export function* loadProposalsSaga(
           }
 
           if (key === PROPOSALS.CURRENT) {
-            yield put(actions.setCurrentProposals(proposalsData.current));
-            if (!state.shared.isLoaded) {
+            yield put(actions.setCurrentProposals(proposalsData.current.reverse()));
+            const isLoaded = yield select(selectIsLoaded());
+            if (!isLoaded) {
               store.dispatch(setIsLoaded(true));
             }
           } else if (key === PROPOSALS.FUTURE) {

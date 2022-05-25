@@ -7,12 +7,10 @@ import { ROUTES } from '@app/shared/constants';
 import { 
   IconWithdraw,
   IconDeposit,
-  IconBeamx,
-  IconArrowGreenUp,
-  IconArrowRedDown } from '@app/shared/icons';
+  IconBeamx } from '@app/shared/icons';
 import ExpiresTimer  from './ExpiresTimer';
 import { useDispatch, useSelector } from 'react-redux';
-import { Window, Button, ProgressBar } from '@app/shared/components';
+import { Button, ProgressBar } from '@app/shared/components';
 import { selectSystemState } from '@app/shared/store/selectors';
 import {
   selectAppParams,
@@ -255,6 +253,10 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
     const [votes, setVotes] = useState(0);
     const [nextEpochDate, setNextEpochStartDate] = useState(null);
     const [nextEpochStartFrom, setNextEpochStartFrom] = useState(null);
+
+    const [curWithdraw, setCurWithdraw] = useState(null);
+    const [curPowerPercent, setCurPowerPercent] = useState(null);
+    const [futPowerPercent, setFutPowerPercent] = useState(null);
     
     useEffect(() => {
       let count = 0;
@@ -267,6 +269,35 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
       }
       setVotes(count);
     }, [userViewData]);
+
+    useEffect(() => {
+      const wAmountProcessed = withdrawedAmount > depositedAmount ?
+        (withdrawedAmount - depositedAmount) : 
+        withdrawedAmount;
+      
+      if (depositedAmount > 0) {
+        setCurWithdraw(numFormatter(fromGroths(wAmountProcessed)));
+      } else {
+        setCurWithdraw(numFormatter(fromGroths(withdrawedAmount)));
+      }
+
+      const percentBefore = 100 / ((totalsView.stake_active + totalsView.stake_passive + wAmountProcessed) / 
+        (userViewData.stake_active + userViewData.stake_passive + wAmountProcessed));
+      const percentAfter = 100 / ((totalsView.stake_active + totalsView.stake_passive) / 
+        (userViewData.stake_active + userViewData.stake_passive));
+      const cPowerPercent = percentBefore - percentAfter;
+
+      setCurPowerPercent(cPowerPercent < 1 && cPowerPercent !== 0 ? '< 1' : Number(cPowerPercent).toFixed(2));
+
+      const fPercentAfter = 100 / ((totalsView.stake_active + totalsView.stake_passive) / 
+      (userViewData.stake_active + userViewData.stake_passive));
+      const fPercentBefore = 100 / (totalsView.stake_active / userViewData.stake_active);
+
+      const fPowerPercent = fPercentAfter - fPercentBefore;
+
+      setFutPowerPercent(fPowerPercent < 1 && fPowerPercent !== 0 ? '< 1' : Number(fPowerPercent).toFixed(2));
+    
+    }, [userViewData, totalsView]);
 
     useEffect(() => {
       let timestamp = systemState.current_state_timestamp * 1000 + blocksLeft * 60000;
@@ -299,7 +330,7 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
                 <span className='stats-epoch-class'>
                   {state === 'stake' ? 'NEXT EPOCH #' + (appParams.current.iEpoch + 1) : 'EPOCH #' + appParams.current.iEpoch}
                 </span>
-                <ExpiresTimer appParams={appParams} systemState={systemState} cHeight={cHeight}></ExpiresTimer>
+                {state !== 'stake' && <ExpiresTimer appParams={appParams} systemState={systemState} cHeight={cHeight}></ExpiresTimer>}
             </div>
             <StyledSection>
                 <LeftStats>
@@ -392,7 +423,7 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
               </>
             }
 
-            { state === 'stake' &&
+            {/* { state === 'stake' &&
               <>
                 { withdrawedAmount > 0 && <>
                   <Separator/>
@@ -411,18 +442,14 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
                             <SubSectionTitle>Withdraw</SubSectionTitle>
                             <SubSectionValue>
                                 <IconBeamx/>
-                                <span>{
-                                  numFormatter(fromGroths(withdrawedAmount > depositedAmount ?
-                                    (withdrawedAmount - depositedAmount) : 
-                                    withdrawedAmount))
-                                } BEAMX</span>
+                                <span>{ curWithdraw } BEAMX</span>
                             </SubSectionValue>
                         </StyledStaked>
                       </LeftStats>
                       { totalsView.stake_active !== 0 && <PowerStats>
                         <SubSectionTitle>Voting power</SubSectionTitle>
                         <div className='power-value'>
-                          { calcVotingPower(withdrawedAmount, totalsView.stake_active + withdrawedAmount) }%
+                          { curPowerPercent}%
                           <IconArrowRedDown className='power-up-icon'/>
                         </div>
                       </PowerStats> }
@@ -454,16 +481,16 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
                             <SubSectionTitle>Withdraw</SubSectionTitle>
                             <SubSectionValue>
                                 <IconBeamx/>
-                                <span>{withdrawedAmount > depositedAmount ? 
-                                  numFormatter(fromGroths(depositedAmount)) : 
-                                  '-'} BEAMX</span>
+                                <span>{depositedAmount > 0 ? 
+                                  numFormatter(fromGroths(withdrawedAmount > depositedAmount ? depositedAmount : 0)) : 
+                                  numFormatter(fromGroths(withdrawedAmount))} BEAMX</span>
                             </SubSectionValue>
                         </StyledStaked>
                       </LeftStats>
                       { totalsView.stake_active !== 0 && <PowerStats>
                         <SubSectionTitle>Voting power</SubSectionTitle>
                         <div className='power-value'>
-                          { calcVotingPower(userViewData.stake_passive, totalsView.stake_active + totalsView.stake_passive) }%
+                          { futPowerPercent }%
                           <IconArrowGreenUp className='power-up-icon'/>
                         </div>
                       </PowerStats> }
@@ -472,7 +499,7 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
                   </StyledNextEpoch>
                 </> }
               </>
-            }
+            } */}
         </StyledStats>
     );
 };
