@@ -265,7 +265,7 @@ const ProposalsList: React.FC<ListProps> = ({
         if (type === PROPOSALS.CURRENT) {
             setActiveFilter(appParams.current.iEpoch);
         } else if (type === PROPOSALS.FUTURE) {
-            setActiveFilter(appParams.current.iEpoch + 1);
+            setActiveFilter(appParams.next.proposals > 0 ? appParams.current.iEpoch + 1 : appParams.current.iEpoch);
         } else if (type === PROPOSALS.PREV) {
             setActiveFilter(prevEpoches[0]);
         }

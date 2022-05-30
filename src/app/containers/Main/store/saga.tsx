@@ -16,6 +16,7 @@ import { setIsLoaded } from '@app/shared/store/actions';
 import { selectIsLoaded } from '@app/shared/store/selectors';
 import { EpochesStateType, RateResponse } from '../interfaces';
 import { Base64DecodeUrl, fromGroths, toGroths } from '@core/appUtils';
+import { decode } from 'js-base64';
 
 const FETCH_INTERVAL = 310000;
 const API_URL = 'https://api.coingecko.com/api/v3/simple/price';
@@ -39,7 +40,7 @@ export function* loadParamsSaga(
         const isLoaded = yield select(selectIsLoaded());
         if (!isLoaded) {
           const voteCounter = localStorage.getItem('voteCounter');
-          const parsedCounter = voteCounter.length > 0 ? parseInt(voteCounter) : 0;
+          const parsedCounter = voteCounter && voteCounter.length > 0 ? parseInt(voteCounter) : 0;
           yield put(actions.setLocalVoteCounter(parsedCounter > userView.voteCounter ? parsedCounter : userView.voteCounter));
         }
         
@@ -108,7 +109,7 @@ export function* loadProposalsSaga(
             }
             item['data'] = {};
             try {
-              item['data'] = JSON.parse(window.atob(Base64DecodeUrl(item.text))) as ProposalData;
+              item['data'] = JSON.parse(decode(Base64DecodeUrl(item.text))) as ProposalData;
             } catch (e) {
               console.log(e)
             }

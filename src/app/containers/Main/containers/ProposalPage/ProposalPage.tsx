@@ -195,12 +195,21 @@ const ContentStyled = styled.div`
       }
 
       th, td {
-        padding: 1px 5px;
+        padding: 5px 10px;
       }
 
       code {
         border: 1px solid;
         padding: 1px 5px;
+      }
+
+      pre {
+        border: 1px solid;
+        padding: 1px 5px;
+      }
+
+      pre code {
+        border: none;
       }
     }
 

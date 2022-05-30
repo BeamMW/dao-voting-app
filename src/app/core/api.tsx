@@ -5,6 +5,7 @@ import { Base64EncodeUrl } from '@core/appUtils';
 
 import React from 'react';
 import { toast } from 'react-toastify';
+import { encode } from 'js-base64';
 
 export function LoadViewParams<T = any>(payload): Promise<T> {
     return new Promise((resolve, reject) => {
@@ -72,8 +73,8 @@ export function LoadPublicKey<T = any>(): Promise<T> {
 export function AddProposal<T = any>(payload: ProposalData): Promise<T> {
     return new Promise((resolve, reject) => {
         const jsonData = JSON.stringify(payload);
-        const proposal = Base64EncodeUrl(window.btoa(jsonData));
-        Utils.invokeContract("role=manager,action=add_proposal,variants=2,text="+proposal+",cid=" + CID, 
+        const proposal = Base64EncodeUrl(encode(jsonData));
+        Utils.invokeContract(`role=manager,action=add_proposal,variants=2,text=${proposal},cid=${CID}`, 
         (error, result, full) => {
             onMakeTx(error, result, full, null, payload.title);
             resolve(result);
