@@ -58,6 +58,17 @@
     </div>
     <script type="module">
       import * as Utils from './utils.js';
+      Utils.default.initialize({
+      "appname": "BEAM DAO Voting app",
+      "min_api_version": "6.2",
+      "headless": false,
+      "apiResultHandler": (error, result, full) => {
+        console.log('api result data: ', result, full);
+        if (!result.error) {
+          emitter(full);
+        }
+      }
+    }, (err) => {});
       if (Utils.default.isWeb() || Utils.default.isAndroid()) {
         document.getElementById('root').classList.add('bg');
       }
