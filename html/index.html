@@ -18,11 +18,27 @@
     html * {
       font-family: 'SFProDisplay', sans-serif;
     }
+
+    html, body {
+      height: 100%;
+    }
+    
+    body {
+      margin: 0; padding: 0;
+    }
+
+    #root {
+      display: flex;
+      background-color: #042548;
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      flex-direction: column;
+    }
   </style>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root" style="display: flex;
-    flex-direction: column;">
+    <div id="root">
         <object
         style="margin: 250px auto 40px auto;"
         type="image/svg+xml"
