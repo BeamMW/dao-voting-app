@@ -12,6 +12,7 @@ interface WithdrawPopupProps {
   visible?: boolean;
   onCancel?: ()=>void;
   voted: number;
+  propTitle: string;
   onChangeResult: (res: boolean)=>void;
 }
 
@@ -27,7 +28,7 @@ const WithdrawButtonsClass = css`
     max-width: 145px !important;
 `;
 
-const ChangeDecisionPopup: React.FC<WithdrawPopupProps> = ({ visible, onCancel, voted, onChangeResult }) => {
+const ChangeDecisionPopup: React.FC<WithdrawPopupProps> = ({ visible, onCancel, voted, propTitle, onChangeResult }) => {
   const userViewData = useSelector(selectUserView());
   const appParams = useSelector(selectAppParams());
   const [nextEpochDate, setNextEpochStartDate] = useState(null);
@@ -62,8 +63,7 @@ const ChangeDecisionPopup: React.FC<WithdrawPopupProps> = ({ visible, onCancel, 
       }}
     >
     <StyledContent>
-        You voted {voted > 0 ? 'YES' : 'NO'}. Are you sure you want to change your current decision in proposal “Decrease transaction’s 
-        fee for Smart Contract transaction”?
+        You voted {voted > 0 ? 'YES' : 'NO'}. Are you sure you want to change your current decision in proposal “{propTitle}”?
     </StyledContent> 
     </Popup>
   );

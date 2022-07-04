@@ -13,8 +13,10 @@ import { VotingAppParams, ManagerViewData, UserViewParams,
 
 import { SharedStateType } from '@app/shared/interface';
 import { setIsLoaded } from '@app/shared/store/actions';
+import { selectIsLoaded } from '@app/shared/store/selectors';
 import { EpochesStateType, RateResponse } from '../interfaces';
 import { Base64DecodeUrl, fromGroths, toGroths } from '@core/appUtils';
+import { decode } from 'js-base64';
 
 const FETCH_INTERVAL = 310000;
 const API_URL = 'https://api.coingecko.com/api/v3/simple/price';
@@ -34,6 +36,13 @@ export function* loadParamsSaga(
 
         const userView = (yield call(LoadUserView)) as UserViewParams;
         yield put(actions.setUserView(userView));
+
+        const isLoaded = yield select(selectIsLoaded());
+        if (!isLoaded) {
+          const voteCounter = localStorage.getItem('voteCounter');
+          const parsedCounter = voteCounter && voteCounter.length > 0 ? parseInt(voteCounter) : 0;
+          yield put(actions.setLocalVoteCounter(parsedCounter > userView.voteCounter ? parsedCounter : userView.voteCounter));
+        }
         
         const state = (yield select()) as {main: EpochesStateType, shared: SharedStateType};
         if (!state.shared.isLoaded) {
@@ -100,7 +109,7 @@ export function* loadProposalsSaga(
             }
             item['data'] = {};
             try {
-              item['data'] = JSON.parse(window.atob(Base64DecodeUrl(item.text))) as ProposalData;
+              item['data'] = JSON.parse(decode(Base64DecodeUrl(item.text))) as ProposalData;
             } catch (e) {
               console.log(e)
             }
@@ -124,8 +133,9 @@ export function* loadProposalsSaga(
           }
 
           if (key === PROPOSALS.CURRENT) {
-            yield put(actions.setCurrentProposals(proposalsData.current));
-            if (!state.shared.isLoaded) {
+            yield put(actions.setCurrentProposals(proposalsData.current.reverse()));
+            const isLoaded = yield select(selectIsLoaded());
+            if (!isLoaded) {
               store.dispatch(setIsLoaded(true));
             }
           } else if (key === PROPOSALS.FUTURE) {
@@ -146,13 +156,13 @@ export function* loadProposalsSaga(
 
             if (prevProposal.data.quorum !== undefined) {
               if (prevProposal.data.quorum.type === 'beamx') {
-                yield put(actions.setIsPassed({propId: i, isPassed: stats.variants[1] > toGroths(prevProposal.data.quorum.value)}));
+                yield put(actions.setIsPassed({propId: i, isPassed: stats.result.variants[1] > toGroths(prevProposal.data.quorum.value)}));
               } else if (prevProposal.data.quorum.type === 'percent') {
-                const isPassed = fromGroths(stats.variants[1]) > (BEAMX_TVL * (prevProposal.data.quorum.value / 100));
+                const isPassed = fromGroths(stats.result.variants[1]) > (BEAMX_TVL * (prevProposal.data.quorum.value / 100));
                 yield put(actions.setIsPassed({propId: i, isPassed: isPassed}));
               }
             } else {
-              yield put(actions.setIsPassed({propId: i, isPassed: stats.variants[1] > stats.variants[0]}));
+              yield put(actions.setIsPassed({propId: i, isPassed: stats.result.variants[1] > stats.result.variants[0]}));
             }
           }
         }
@@ -184,12 +194,18 @@ export function* loadContractInfoSaga(
         }
 
         let withdrawedAmount = 0;
+        let depositedAmount = 0;
         for (let tr of state.shared.transactions) {
-          if (tr.comment === 'dao-vote move funds' && tr.income && tr.height >= epochStartsHeight && tr.height < epochEndsHeight) {
-            withdrawedAmount += tr.invoke_data[0].amounts[0].amount * -1;
+          if (tr.comment === 'dao-vote move funds' && tr.height >= epochStartsHeight && tr.height < epochEndsHeight) {
+            if (tr.income) {
+              withdrawedAmount += tr.invoke_data[0].amounts[0].amount * -1;
+            } else {
+              depositedAmount += tr.invoke_data[0].amounts[0].amount;
+            }
           }
         }
         yield put(actions.setWithdrawedAmount(withdrawedAmount));
+        yield put(actions.setDepositedAmount(depositedAmount));
     } catch (e) {
       yield put(actions.loadContractInfo.failure(e));
     }

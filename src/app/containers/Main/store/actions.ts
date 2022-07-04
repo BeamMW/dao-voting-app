@@ -11,10 +11,14 @@ export const setProposalsState = createAction('@@MAIN/SET_PROPOSALS_STATE')<{is_
 export const setPopupState = createAction('@@MAIN/SET_POPUP_STATE')<{type: string, state: boolean}>();
 export const setBlocksLeft = createAction('@@MAIN/SET_BLOCKS_LEFT')<number>();
 export const setWithdrawedAmount = createAction('@@MAIN/SET_WITHDRAWED_AMOUNT')<number>();
+export const setDepositedAmount = createAction('@@MAIN/SET_DEPOSITED_AMOUNT')<number>();
 export const loadPrevProposalStats = createAction('@@MAIN/LOAD_PREV_PROPOSAL_STATS')<{propId: number, stats: ProposalStats}>();
 export const setIsPassed = createAction('@@MAIN/SET_PROPOSAL_IS_PASSED')<{propId: number, isPassed: boolean}>();
 export const setPrevEpoches = createAction('@@MAIN/SET_PREV_EPOCHES')<number[]>();
 export const setFitlerEpoch = createAction('@@MAIN/SET_FILTER_EPOCH')<number>();
+
+export const setLocalVotes = createAction('@@MAIN/SET_LOCAL_VOTES')<number[]>();
+export const setLocalVoteCounter = createAction('@@MAIN/SET_LOCAL_VOTE_COUNTER')<number>();
 
 export const loadAppParams = createAsyncAction(
     '@@MAIN/LOAD_PARAMS',

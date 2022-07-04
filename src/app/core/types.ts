@@ -25,8 +25,11 @@ export interface InitialProposal {
 }
 
 export interface ProposalStats {
-    total: number;
-    variants: number[];
+    result: {
+      total: number;
+      stake_active: number;
+      variants: number[];
+    }
 }
 
 export interface ProposalData {
@@ -63,8 +66,14 @@ export interface VotingAppParams {
 
 export interface UserViewParams {
     current_votes?: number[];
+    voteCounter: number;
     stake_active: number;
     stake_passive: number;
+}
+
+export interface TotalViewParams {
+  stake_active: number;
+  stake_passive: number;
 }
 
 export interface Moderator {

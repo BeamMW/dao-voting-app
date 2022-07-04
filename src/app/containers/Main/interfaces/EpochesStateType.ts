@@ -1,4 +1,4 @@
-import { VotingAppParams, UserViewParams, ProposalState } from '@core/types';
+import { VotingAppParams, UserViewParams, ProposalState, TotalViewParams } from '@core/types';
 
 export interface EpochesStateType {
   appParams: VotingAppParams;
@@ -12,7 +12,7 @@ export interface EpochesStateType {
   public_key: string;
   contractHeight: number;
   userView: UserViewParams;
-  totalsView: UserViewParams;
+  totalsView: TotalViewParams;
   rate: number;
   popupsState: {
     deposit: boolean;
@@ -21,5 +21,10 @@ export interface EpochesStateType {
   },
   prevEpoches: number[];
   withdrawedAmount: number;
+  depositedAmount: number;
   filterEpochSelected: number;
+  localVoteData: {
+    state: number[],
+    counter: number
+  };
 }

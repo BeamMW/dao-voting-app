@@ -120,13 +120,12 @@ css`
     }
 
     ul,
-    ol {
-      list-style: none;
+    ol :not(.description) {
       margin: 0;
       padding: 0;
     }
 
-    tr, th, table {
+    tr, th, table :not(.description) {
       border: none;
       border-spacing: 0;
       padding: 0;
