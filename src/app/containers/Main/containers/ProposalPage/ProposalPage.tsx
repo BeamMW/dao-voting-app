@@ -858,6 +858,7 @@ const ProposalPage: React.FC = () => {
       </Window>
       <ChangeDecisionPopup voted={proposal.voted !== undefined ? proposal.voted : null}
         onChangeResult={(res)=>{setChangeProcessState(res)}}
+        propTitle={proposal.data.title}
         visible={isChangeVisible} onCancel={()=>{setChangePopupState(false)}}/>
     </>
   );

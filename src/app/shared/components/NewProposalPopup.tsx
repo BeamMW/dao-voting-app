@@ -103,8 +103,11 @@ const NewProposalForm = styled.form`
         > .tvl-part {
             margin-left: 30px;
             margin-right: auto;
+            display: flex;
+            flex-direction: column;
 
             > .beamx {
+                height: 100%;
                 display: flex;
                 align-items: center;
 
@@ -123,6 +126,12 @@ const NewProposalForm = styled.form`
 
 const InputTitle = styled.div`
     margin-bottom: 10px;
+    font-size: 14px;
+    color: #8DA1AD;
+    text-align: start;
+`;
+
+const TvlTitle = styled.div`
     font-size: 14px;
     color: #8DA1AD;
     text-align: start;
@@ -332,7 +341,7 @@ const NewProposalPopup: React.FC<NewProposalPopupProps> = ({ visible, onCancel }
       cancelButton={(
         <Button className={NewProposalButtonsClass} variant="ghost" icon={IconCancel} onClick={() => {
             onCancel();
-            resetForm();
+            //resetForm();
             setActiveToggle(false);
         }}>
           cancel
@@ -348,7 +357,7 @@ const NewProposalPopup: React.FC<NewProposalPopupProps> = ({ visible, onCancel }
       )}
       onCancel={() => {
         onCancel();
-        resetForm();
+        //resetForm();
         setActiveToggle(false);
     }}
     >
@@ -403,7 +412,7 @@ const NewProposalPopup: React.FC<NewProposalPopupProps> = ({ visible, onCancel }
                     <p className={`toggle-title ${activeToggle ? 'active' : ''}`}>% of TVL</p>
                 </span>
                 <div className='tvl-part'>
-                    <InputTitle>Total supply</InputTitle>
+                    <TvlTitle>Total supply</TvlTitle>
                     <div className='beamx'>
                         <IconBeamx/>
                         <span>{BEAMX_TVL_STR} BEAMX</span>
