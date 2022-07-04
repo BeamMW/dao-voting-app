@@ -227,8 +227,8 @@ const WithdrawPopup: React.FC<WithdrawPopupProps> = ({ visible, onCancel }) => {
           <Rate value={0.011} className='fee-rate'/>
       </FeeContainer>
       <InfoContainer>
-          <div>Withdrawing will decrease your voting power in current epoch #{appParams.current.iEpoch}</div>
-          <div>({nextEpochDate})</div>
+        <div>Withdrawing will decrease your voting power in current epoch #{appParams.current.iEpoch - 1}</div>
+        <div>({nextEpochDate})</div>
       </InfoContainer>
     </Popup>
   );

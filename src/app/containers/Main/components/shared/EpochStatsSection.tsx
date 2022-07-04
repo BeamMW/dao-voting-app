@@ -328,7 +328,7 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
         <StyledStats className={className}>
             <div className='stats-title-class'>
                 <span className='stats-epoch-class'>
-                  {state === 'stake' ? 'NEXT EPOCH #' + (appParams.current.iEpoch + 1) : 'EPOCH #' + appParams.current.iEpoch}
+                  {state === 'stake' ? 'NEXT EPOCH #' + (appParams.current.iEpoch) : 'EPOCH #' + (appParams.current.iEpoch - 1)}
                 </span>
                 {state !== 'stake' && <ExpiresTimer appParams={appParams} systemState={systemState} cHeight={cHeight}></ExpiresTimer>}
             </div>
@@ -413,8 +413,8 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
                       </>)}
                     </LeftStatsProgress>
                     <MiddleStats isStake={false}>
-                        <div className='next-epoch-title'>NEXT EPOCH #{appParams.current.iEpoch + 1}</div>
-                        <div className='next-epoch-date'>{nextEpochDate}</div>
+                      <div className='next-epoch-title'>NEXT EPOCH #{appParams.current.iEpoch}</div>
+                      <div className='next-epoch-date'>{nextEpochDate}</div>
                     </MiddleStats>
                     <Button className={ButtonBottomLinkClass}
                     onClick={() => navigate(ROUTES.MAIN.FUTURE_EPOCHS)}

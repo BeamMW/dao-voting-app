@@ -407,7 +407,7 @@ const ProposalsList: React.FC<ListProps> = ({
                 <Select value={activeFilter} onSelect={handleSelect}>
                     {filterItems.map((epoch) => (
                         <Option key={epoch} value={epoch}>
-                            <LabelStyled>{epoch}</LabelStyled>
+                            <LabelStyled>{epoch - 1}</LabelStyled>
                         </Option>
                     ))}
                 </Select>
@@ -416,7 +416,7 @@ const ProposalsList: React.FC<ListProps> = ({
 
         { type === PROPOSALS.CURRENT && 
             <StyledEpochTitle>
-                Epoch #{appParams.current.iEpoch} (current)
+                Epoch #{appParams.current.iEpoch - 1} (current)
             </StyledEpochTitle>
         }
 
@@ -476,7 +476,7 @@ const ProposalsList: React.FC<ListProps> = ({
             extendedFilteredEpochs.map((extEpoch, extIndex) =>
             <div key={extIndex}> 
                 <StyledEpochTitle>
-                    Epoch #{extEpoch}
+                    Epoch #{extEpoch - 1}
                 </StyledEpochTitle>
 
                 <List>
@@ -524,7 +524,7 @@ const ProposalsList: React.FC<ListProps> = ({
                                     {
                                         item.prevVoted && item.prevVoted.value !== 255 ? 
                                         (item.prevVoted.value === 1 ? <IconVotedYes/> : <IconVotedNo/>) :
-                                        <div className='text'>The epoch #{item.epoch} is finished. You hadn’t voted.</div>
+                                        <div className='text'>The epoch #{item.epoch - 1} is finished. You hadn’t voted.</div>
                                     }
                                 </span>
                             </StyledItemContent>

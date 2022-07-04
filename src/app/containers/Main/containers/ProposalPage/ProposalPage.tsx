@@ -616,10 +616,10 @@ const PrevProposalContent: React.FC<ProposalContentProps> = (
               <span className='voted-no'>You voted NO</span>
             </span>)
           }
-          <div className='voted-cant'>The epoch #{proposal.epoch} is finished. You can’t change your decision.</div>
+          <div className='voted-cant'>The epoch #{proposal.epoch - 1} is finished. You can’t change your decision.</div>
       </div> : 
       <div className='voted-finished'>
-        The epoch #{proposal.epoch} is finished. You hadn’t voted.
+        The epoch #{proposal.epoch - 1} is finished. You hadn’t voted.
       </div>
       }
       <VotingBar active={proposal.prevVoted && proposal.prevVoted.value < 255}
@@ -730,7 +730,7 @@ const FutureProposalContent: React.FC<ProposalContentProps> = (
     <ContentStyled>
       { proposal.data &&
         <div className='content'>
-          <div className='epoch-comes'>The voting will be active when epoch #{appParams.current.iEpoch + 1} comes.</div>
+          <div className='epoch-comes'>The voting will be active when epoch #{appParams.current.iEpoch} comes.</div>
           <div className='stake-info'>
             <span className='total'>
               <StyledStakeTitle>Total staked</StyledStakeTitle>
