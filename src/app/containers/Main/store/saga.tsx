@@ -159,7 +159,7 @@ export function* loadProposalsSaga(
                 yield put(actions.setIsPassed({propId: i, isPassed: stats.result.variants[1] > toGroths(prevProposal.data.quorum.value)}));
               } else if (prevProposal.data.quorum.type === 'percent') {
                 const totalsView = (yield select(selectors.selectTotalsView())) as any 
-                const isPassed = fromGroths(stats.result.variants[1]) > (totalsView.stake_active * (prevProposal.data.quorum.value / 100));
+                const isPassed = fromGroths(stats.result.variants[1]) > (fromGroths(totalsView.stake_active) * (prevProposal.data.quorum.value / 100));
                 yield put(actions.setIsPassed({propId: i, isPassed: isPassed}));
               }
             } else {
