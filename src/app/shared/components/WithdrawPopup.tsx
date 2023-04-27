@@ -91,10 +91,17 @@ const AddMaxStyled = styled.div`
     > .add-max-text {
         margin-left: 11px;
     }
+      @media screen and (max-width : 470px) {
+          top: 34%;
+          right: 10%;
+      }
 `;
 
 const WithdrawPopupClass = css`
     width: 450px !important;
+  @media screen and (max-width : 625px) {
+    width: 90% !important;
+  }
 `;
 
 const AmountErrorClass = css`

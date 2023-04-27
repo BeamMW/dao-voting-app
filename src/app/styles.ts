@@ -132,6 +132,12 @@ css`
       margin: 0;
       border-collapse: inherit;
     }
+    @media screen and (max-width : 900px) {
+      html,
+      body {
+        min-width: 100%;
+      }
+    }
   }
 `;
 
