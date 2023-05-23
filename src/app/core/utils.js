@@ -13,7 +13,7 @@ export default class Utils {
         const ua = navigator.userAgent;
         return (/android/i.test(ua) || /iPad|iPhone|iPod/.test(ua));
     }
-    
+
     static isAndroid () {
         const ua = navigator.userAgent;
         return (/android/i.test(ua));
@@ -64,7 +64,7 @@ export default class Utils {
                     styles: channel.objects.BEAM.style
                 })
             })
-        })  
+        })
     }
 
     static async createWebAPI(apiver, apivermin, appname, apirescback) {
@@ -83,7 +83,7 @@ export default class Utils {
 
     static async createHeadlessAPI(apiver, apivermin, appname, apirescback) {
         await Utils.injectScript("wasm-client.js")
-        
+
         let WasmModule = await BeamModule()
         let WasmWalletClient = WasmModule.WasmWalletClient
         let client = new WasmWalletClient(headlessNode)
@@ -100,14 +100,14 @@ export default class Utils {
             console.log(err)
             throw err
         })
-        
+
         return new Promise((resolve, reject) => {
             let appid = WasmWalletClient.GenerateAppID(appname, window.location.href)
             client.createAppAPI(apiver, apivermin, appid, appname, (err, api) => {
                 if (err) {
                     reject(err)
                 }
-                
+
                 api.setHandler(apirescback)
                 resolve({
                     headless: true,
@@ -206,12 +206,12 @@ export default class Utils {
 
         if (Utils.isWeb()) {
             return BEAM.api.callWalletApi(callid, method, params);
-        } 
+        }
 
         if (Utils.isMobile()) {
             return BEAM.api.callWalletApi(JSON.stringify(request));
         }
-        
+
         if (Utils.isDesktop()) {
             return BEAM.api.callWalletApi(JSON.stringify(request));
         }
@@ -242,24 +242,24 @@ export default class Utils {
         try
         {
             answer = JSON.parse(json);
-           
+
             if (answer.result && answer.result.output) {
                 //console.log('Output: ', JSON.parse(answer.result.output));
             } else {
                 //console.log('Api result: ', answer);
             }
-            
+
             const id = answer.id
             const cback = Calls[id] || APIResCB
             delete Calls[id]
-            
+
             if (answer.error) {
                 return cback(answer)
             }
 
             if (typeof answer.result == 'undefined') {
                 return cback({
-                    error: "no valid api call result", 
+                    error: "no valid api call result",
                     answer
                 })
             }
@@ -293,13 +293,13 @@ export default class Utils {
         InitParams = params
         APIResCB = params["apiResultHandler"]
         let headless = params["headless"]
-        
+
         try
         {
             if (Utils.isDesktop()) {
                 BEAM = await Utils.createDesktopAPI((...args) => Utils.handleApiResult(...args))
-            } 
-            
+            }
+
             if (Utils.isWeb()) {
                 let apiver    = params["api_version"] || "current"
                 let apivermin = params["min_api_version"] || ""
@@ -309,23 +309,23 @@ export default class Utils {
                     Utils.showChromeDownload();
                     return false;
                 }
-                
+
                 if (headless) {
                     Utils.showLoading({
                         headless: true,
                         connecting: false
                     });
                     BEAM = await Utils.createHeadlessAPI(
-                                apiver, apivermin, appname, 
+                                apiver, apivermin, appname,
                                 (...args) => Utils.handleApiResult(...args)
-                            )        
+                            )
                 } else {
                     Utils.showLoading({
                         headless: false,
                         connecting: true
                     });
                     BEAM = await Utils.createWebAPI(
-                                apiver, apivermin, appname, 
+                                apiver, apivermin, appname,
                                 (...args) => Utils.handleApiResult(...args)
                             )
                 }
@@ -343,7 +343,7 @@ export default class Utils {
             let styles = Utils.getStyles()
             Utils.applyStyles(styles)
             Utils.hideLoading()
-            
+
             if (!BEAM) {
                 return initcback("Failed to create BEAM API")
             }
@@ -375,7 +375,7 @@ export default class Utils {
 
     static applyStyles(style) {
         if (!Utils.isDesktop()) {
-            document.head.innerHTML += '<meta name="viewport" content="width=device-width, initial-scale=1" />';
+            // document.head.innerHTML += '<meta name="viewport" content="width=device-width, initial-scale=1" />';
         }
 
         if (Utils.isMobile()) {
@@ -386,14 +386,14 @@ export default class Utils {
             document.body.classList.add('web');
         }
     }
-    
+
     //
     // Convenience functions
     //
     static reload () {
         window.location.reload();
     }
-    
+
     static async injectScript(url) {
         return new Promise((resolve, reject) => {
             let js = document.createElement('script');
@@ -414,7 +414,7 @@ export default class Utils {
     static getById = (id)  => {
         return document.getElementById(id);
     }
-    
+
     static setText(id, text) {
         Utils.getById(id).innerText = text;
     }
@@ -422,7 +422,7 @@ export default class Utils {
     static show(id) {
         Utils.getById(id).classList.remove("hidden");
     }
-    
+
     static hide(id) {
         Utils.getById(id).classList.add("hidden");
     }
@@ -439,7 +439,7 @@ export default class Utils {
                     if (!array || !array.length) {
                         return cback("empty shader");
                     }
-                
+
                     return cback(null, array);
                 } else {
                     let errMsg = ["code", xhr.status].join(" ");
@@ -512,10 +512,10 @@ export default class Utils {
 
         let titleElem = null;
         let subtitle = null;
-        
+
         if (connecting) {
             titleElem = document.createElement("h3");
-            titleElem.innerText = "Connecting to BEAM Web Wallet."; 
+            titleElem.innerText = "Connecting to BEAM Web Wallet.";
             subtitle = document.createElement("p");
             subtitle.innerText = ["To use ", InitParams["appname"], " you should have BEAM Web Wallet installed and allow connection."].join("")
 
@@ -538,7 +538,7 @@ export default class Utils {
             subtitle = document.createElement("p");
             subtitle.innerText = "Please wait...";
         }
-        
+
         loadContainer.appendChild(titleElem);
         loadContainer.appendChild(subtitle);
 
@@ -577,7 +577,7 @@ export default class Utils {
             installButton.style.fontSize = "14px";
             installButton.style.backgroundColor = "#00f6d2";
             installButton.addEventListener('click', () => {
-                window.open('https://chrome.google.com/webstore/detail/beam-web-wallet/ilhaljfiglknggcoegeknjghdgampffk', 
+                window.open('https://chrome.google.com/webstore/detail/beam-web-wallet/ilhaljfiglknggcoegeknjghdgampffk',
                     '_blank');
             });
 
@@ -588,10 +588,10 @@ export default class Utils {
                 installButton.style.boxShadow = "none";
             }, false);
             installButton.style.marginLeft = '30px';
-            
+
             let controlsArea = document.createElement("div");
             controlsArea.style.marginTop = "50px";
-            
+
             loadContainer.appendChild(controlsArea);
             controlsArea.appendChild(reconnectButton);
             controlsArea.appendChild(installButton);
@@ -634,7 +634,7 @@ export default class Utils {
         download.style.color = "#00f6d2";
 
         download.addEventListener('click', () => {
-            window.open('https://www.google.com/chrome/', 
+            window.open('https://www.google.com/chrome/',
                 '_blank');
         });
 
@@ -670,10 +670,10 @@ export default class Utils {
         downloadLink.style.fontSize = "20px";
         downloadLink.style.color = "#00f6d2";
         downloadLink.addEventListener('click', () => {
-            Utils.isAndroid() 
-            ? window.open('https://play.google.com/store/apps/details?id=com.mw.beam.beamwallet.mainnet', 
+            Utils.isAndroid()
+            ? window.open('https://play.google.com/store/apps/details?id=com.mw.beam.beamwallet.mainnet',
                 '_blank')
-            : window.open('https://apps.apple.com/us/app/beam-privacy-wallet/id1459842353?ls=1', 
+            : window.open('https://apps.apple.com/us/app/beam-privacy-wallet/id1459842353?ls=1',
             '_blank');
         });
 
