@@ -27,6 +27,9 @@ const ContainerStyled = styled.div`
   background-color: var(--color-popup);
   text-align: center;
   color: white;
+  @media screen and (max-width : 600px) {
+    padding: 20px 10px;
+  }
 
   > .cancel-header {
     right: 4px;

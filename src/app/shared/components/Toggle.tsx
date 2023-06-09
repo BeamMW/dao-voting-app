@@ -17,7 +17,7 @@ const ContainerStyled = styled.label`
 
 const InputStyled = styled.input`
   position: absolute;
-  ]z-index: -1;
+  z-index: -1;
   top: 0;
   left: 0;
   opacity: 0;

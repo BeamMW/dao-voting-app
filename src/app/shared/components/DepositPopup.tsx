@@ -52,6 +52,9 @@ const FeeContainer = styled.div`
 
 const DepositPopupClass = css`
     width: 450px !important;
+      @media screen and (max-width : 625px) {
+          width: 90% !important;
+      }
 `;
 
 const InfoContainer = styled.div`

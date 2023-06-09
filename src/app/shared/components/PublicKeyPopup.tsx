@@ -16,6 +16,9 @@ interface RemovePopupProps {
 
 const PopupClass = css`
   width: 760px;
+  @media screen and (max-width : 900px) {
+    width: 90%;
+  }
 `;
 
 const CloseButtonClass = css`
@@ -29,6 +32,12 @@ const CopyButtonClass = css`
 const CopyIconClass = css`
   margin-left: 10px;
   cursor: pointer;
+  @media screen and (max-width : 600px) {
+    width: 20px;
+  }
+  @media screen and (max-width : 425px) {
+    width: 30px;
+  }
 `;
 
 const StyledContent = styled.div`
@@ -36,6 +45,7 @@ const StyledContent = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  word-break: break-word;
 `;
 
 const PublicKeyPopup: React.FC<RemovePopupProps> = ({ visible, onCancel }) => {
