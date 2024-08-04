@@ -51,7 +51,7 @@ jobs:
     - name: Package into .dapp file
       run: |
         cd BeamX-DAO-Voting
-        zip -r ../BeamX-DAO-Voting.dapp .
+        zip -r ../BeamX-DAO-Voting.dapp ./*
         cd ..
 
     - name: Upload .dapp file
