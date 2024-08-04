@@ -45,12 +45,14 @@ jobs:
           "api_version":  "7.0",
           "min_api_version":  "7.0",
           "icon":  "localapp/app/logo.svg",
-          "guid":  "d353352eb6a94618ac0a8ec7b29ca7bb"
+          "guid":  "c26538f5ce9e410b89c1fd0dff783f97"
         }' > BeamX-DAO-Voting/manifest.json
 
     - name: Package into .dapp file
       run: |
-        zip -r BeamX-DAO-Voting.zip BeamX-DAO-Voting
+        cd BeamX-DAO-Voting
+        zip -r ../BeamX-DAO-Voting.zip .
+        cd ..
         mv BeamX-DAO-Voting.zip BeamX-DAO-Voting.dapp
 
     - name: Upload .dapp file
