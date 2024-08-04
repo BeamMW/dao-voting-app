@@ -33,7 +33,7 @@ jobs:
       run: mkdir -p BeamX-DAO-Voting/app
 
     - name: Copy build files
-      run: cp -r /* BeamX-DAO-Voting/app/
+      run: cp -r html/* BeamX-DAO-Voting/app/
 
     - name: Create manifest.json
       run: |
