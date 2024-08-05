@@ -46,7 +46,7 @@ jobs:
           "api_version":  "7.0",
           "min_api_version":  "7.0",
           "guid":  "c26538f5ce9e410b89c1fd0dff783f97"
-        }' > BeamX-DAO-Voting/manifest.json
+        }' > dao-voting/manifest.json
 
     - name: Package into .dapp file
       run: |
