@@ -57,5 +57,5 @@ jobs:
     - name: Upload .dapp file
       uses: actions/upload-artifact@v4
       with:
-        name: BeamX-DAO-Voting
-        path: BeamX-DAO-Voting
+        name: BeamX-DAO-Voting.dapp
+        path: /
