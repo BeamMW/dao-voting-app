@@ -95,7 +95,7 @@ jobs:
           "description":  "${{ inputs.manifest_description }}",
           "icon":  "${{ inputs.manifest_icon }}",
           "url":  "${{ inputs.manifest_url }}",
-          "version":  "${VERSION}",
+          "version":  "${{ env.VERSION }}",
           "api_version":  "${{ inputs.manifest_api_version }}",
           "min_api_version":  "${{ inputs.manifest_min_api_version }}",
           "guid":  "${{ inputs.manifest_guid }}"
