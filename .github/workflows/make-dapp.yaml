@@ -103,7 +103,7 @@ jobs:
 
     - name: Package into .dapp file
       run: |
-        cd ${{ inputs.dapp_name }}.dapp
+        cd ${{ inputs.dapp_name }}
         zip -r ../${{ inputs.dapp_name }}.dapp ./*
         cd ..
 
