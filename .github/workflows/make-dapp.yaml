@@ -6,36 +6,47 @@ on:
       node_version:
         description: 'Node.js version to use'
         default: '16'
+        type: string
       build_command:
         description: 'Command to build the project'
         default: 'yarn build'
+        type: string
       manifest_name:
         description: 'Name of the .dapp application'
         required: true
+        type: string
       manifest_description:
         description: 'Description of the .dapp application'
         required: true
+        type: string
       manifest_icon:
         description: 'Path to the icon file'
         default: 'localapp/app/logo.svg'
+        type: string
       manifest_url:
         description: 'URL for the application'
         default: 'localapp/app/index.html'
+        type: string
       manifest_version_prefix:
         description: 'Version prefix of the application'
         required: true
+        type: string
       manifest_api_version:
         description: 'API version of the application'
         default: '7.0'
+        type: string
       manifest_min_api_version:
         description: 'Minimum API version required'
         default: '7.0'
+        type: string
       manifest_guid:
         description: 'GUID for the .dapp manifest'
         required: true
+        type: string
       dapp_name:
         description: 'Name of the dapp'
         required: true
+        type: string
 
 jobs:
   build:
