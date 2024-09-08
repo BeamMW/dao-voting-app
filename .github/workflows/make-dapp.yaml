@@ -5,11 +5,9 @@ on:
     inputs:
       node_version:
         description: 'Node.js version to use'
-        required: true
         default: '16'
       build_command:
         description: 'Command to build the project'
-        required: true
         default: 'yarn build'
       manifest_name:
         description: 'Name of the .dapp application'
@@ -19,22 +17,18 @@ on:
         required: true
       manifest_icon:
         description: 'Path to the icon file'
-        required: true
         default: 'localapp/app/logo.svg'
       manifest_url:
         description: 'URL for the application'
-        required: true
         default: 'localapp/app/index.html'
       manifest_version_prefix:
         description: 'Version prefix of the application'
         required: true
       manifest_api_version:
         description: 'API version of the application'
-        required: true
         default: '7.0'
       manifest_min_api_version:
         description: 'Minimum API version required'
-        required: true
         default: '7.0'
       manifest_guid:
         description: 'GUID for the .dapp manifest'
