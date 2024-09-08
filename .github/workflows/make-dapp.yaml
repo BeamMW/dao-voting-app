@@ -68,7 +68,7 @@ jobs:
     - name: Generate version
       id: version
       run: |
-          VERSION="${{input.manifest_version_prefix}}.${{ env.COMMIT_COUNT }}"
+          VERSION="${{inputs.manifest_version_prefix}}.${{ env.COMMIT_COUNT }}"
           echo "VERSION=${VERSION}" >> $GITHUB_ENV
 
     - name: Set up Node.js environment
