@@ -25,10 +25,9 @@ on:
         description: 'URL for the application'
         required: true
         default: 'localapp/app/index.html'
-      manifest_version:
-        description: 'Version of the application'
+      manifest_version_prefix:
+        description: 'Version prefix of the application'
         required: true
-        default: '1.0.0'
       manifest_api_version:
         description: 'API version of the application'
         required: true
@@ -55,6 +54,21 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
+    - name: Set up Git
+      run: git fetch --prune --unshallow
+        
+    - name: Get commit count
+      id: commit_count
+      run: |
+          COMMIT_COUNT=$(git rev-list --count HEAD)
+          echo "COMMIT_COUNT=${COMMIT_COUNT}" >> $GITHUB_ENV
+
+    - name: Generate version
+      id: version
+      run: |
+          VERSION="${{input.manifest_version_prefix}}.${{ env.COMMIT_COUNT }}"
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+
     - name: Set up Node.js environment
       uses: actions/setup-node@v2
       with:
@@ -79,7 +93,7 @@ jobs:
           "description":  "${{ inputs.manifest_description }}",
           "icon":  "${{ inputs.manifest_icon }}",
           "url":  "${{ inputs.manifest_url }}",
-          "version":  "${{ inputs.manifest_version }}",
+          "version":  "${VERSION}",
           "api_version":  "${{ inputs.manifest_api_version }}",
           "min_api_version":  "${{ inputs.manifest_min_api_version }}",
           "guid":  "${{ inputs.manifest_guid }}"
