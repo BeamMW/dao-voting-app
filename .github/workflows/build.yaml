@@ -18,6 +18,21 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
+    - name: Set up Git
+      run: git fetch --prune --unshallow
+        
+    - name: Get commit count
+      id: commit_count
+      run: |
+          COMMIT_COUNT=$(git rev-list --count HEAD)
+          echo "COMMIT_COUNT=${COMMIT_COUNT}" >> $GITHUB_ENV
+
+    - name: Generate version
+      id: version
+      run: |
+          VERSION="1.0.${{ env.COMMIT_COUNT }}"
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+
     - name: Set up Node.js environment
       uses: actions/setup-node@v2
       with:
@@ -42,7 +57,7 @@ jobs:
           "description":  "Voting on Beam community proposals",
           "icon":  "localapp/app/logo.svg",
           "url":  "localapp/app/index.html",
-          "version":  "1.0.0",
+          "version":  "${VERSION}",
           "api_version":  "7.0",
           "min_api_version":  "7.0",
           "guid":  "c26538f5ce9e410b89c1fd0dff783f97"
