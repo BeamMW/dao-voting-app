@@ -542,7 +542,7 @@ const CurrentProposalContent: React.FC<ProposalContentProps> = (
           proposal.data.ref_link.length > 0 && 
           <>
             <div className='ref-title'>References</div>
-            <div className='ref-link' onClick={() => {openInNewTab(proposal.data.ref_link)}}>
+            <div className='ref-link' onClick={() => {openInNewTab(proposal.data.forum_link)}}>
                 <span>{proposal.data.ref_link}</span>
                 <IconExternalLink className='icon-link'/>
             </div>
@@ -708,7 +708,7 @@ const PrevProposalContent: React.FC<ProposalContentProps> = (
           proposal.data.ref_link.length > 0 && 
           <>
             <div className='ref-title'>References</div>
-            <div className='ref-link' onClick={() => {openInNewTab(proposal.data.ref_link)}}>
+            <div className='ref-link' onClick={() => {openInNewTab(proposal.data.forum_link)}}>
                 <span>{proposal.data.ref_link}</span>
                 <IconExternalLink className='icon-link'/>
             </div>
@@ -776,7 +776,7 @@ const FutureProposalContent: React.FC<ProposalContentProps> = (
             proposal.data.ref_link.length > 0 && 
             <>
               <div className='ref-title'>References</div>
-              <div className='ref-link' onClick={() => {openInNewTab(proposal.data.ref_link)}}>
+              <div className='ref-link' onClick={() => {openInNewTab(proposal.data.forum_link)}}>
                   <span>{proposal.data.ref_link}</span>
                   <IconExternalLink className='icon-link'/>
               </div>
