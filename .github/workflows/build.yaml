@@ -1,0 +1,26 @@
+name: Build and Package .dapp
+
+on:
+  push:
+    branches:
+      - master
+      - mainnet
+      - workflow-test
+  pull_request:
+    branches:
+      - master
+      - mainnet
+      - workflow-test
+
+jobs:
+  build:
+    uses: BeamMW/dao-voting-app/.github/workflows/make-dapp.yaml@workflow-test
+    with:
+      manifest_name: 'BeamX DAO Voting'
+      manifest_description: 'Voting on Beam community proposals'
+      manifest_version_prefix: "1.0"
+      manifest_icon: "localapp/app/assets/icon.svg"
+      manifest_guid: 'c26538f5ce9e410b89c1fd0dff783f97'
+      dapp_name: 'dao-voting'
+
+
