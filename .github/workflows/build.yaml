@@ -4,13 +4,10 @@ on:
   push:
     branches:
       - master
-      - mainnet
-      - workflow-test
+      
   pull_request:
     branches:
       - master
-      - mainnet
-      - workflow-test
 
 jobs:
   build:
