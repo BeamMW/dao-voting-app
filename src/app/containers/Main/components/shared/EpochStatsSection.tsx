@@ -61,6 +61,9 @@ const StyledSection = styled.div`
   display: flex;
   flex-direction: row;
   align-items: stretch;
+  @media screen and (max-width : 900px) {
+    flex-direction: column;
+  }
 `;
 
 const LeftStats = styled.span`
@@ -70,6 +73,10 @@ const LeftStats = styled.span`
 
   @media screen and (min-width : 1050px) {
     min-width: 600px;
+  }
+
+  @media screen and (max-width : 768px) {
+    min-width: 100%;
   }
   display: flex;
   flex-direction: row;
@@ -111,6 +118,10 @@ const MiddleStats = styled.span<{isStake: boolean}>`
   > .next-epoch-date {
       font-size: 14px;
       margin-top: 22px;
+  }
+  @media screen and (max-width : 900px) {
+    align-self: flex-start;
+    margin-left: 0;
   }
 `;
 
@@ -165,6 +176,13 @@ const SubSectionValue = styled.div`
       margin-left: 8px;
       width: 240px;
       word-wrap: break-word;
+    }
+  }
+
+  @media screen and (max-width : 625px) {
+    align-items: flex-start;
+    > span {
+      width: 73%;
     }
   }
 `;
@@ -328,7 +346,7 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
         <StyledStats className={className}>
             <div className='stats-title-class'>
                 <span className='stats-epoch-class'>
-                  {state === 'stake' ? 'NEXT EPOCH #' + (appParams.current.iEpoch + 1) : 'EPOCH #' + appParams.current.iEpoch}
+                  {state === 'stake' ? 'NEXT EPOCH #' + (appParams.current.iEpoch) : 'EPOCH #' + (appParams.current.iEpoch - 1)}
                 </span>
                 {state !== 'stake' && <ExpiresTimer appParams={appParams} systemState={systemState} cHeight={cHeight}></ExpiresTimer>}
             </div>
@@ -413,8 +431,8 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
                       </>)}
                     </LeftStatsProgress>
                     <MiddleStats isStake={false}>
-                        <div className='next-epoch-title'>NEXT EPOCH #{appParams.current.iEpoch + 1}</div>
-                        <div className='next-epoch-date'>{nextEpochDate}</div>
+                      <div className='next-epoch-title'>NEXT EPOCH #{appParams.current.iEpoch}</div>
+                      <div className='next-epoch-date'>{nextEpochDate}</div>
                     </MiddleStats>
                     <Button className={ButtonBottomLinkClass}
                     onClick={() => navigate(ROUTES.MAIN.FUTURE_EPOCHS)}

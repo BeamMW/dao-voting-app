@@ -158,7 +158,8 @@ export function* loadProposalsSaga(
               if (prevProposal.data.quorum.type === 'beamx') {
                 yield put(actions.setIsPassed({propId: i, isPassed: stats.result.variants[1] > toGroths(prevProposal.data.quorum.value)}));
               } else if (prevProposal.data.quorum.type === 'percent') {
-                const isPassed = fromGroths(stats.result.variants[1]) > (BEAMX_TVL * (prevProposal.data.quorum.value / 100));
+                const totalsView = (yield select(selectors.selectTotalsView())) as any 
+                const isPassed = fromGroths(stats.result.variants[1]) > (fromGroths(totalsView.stake_active) * (prevProposal.data.quorum.value / 100));
                 yield put(actions.setIsPassed({propId: i, isPassed: isPassed}));
               }
             } else {

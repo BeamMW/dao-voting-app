@@ -20,6 +20,9 @@ const Container = styled.div<{ bgColor: string }>`
   display: flex;
   flex-direction: column;
   padding: 20px;
+  @media screen and (max-width : 424px) {
+    padding: 10px 5px;
+  }
 `;
 
 const StyledTitle = styled.div`
@@ -40,6 +43,12 @@ const StyledTitle = styled.div`
       margin-bottom: 0 !important;
       margin-right: 30px !important;
     }  
+  }
+  @media screen and (max-width : 625px) {
+    > .controls {
+      height: auto;
+      right: 23px !important;
+    }
   }
 `;
 

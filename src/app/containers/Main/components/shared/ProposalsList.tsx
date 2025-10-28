@@ -37,7 +37,22 @@ const ProposalsHeader = styled.div`
     > .selector-class {
         margin-left: 18px;
         font-size: 12px;
+    } 
+  
+    @media screen and (max-width : 625px) {
+      position: relative;
+        flex-direction: column;
+        align-items: flex-start;
+        height: auto;
+      > .selector-class {
+        margin: 15px;
+      }
     }
+  @media screen and (max-width : 320px) {
+    > .selector-class {
+      font-size: 11px;
+    }
+  }
 `;
 
 const List = styled.ul`
@@ -58,6 +73,9 @@ const SelectorItem = styled.span<{ active: boolean }>`
     border-bottom: ${({ active }) => (active ? '2px solid #00F6D2' : 'none')};
     cursor: ${({ active }) => (active ? 'default' : 'pointer')};
     color: ${({ active }) => (active ? 'var(--color-white)' : 'rgba(255, 255, 255, .3)')};
+    @media screen and (max-width : 625px) {
+        margin-top: 10px;
+    }
 `;
 
 const ListItem = styled.li`
@@ -97,7 +115,7 @@ const StyledItemHeader = styled.div`
 const StyledItemContent = styled.div`
     display: flex;
     align-items: center;
-    width: 100%
+    width: 100%;
     padding: 10px 20px 20px 75px;
 
     > .voted-yes {
@@ -119,6 +137,18 @@ const StyledItemContent = styled.div`
             opacity: 0.5;
         }
     }
+  @media screen and (max-width : 625px) {
+    flex-direction: column;
+    align-items: flex-start;
+
+    > .voted-no {
+      margin: 10px 0 0 0;
+    }
+
+    > .voted-icon {
+      margin-left: 0;
+    }
+  }
 `;
 
 const StyledVotedTitle = styled.div`
@@ -210,6 +240,14 @@ const StyledSearch = styled.div`
             color: rgba(255, 255, 255, .3);
         }
     }
+  @media screen and (max-width : 625px) {
+    position: absolute;
+    top: -10px;
+    right: 1%;
+  }
+  @media screen and (max-width : 375px) {
+    width: 175px;
+  }
 `;
 
 const highlighterClass = css`
@@ -220,6 +258,11 @@ const highlighterClass = css`
 const cancelSearchIcon = css`
     cursor: pointer;
     margin-left: auto;
+  @media screen and (max-width : 625px) {
+    position: absolute;
+    top: 0;
+    right: 1%;
+  }
 `;
 
 const ProposalsList: React.FC<ListProps> = ({ 
@@ -407,7 +450,7 @@ const ProposalsList: React.FC<ListProps> = ({
                 <Select value={activeFilter} onSelect={handleSelect}>
                     {filterItems.map((epoch) => (
                         <Option key={epoch} value={epoch}>
-                            <LabelStyled>{epoch}</LabelStyled>
+                            <LabelStyled>{epoch - 1}</LabelStyled>
                         </Option>
                     ))}
                 </Select>
@@ -416,7 +459,7 @@ const ProposalsList: React.FC<ListProps> = ({
 
         { type === PROPOSALS.CURRENT && 
             <StyledEpochTitle>
-                Epoch #{appParams.current.iEpoch} (current)
+                Epoch #{appParams.current.iEpoch - 1} (current)
             </StyledEpochTitle>
         }
 
@@ -476,7 +519,7 @@ const ProposalsList: React.FC<ListProps> = ({
             extendedFilteredEpochs.map((extEpoch, extIndex) =>
             <div key={extIndex}> 
                 <StyledEpochTitle>
-                    Epoch #{extEpoch}
+                    Epoch #{extEpoch - 1}
                 </StyledEpochTitle>
 
                 <List>
@@ -524,7 +567,7 @@ const ProposalsList: React.FC<ListProps> = ({
                                     {
                                         item.prevVoted && item.prevVoted.value !== 255 ? 
                                         (item.prevVoted.value === 1 ? <IconVotedYes/> : <IconVotedNo/>) :
-                                        <div className='text'>The epoch #{item.epoch} is finished. You hadn’t voted.</div>
+                                        <div className='text'>The epoch #{item.epoch - 1} is finished. You hadn’t voted.</div>
                                     }
                                 </span>
                             </StyledItemContent>

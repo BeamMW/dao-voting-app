@@ -365,7 +365,7 @@ const NewProposalPopup: React.FC<NewProposalPopupProps> = ({ visible, onCancel }
             <div className='title-segment'>
                 <span className='epoch-part'>
                     <InputTitle>Epoch number *</InputTitle>
-                    <div className='epoch-number'>#{appParams.current.iEpoch + 1}</div>
+                    <div className='epoch-number'>#{appParams.current.iEpoch}</div>
                 </span>
                 <span className='title-part'>
                     <InputTitle>Proposal title *</InputTitle>

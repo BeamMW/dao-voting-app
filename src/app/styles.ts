@@ -95,7 +95,7 @@ css`
       margin: 0;
       padding: 0;
       height: 100%;
-      min-width: 860px;
+      //min-width: 860px;
     }
 
     #root {
@@ -132,6 +132,12 @@ css`
       margin: 0;
       border-collapse: inherit;
     }
+    //@media screen and (max-width : 900px) {
+    //  html,
+    //  body {
+    //    min-width: 100%;
+    //  }
+    //}
   }
 `;
 

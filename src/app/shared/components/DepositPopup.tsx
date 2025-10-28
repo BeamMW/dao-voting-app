@@ -52,6 +52,9 @@ const FeeContainer = styled.div`
 
 const DepositPopupClass = css`
     width: 450px !important;
+      @media screen and (max-width : 625px) {
+          width: 90% !important;
+      }
 `;
 
 const InfoContainer = styled.div`
@@ -146,8 +149,8 @@ const DepositPopup: React.FC<DepositPopupProps> = ({ visible, onCancel }) => {
                 <Rate value={0.011} className='fee-rate'/>
             </FeeContainer>
             <InfoContainer>
-                <div>Depositing will increase your voting power in next epoch #{appParams.current.iEpoch + 1}</div>
-                <div>({nextEpochDate})</div>
+              <div>Depositing will increase your voting power in next epoch #{appParams.current.iEpoch}</div>
+              <div>({nextEpochDate})</div>
             </InfoContainer>
         </form>
     </Popup>

@@ -350,7 +350,7 @@ const CurrentProposalContent: React.FC<ProposalContentProps> = (
 
     if (proposal.data.quorum !== undefined && 
       (proposal.data.quorum.type === 'beamx' ? proposal.stats.result.variants[1] >= toGroths(proposal.data.quorum.value) : 
-      ((fromGroths(proposal.stats.result.variants[1]) / BEAMX_TVL) * 100 >= proposal.data.quorum.value))) {
+      ((fromGroths(proposal.stats.result.variants[1]) / fromGroths(totalsView.stake_active)) * 100 >= proposal.data.quorum.value))) {
         setQuorumPassed(true);
     }
 
@@ -488,7 +488,7 @@ const CurrentProposalContent: React.FC<ProposalContentProps> = (
               content={
                 <StyledPopover>
                   {proposal.data.quorum.type === 'percent' ? 
-                    numFormatter(BEAMX_TVL * (proposal.data.quorum.value / 100)) :
+                    numFormatter(fromGroths(totalsView.stake_active) * (proposal.data.quorum.value / 100)) :
                     numFormatter(proposal.data.quorum.value)} BEAMX votes «YES» needed 
                 </StyledPopover>
               }
@@ -542,7 +542,7 @@ const CurrentProposalContent: React.FC<ProposalContentProps> = (
           proposal.data.ref_link.length > 0 && 
           <>
             <div className='ref-title'>References</div>
-            <div className='ref-link' onClick={() => {openInNewTab(proposal.data.forum_link)}}>
+            <div className='ref-link' onClick={() => {openInNewTab(proposal.data.ref_link)}}>
                 <span>{proposal.data.ref_link}</span>
                 <IconExternalLink className='icon-link'/>
             </div>
@@ -571,7 +571,7 @@ const PrevProposalContent: React.FC<ProposalContentProps> = (
 
     if (proposal.data.quorum !== undefined && 
       (proposal.data.quorum.type === 'beamx' ? (proposal.stats.result.variants[1] >= toGroths(proposal.data.quorum.value)) : 
-      ((fromGroths(proposal.stats.result.variants[1]) / BEAMX_TVL) * 100 >= proposal.data.quorum.value))) {
+      ((fromGroths(proposal.stats.result.variants[1]) / fromGroths(totalsView.stake_active)) * 100 >= proposal.data.quorum.value))) {
         setQuorumPassed(true);
     }
 
@@ -616,10 +616,10 @@ const PrevProposalContent: React.FC<ProposalContentProps> = (
               <span className='voted-no'>You voted NO</span>
             </span>)
           }
-          <div className='voted-cant'>The epoch #{proposal.epoch} is finished. You can’t change your decision.</div>
+          <div className='voted-cant'>The epoch #{proposal.epoch - 1} is finished. You can’t change your decision.</div>
       </div> : 
       <div className='voted-finished'>
-        The epoch #{proposal.epoch} is finished. You hadn’t voted.
+        The epoch #{proposal.epoch - 1} is finished. You hadn’t voted.
       </div>
       }
       <VotingBar active={proposal.prevVoted && proposal.prevVoted.value < 255}
@@ -654,7 +654,7 @@ const PrevProposalContent: React.FC<ProposalContentProps> = (
               content={
                 <StyledPopover>
                   {proposal.data.quorum.type === 'percent' ? 
-                    numFormatter(BEAMX_TVL * (proposal.data.quorum.value / 100)) :
+                    numFormatter(fromGroths(totalsView.stake_active) * (proposal.data.quorum.value / 100)) :
                     numFormatter(proposal.data.quorum.value)} BEAMX votes «YES» needed 
                 </StyledPopover>
               }
@@ -708,7 +708,7 @@ const PrevProposalContent: React.FC<ProposalContentProps> = (
           proposal.data.ref_link.length > 0 && 
           <>
             <div className='ref-title'>References</div>
-            <div className='ref-link' onClick={() => {openInNewTab(proposal.data.forum_link)}}>
+            <div className='ref-link' onClick={() => {openInNewTab(proposal.data.ref_link)}}>
                 <span>{proposal.data.ref_link}</span>
                 <IconExternalLink className='icon-link'/>
             </div>
@@ -730,7 +730,7 @@ const FutureProposalContent: React.FC<ProposalContentProps> = (
     <ContentStyled>
       { proposal.data &&
         <div className='content'>
-          <div className='epoch-comes'>The voting will be active when epoch #{appParams.current.iEpoch + 1} comes.</div>
+          <div className='epoch-comes'>The voting will be active when epoch #{appParams.current.iEpoch} comes.</div>
           <div className='stake-info'>
             <span className='total'>
               <StyledStakeTitle>Total staked</StyledStakeTitle>
@@ -776,7 +776,7 @@ const FutureProposalContent: React.FC<ProposalContentProps> = (
             proposal.data.ref_link.length > 0 && 
             <>
               <div className='ref-title'>References</div>
-              <div className='ref-link' onClick={() => {openInNewTab(proposal.data.forum_link)}}>
+              <div className='ref-link' onClick={() => {openInNewTab(proposal.data.ref_link)}}>
                   <span>{proposal.data.ref_link}</span>
                   <IconExternalLink className='icon-link'/>
               </div>
