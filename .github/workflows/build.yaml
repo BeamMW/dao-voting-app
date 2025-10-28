@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-    uses: BeamMW/dao-voting-app/.github/workflows/make-dapp.yaml@workflow-test
+    uses: BeamMW/dao-voting-app/.github/workflows/make-dapp.yaml@master
     with:
       manifest_name: 'BeamX DAO Voting'
       manifest_description: 'Voting on Beam community proposals'
