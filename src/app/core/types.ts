@@ -1,5 +1,20 @@
 export type Pallete = 'green' | 'ghost' | 'purple' | 'blue' | 'red' | 'white' | 'vote-red';
 
+export interface IMetadataPairs {
+  N: string;
+  NTHUN?: string;
+  SCH_VER?: string;
+  SN: string;
+  UN?: string;
+  OPT_COLOR?: string;
+}
+
+export interface IAsset {
+  asset_id: number;
+  metadata: string;
+  parsedMetadata?: IMetadataPairs;
+}
+
 export type ButtonVariant = 'regular' | 'ghost' | 'ghostBordered' | 'block' | 'link' | 'icon';
 
 export interface CurrentEpoch {

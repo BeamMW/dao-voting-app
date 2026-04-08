@@ -20,7 +20,8 @@ import {
   IconChangeDecision,
   IconExternalLink,
   IconQuorumAlert,
-  IconQuorumApprove
+  IconQuorumApprove,
+  IconBeamx
 } from '@app/shared/icons';
 import { useParams } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
@@ -48,6 +49,58 @@ interface ProposalContentProps {
 
 const StatsSectionClass = css`
   margin-bottom: 40px;
+`;
+
+const PrevEpochStatsSection = styled.div`
+  margin-bottom: 40px;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 20px;
+
+  > .title {
+    font-weight: bold;
+    font-size: 14px;
+    line-height: 17px;
+    letter-spacing: 3.11111px;
+    margin-bottom: 20px;
+  }
+
+  > .stats {
+    display: flex;
+    flex-direction: row;
+
+    @media screen and (max-width: 768px) {
+      flex-direction: column;
+      gap: 20px;
+    }
+  }
+
+  > .stats .item + .item {
+    margin-left: 60px;
+
+    @media screen and (max-width: 768px) {
+      margin-left: 0;
+    }
+  }
+
+  > .stats .label {
+    font-size: 12px;
+    opacity: 0.5;
+    margin-bottom: 6px;
+  }
+
+  > .stats .value {
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+
+    > span {
+      margin-left: 8px;
+    }
+  }
 `;
 
 const Proposal = styled.div`
@@ -806,6 +859,10 @@ const ProposalPage: React.FC = () => {
   const params = useParams();
   const state = location.state as locationProps;
   const proposal = useSelector(selectProposal(state.id, state.type));
+
+  const prevEpochNumber = proposal?.epoch !== undefined ? proposal.epoch - 1 : null;
+  const prevEpochStakeActive = proposal?.stats?.result?.stake_active ?? 0;
+  const prevEpochUserStake = proposal?.prevVoted ? proposal.prevVoted.stake : null;
   
   const handlePrevious: React.MouseEventHandler = () => {
     if (state.type === PROPOSALS.CURRENT) {
@@ -834,9 +891,35 @@ const ProposalPage: React.FC = () => {
   return (
     <>
       <Window onPrevious={handlePrevious}>
-        <EpochStatsSection
-          state='none'
-          className={StatsSectionClass}></EpochStatsSection>
+        {
+          state.type === PROPOSALS.PREV ? (
+            <PrevEpochStatsSection>
+              <div className='title'>{`EPOCH #${prevEpochNumber}`}</div>
+              <div className='stats'>
+                <span className='item'>
+                  <div className='label'>Total value locked</div>
+                  <div className='value'>
+                    <IconBeamx />
+                    <span>{numFormatter(fromGroths(prevEpochStakeActive))} BEAMX</span>
+                  </div>
+                </span>
+                <span className='item'>
+                  <div className='label'>Your staked</div>
+                  <div className='value'>
+                    <IconBeamx />
+                    <span>
+                      {prevEpochUserStake !== null ? `${numFormatter(fromGroths(prevEpochUserStake))} BEAMX` : '-'}
+                    </span>
+                  </div>
+                </span>
+              </div>
+            </PrevEpochStatsSection>
+          ) : (
+            <EpochStatsSection
+              state='none'
+              className={StatsSectionClass}></EpochStatsSection>
+          )
+        }
         <Proposal>
           <HeaderStyled>
             <div className='id-section'>#{getProposalId(proposal.id)}</div>

@@ -5,7 +5,9 @@ export const ROUTES = {
     FUTURE_EPOCHS: '/main/future_epochs',
     PREVIOUS_EPOCHS: '/main/previous_epochs',
     PROPOSAL_PAGE: '/main/proposal',
-    STAKED_INFO: '/main/staked_info'
+  },
+  TREASURY: {
+    BASE: '/treasury',
   },
 };
 
@@ -16,7 +18,6 @@ export const ROUTES_PATH = {
     FUTURE_EPOCHS: '/future_epochs',
     PREVIOUS_EPOCH: '/previous_epochs',
     PROPOSAL_PAGE: '/proposal',
-    STAKED_INFO: '/staked_info'
   },
   
 };

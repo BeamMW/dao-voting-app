@@ -1,9 +1,7 @@
 import { styled } from '@linaria/react';
-import { css, cx } from '@linaria/core';
+import { css } from '@linaria/core';
 import React, { useEffect, useState } from 'react';
 
-import { useNavigate } from 'react-router-dom';
-import { ROUTES } from '@app/shared/constants';
 import { 
   IconWithdraw,
   IconDeposit,
@@ -16,7 +14,6 @@ import {
   selectAppParams,
   selectTotalsView,
   selectCurrentProposals,
-  selectPopupsState,
   selectContractHeight,
   selectBlocksLeft,
   selectWithdrawedAmount,
@@ -27,7 +24,7 @@ import { setPopupState } from '@app/containers/Main/store/actions';
 
 interface SeedListProps {
   className?: string;
-  state: 'progress' | 'stake' | 'none'
+  state: 'progress' | 'none'
 }
 
 const StyledStats = styled.div`
@@ -104,8 +101,10 @@ const LeftStatsProgress = styled(LeftStats)`
     }
 `;
 
-const MiddleStats = styled.span<{isStake: boolean}>`
-  margin-left: ${({ isStake }) => isStake ? 'auto' : '40px'};
+const MiddleStats = styled.span`
+  position: relative;
+  z-index: 2;
+  margin-left: 40px;
   align-self: center;
 
   > .next-epoch-title {
@@ -122,6 +121,33 @@ const MiddleStats = styled.span<{isStake: boolean}>`
   @media screen and (max-width : 900px) {
     align-self: flex-start;
     margin-left: 0;
+  }
+`;
+
+const NextEpochHeading = styled.div`
+  margin-bottom: 16px;
+
+  .next-epoch-title {
+    font-weight: bold;
+    font-size: 14px;
+    letter-spacing: 3.1px;
+    color: rgba(255, 255, 255, .5);
+  }
+`;
+
+const NextEpochAfterProgressClass = css`
+  margin-left: 40px;
+`;
+
+const StyledNextEpochStakeDetails = styled.div`
+  align-self: flex-start;
+  flex: 0 1 auto;
+  min-width: 0;
+
+  @media screen and (max-width : 900px) {
+    margin-left: 0 !important;
+    margin-top: 20px;
+    width: 100%;
   }
 `;
 
@@ -202,19 +228,6 @@ const StyledStaked = styled.span`
   }
 `;
 
-const ButtonLinkClass = css`
-  font-size: 16px !important;
-  font-weight: normal !important;
-  margin-left: auto !important;
-`;
-
-const ButtonBottomLinkClass = css`
-    font-size: 16px !important;
-    font-weight: normal !important;
-    margin: auto 0 0 auto !important;
-    line-height: 17px;
-`;
-
 const WithdrawClass = css`
   margin-left: 30px !important;
 `;
@@ -254,7 +267,6 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
   className,
   state
 }) => {
-    const navigate = useNavigate();
     const dispatch = useDispatch();
 
     const appParams = useSelector(selectAppParams());
@@ -262,7 +274,6 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
     const cHeight = useSelector(selectContractHeight());
     const userViewData = useSelector(selectUserView());
     const totalsView = useSelector(selectTotalsView());
-    const popupsState = useSelector(selectPopupsState());
     const blocksLeft = useSelector(selectBlocksLeft());
     const withdrawedAmount = useSelector(selectWithdrawedAmount());
     const depositedAmount = useSelector(selectDepositedAmount());
@@ -331,24 +342,22 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
     }, [blocksLeft]);
 
     const handleDeposit = () => {
-      dispatch(setPopupState({type: 'deposit', state: !popupsState.deposit}));
+      dispatch(setPopupState({type: 'withdraw', state: false}));
+      dispatch(setPopupState({type: 'deposit', state: true}));
     };
 
     const handleWithdraw = () => {
-      dispatch(setPopupState({type: 'withdraw', state: !popupsState.withdraw}));
+      dispatch(setPopupState({type: 'deposit', state: false}));
+      dispatch(setPopupState({type: 'withdraw', state: true}));
     };
-
-    const handleStakedInfo = () => {
-      navigate(ROUTES.MAIN.STAKED_INFO);
-    }
 
     return (
         <StyledStats className={className}>
             <div className='stats-title-class'>
                 <span className='stats-epoch-class'>
-                  {state === 'stake' ? 'NEXT EPOCH #' + (appParams.current.iEpoch) : 'EPOCH #' + (appParams.current.iEpoch - 1)}
+                  {'EPOCH #' + (appParams.current.iEpoch - 1)}
                 </span>
-                {state !== 'stake' && <ExpiresTimer appParams={appParams} systemState={systemState} cHeight={cHeight}></ExpiresTimer>}
+                <ExpiresTimer appParams={appParams} systemState={systemState} cHeight={cHeight}></ExpiresTimer>
             </div>
             <StyledSection>
                 <LeftStats>
@@ -356,38 +365,23 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
                         <SubSectionTitle>Total value locked</SubSectionTitle>
                         <SubSectionValue>
                             <IconBeamx/>
-                            <span>{numFormatter(fromGroths(
-                              state === 'stake' ? (totalsView.stake_active + totalsView.stake_passive) : totalsView.stake_active
-                            ))} BEAMX</span>
+                            <span>{numFormatter(fromGroths(totalsView.stake_active))} BEAMX</span>
                         </SubSectionValue>
                     </StyledTotalLocked>
                     <StyledStaked>
                         <SubSectionTitle>Your staked</SubSectionTitle>
                         <SubSectionValue>
                             <IconBeamx/>
-                            <span>{numFormatter(fromGroths(
-                              state === 'stake' ? (userViewData.stake_active + userViewData.stake_passive) : userViewData.stake_active
-                            ))} BEAMX</span>
+                            <span>{numFormatter(fromGroths(userViewData.stake_active))} BEAMX</span>
                         </SubSectionValue>
-                        { totalsView.stake_active > 0 && state !== 'stake' ?
+                        { totalsView.stake_active > 0 ?
                         (<div className='voting-power-class'>
                           Voting power is {calcVotingPower(userViewData.stake_active, totalsView.stake_active)}%
                         </div>)
                         : null }
                     </StyledStaked>
                 </LeftStats>
-                {
-                  state === 'stake' && totalsView.stake_active > 0 &&
-                  <PowerStats>
-                    <SubSectionTitle>Voting power</SubSectionTitle>
-                    <div className='power-value'>
-                      { calcVotingPower(userViewData.stake_active + userViewData.stake_passive,
-                        totalsView.stake_active + totalsView.stake_passive) }%
-                    </div>
-                    <div className='text'>At the epoch beginning</div>
-                  </PowerStats>
-                }
-                <MiddleStats isStake={state === 'stake'}>
+                <MiddleStats>
                     <Button pallete='purple' 
                     variant='link' 
                     onClick={handleDeposit} 
@@ -402,13 +396,6 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
                         withdraw
                     </Button>
                 </MiddleStats>
-                { state !== 'stake' ? 
-                  <Button className={ButtonLinkClass}
-                  onClick={handleStakedInfo}
-                  pallete='green'
-                  variant='link'>
-                    Show staked info
-                  </Button> : null }
             </StyledSection>
 
             { state === 'progress' &&
@@ -416,27 +403,54 @@ const EpochStatsSection: React.FC<SeedListProps> = ({
                 <Separator/>
 
                 <StyledSection>
+                    { currentProposals.items.length > 0 ? (
                     <LeftStatsProgress>
-                      { currentProposals.items.length > 0 &&
-                      (<>
-                        <div className='progress-title'>Your completed proposals</div>                        
-                        <div className='progress'>
-                            <ProgressBar active={true} percent={
-                              (votes / currentProposals.items.length) * 100
-                            }/>
-                            <span className='progress-percentage'>
-                              {parseInt((votes / currentProposals.items.length) * 100 + '')}% ({votes} of {currentProposals.items.length})
-                            </span>
-                        </div>
-                      </>)}
+                      <div className='progress-title'>Your completed proposals</div>                        
+                      <div className='progress'>
+                          <ProgressBar active={true} percent={
+                            (votes / currentProposals.items.length) * 100
+                          }/>
+                          <span className='progress-percentage'>
+                            {parseInt((votes / currentProposals.items.length) * 100 + '')}% ({votes} of {currentProposals.items.length})
+                          </span>
+                      </div>
                     </LeftStatsProgress>
-                    <MiddleStats isStake={false}>
-                      <div className='next-epoch-title'>NEXT EPOCH #{appParams.current.iEpoch}</div>
-                      <div className='next-epoch-date'>{nextEpochDate}</div>
-                    </MiddleStats>
-                    <Button className={ButtonBottomLinkClass}
-                    onClick={() => navigate(ROUTES.MAIN.FUTURE_EPOCHS)}
-                    pallete='green' variant='link'>Show future proposals</Button>
+                    ) : null }
+                    <StyledNextEpochStakeDetails
+                      className={currentProposals.items.length > 0 ? NextEpochAfterProgressClass : undefined}
+                    >
+                      <NextEpochHeading>
+                        <span className='next-epoch-title'>
+                          NEXT EPOCH #{appParams.current.iEpoch} ({nextEpochDate})
+                        </span>
+                      </NextEpochHeading>
+                      <LeftStats>
+                        <StyledTotalLocked>
+                          <SubSectionTitle>Total value locked</SubSectionTitle>
+                          <SubSectionValue>
+                            <IconBeamx/>
+                            <span>{numFormatter(fromGroths(
+                              totalsView.stake_active + totalsView.stake_passive
+                            ))} BEAMX</span>
+                          </SubSectionValue>
+                        </StyledTotalLocked>
+                        <StyledStaked>
+                          <SubSectionTitle>Your staked</SubSectionTitle>
+                          <SubSectionValue>
+                            <IconBeamx/>
+                            <span>{numFormatter(fromGroths(
+                              userViewData.stake_active + userViewData.stake_passive
+                            ))} BEAMX</span>
+                          </SubSectionValue>
+                          { totalsView.stake_active > 0 ?
+                          (<div className='voting-power-class'>
+                            Voting power is {calcVotingPower(userViewData.stake_active + userViewData.stake_passive,
+                              totalsView.stake_active + totalsView.stake_passive)}%
+                          </div>)
+                          : null }
+                        </StyledStaked>
+                      </LeftStats>
+                    </StyledNextEpochStakeDetails>
                 </StyledSection>
               </>
             }

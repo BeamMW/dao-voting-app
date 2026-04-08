@@ -1,7 +1,9 @@
 import React, { useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { styled } from '@linaria/react';
-import Utils from '@core/utils.js';
-import { useNavigate } from 'react-router-dom';
+import BeamDappConnector from '@core/BeamDappConnector.js';
+import connector from '@core/connector';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { ROUTES } from '@app/shared/constants';
 import { IconBackWindow, IconAddProposal } from '@app/shared/icons';
 import { useSelector, useDispatch } from 'react-redux';
@@ -15,7 +17,8 @@ interface WindowProps {
 }
 
 const Container = styled.div<{ bgColor: string }>`
-  background-color: ${({ bgColor }) => Utils.isWeb() || Utils.isAndroid() ? bgColor : 'transparent'};
+  position: relative;
+  background-color: ${({ bgColor }) => (BeamDappConnector.isWeb() || /android/i.test(navigator.userAgent)) ? bgColor : 'transparent'};
   min-height: 100%;
   display: flex;
   flex-direction: column;
@@ -25,35 +28,44 @@ const Container = styled.div<{ bgColor: string }>`
   }
 `;
 
-const StyledTitle = styled.div`
-  font-weight: 500;
-  font-size: 36px;
+const NavBar = styled.div`
+  display: flex;
+  align-items: center;
   margin-bottom: 20px;
+`;
 
-  > .controls {
-    height: 36px;
-    position: absolute !important;
-    right: 40px !important;
-    top: 37px !important;
-    display: flex;
-    align-items: flex-end;
+const NavTab = styled.span<{ active: boolean }>`
+  font-weight: 700;
+  font-size: 36px;
+  cursor: pointer;
+  color: ${({ active }) => active ? 'rgba(255, 255, 255, 1)' : 'rgba(255, 255, 255, 0.3)'};
+  transition: color 0.15s;
 
-    > .new-button-class {
-      max-width: 230px !important;
-      margin-bottom: 0 !important;
-      margin-right: 30px !important;
-    }  
-  }
-  @media screen and (max-width : 625px) {
-    > .controls {
-      height: auto;
-      right: 23px !important;
-    }
+  &:hover {
+    color: ${({ active }) => active ? 'rgba(255, 255, 255, 1)' : 'rgba(255, 255, 255, 0.6)'};
   }
 `;
 
-const TitleValue = styled.span`
-  cursor: pointer;
+const NavDivider = styled.span`
+  font-weight: 300;
+  font-size: 36px;
+  color: rgba(255, 255, 255, 0.2);
+  margin: 0 16px;
+  user-select: none;
+`;
+
+const Controls = styled.span`
+  height: 36px;
+  position: absolute !important;
+  right: 40px !important;
+  top: 37px !important;
+  display: flex;
+  align-items: flex-end;
+
+  @media screen and (max-width : 625px) {
+    height: auto;
+    right: 23px !important;
+  }
 `;
 
 const BackStyled = styled.div`
@@ -92,6 +104,7 @@ const Window: React.FC<WindowProps> = ({
   onPrevious
 }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const rootRef = useRef();
   const dispatch = useDispatch();
 
@@ -100,13 +113,12 @@ const Window: React.FC<WindowProps> = ({
   const isModerator = useSelector(selectIsModerator());
   const popupsState = useSelector(selectPopupsState());
 
-  const titleClicked = () => {
-    navigate(ROUTES.MAIN.EPOCHS);
-  };
+  const isVotingActive = location.pathname.startsWith(ROUTES.MAIN.BASE);
+  const isTreasuryActive = location.pathname.startsWith(ROUTES.TREASURY.BASE);
 
   const handlePkey = () => {
     dispatch(setPopupState({type: 'pkey', state: !popupsState.pkey}));
-  }
+  };
 
   const handleNewProposal = () => {
     setIsNewProposalVisible(true);
@@ -115,47 +127,61 @@ const Window: React.FC<WindowProps> = ({
   const hideNewProposalPopup = () => {
     setIsNewProposalVisible(false);
   };
-  
+
   return (
     <>
-      <Container bgColor={Utils.getStyles().background_main} ref={rootRef}>
-        <StyledTitle>
-          <TitleValue onClick={titleClicked}>Voting</TitleValue>
-          <span className='controls'>
-            { appParams.is_admin || isModerator ?
-              <Button className='new-button-class' variant='ghostBordered' pallete='green'
-              onClick={()=>handleNewProposal()}
-              icon={IconAddProposal}>
-                create new proposal
-              </Button> : null
-            }
-            <Button className={PkeyButtonClass}
-              onClick={() => handlePkey()}
-              pallete='green' variant='link'>
-                Show my public key
-            </Button>
-          </span>
-        </StyledTitle>
-        { onPrevious ? (
-        <BackStyled>
-          <div className='control' onClick={onPrevious}>
-            <IconBackWindow/>
-            <span className='control-text'>back</span>
-          </div>
-        </BackStyled>) : null}
-        { children }
-        <NewProposalPopup visible={isNewProposalVisible} onCancel={()=>{hideNewProposalPopup()}}/>
+      <Container bgColor={connector.getStyles().background_main} ref={rootRef}>
+        <NavBar>
+          <NavTab active={isTreasuryActive} onClick={() => navigate(ROUTES.TREASURY.BASE)}>
+            TREASURY
+          </NavTab>
+          <NavDivider>|</NavDivider>
+          <NavTab active={isVotingActive} onClick={() => navigate(ROUTES.MAIN.EPOCHS)}>
+            VOTING
+          </NavTab>
+          {isVotingActive && (
+            <Controls>
+              {appParams.is_admin || isModerator ? (
+                <Button className={NewButtonClass} variant='ghostBordered' pallete='green'
+                  onClick={() => handleNewProposal()}
+                  icon={IconAddProposal}>
+                  create new proposal
+                </Button>
+              ) : null}
+              <Button className={PkeyButtonClass}
+                onClick={() => handlePkey()}
+                pallete='green' variant='link'>
+                  Show my public key
+              </Button>
+            </Controls>
+          )}
+        </NavBar>
+        {onPrevious ? (
+          <BackStyled>
+            <div className='control' onClick={onPrevious}>
+              <IconBackWindow/>
+              <span className='control-text'>back</span>
+            </div>
+          </BackStyled>
+        ) : null}
+        {children}
+        <NewProposalPopup visible={isNewProposalVisible} onCancel={() => hideNewProposalPopup()}/>
       </Container>
 
-      <DepositPopup visible={popupsState.deposit} onCancel={()=>{
-       dispatch(setPopupState({type: 'deposit', state: false}));
-      }}/>
-      <WithdrawPopup visible={popupsState.withdraw} onCancel={()=>{
-       dispatch(setPopupState({type: 'withdraw', state: false}));
-      }}/>
-      <PublicKeyPopup visible={popupsState.pkey} onCancel={()=>{
-       dispatch(setPopupState({type: 'pkey', state: false}));
-      }}/>
+      {typeof document !== 'undefined' && createPortal(
+        <>
+          <DepositPopup visible={popupsState.deposit} onCancel={() => {
+            dispatch(setPopupState({type: 'deposit', state: false}));
+          }}/>
+          <WithdrawPopup visible={popupsState.withdraw} onCancel={() => {
+            dispatch(setPopupState({type: 'withdraw', state: false}));
+          }}/>
+          <PublicKeyPopup visible={popupsState.pkey} onCancel={() => {
+            dispatch(setPopupState({type: 'pkey', state: false}));
+          }}/>
+        </>,
+        document.body,
+      )}
     </>
   );
 };

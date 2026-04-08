@@ -27,6 +27,18 @@ css`
       --color-eth-from: rgba(94, 123, 242, .3);
       --color-wbtc-from: rgba(247, 147, 26, .3);
       --color-dai-from: rgba(245, 172, 55, .3);
+
+      /*
+       * Global stacking (ascending). Keep large gaps between layers so
+       * component-level z-index tweaks (1..50) do not accidentally overlap.
+       */
+      --z-scrollbar-thumb: 10;
+      --z-toast: 900;
+      --z-modal-backdrop: 1000;
+      --z-modal-elevated: 1010;
+
+      /* https://github.com/fkhadra/react-toastify — uses this on the toast container */
+      --toastify-z-index: var(--z-toast);
     }
 
     @font-face {

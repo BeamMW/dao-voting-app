@@ -2,6 +2,7 @@ import { call, put, takeLatest, select } from 'redux-saga/effects';
 import { navigate, setError } from '@app/shared/store/actions';
 import * as selectors from './selectors';
 import { ROUTES, CID, PROPOSALS, BEAMX_TVL } from '@app/shared/constants';
+import { ShaderRuntimeMap } from '@core/shaderRegistry';
 import { LoadViewParams, LoadProposals, LoadProposalData, 
   LoadTotals, LoadPublicKey, LoadVotes,
   LoadManagerView, LoadUserView, LoadModeratorsView } from '@core/api';
@@ -30,7 +31,12 @@ export function* loadParamsSaga(
     action: ReturnType<typeof actions.loadAppParams.request>,
   ): Generator {
     try {
-        const result = (yield call(LoadViewParams, action.payload ? action.payload : null)) as VotingAppParams;
+        const shaderMap = action.payload as ShaderRuntimeMap | null;
+        if (shaderMap) {
+          yield put(actions.setShaderRuntimeMap(shaderMap));
+        }
+        const votingBytes = shaderMap?.voting?.contractBytes ?? null;
+        const result = (yield call(LoadViewParams, votingBytes)) as VotingAppParams;
         yield put(actions.loadAppParams.success(result));
         store.dispatch(actions.loadContractInfo.request());
 

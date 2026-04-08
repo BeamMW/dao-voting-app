@@ -1,42 +1,56 @@
 import {
-  call, take, fork, takeLatest, put, select
+  call, put, take, fork, select
 } from 'redux-saga/effects';
 
 import { eventChannel, END } from 'redux-saga';
 import { actions } from '@app/shared/store/index';
 import { actions as mainActions } from '@app/containers/Main/store/index';
 import { navigate, setSystemState } from '@app/shared/store/actions';
-import { ROUTES, CID } from '@app/shared/constants';
+import { ROUTES } from '@app/shared/constants';
+import { buildShaderRuntimeMap, getShaderFeatures, getShaderDescriptor } from '@core/shaderRegistry';
 import store from '../../../index';
 import { SharedStateType } from '../interface';
 import { EpochesStateType } from '@app/containers/Main/interfaces';
 import { TxsEvent } from '@core/types';
 
-import Utils from '@core/utils.js';
+import connector from '@core/connector';
+
+const iFrameDetection = window !== window.parent;
+
+async function warmupShaderCache(): Promise<Partial<Record<string, number[]>>> {
+  const features = getShaderFeatures();
+  const byteArrays = await Promise.all(
+    features.map((feature) => connector.downloadShader(getShaderDescriptor(feature).wasmPath)),
+  );
+  const bytesByFeature: Partial<Record<string, number[]>> = {};
+  features.forEach((feature, index) => {
+    bytesByFeature[feature] = Array.from(byteArrays[index]);
+  });
+  return bytesByFeature;
+}
+
+export async function startWalletAndShaders() {
+  const bytesByFeature = await warmupShaderCache();
+  await connector.callApi('ev_subunsub', { ev_txs_changed: true, ev_system_state: true });
+  store.dispatch(mainActions.loadAppParams.request(
+    buildShaderRuntimeMap(bytesByFeature),
+  ));
+}
 
 export function remoteEventChannel() {
   return eventChannel((emitter) => {
-    Utils.initialize({
-      "appname": "BEAM DAO Voting app",
-      "min_api_version": "6.2",
-      "headless": false,
-      "apiResultHandler": (error, result, full) => {
-        console.log('api result data: ', result, full);
-        if (!result.error) {
-          emitter(full);
-        }
+    connector.on('apiEvent', (response: unknown) => {
+      if (response) {
+        emitter(response);
       }
-    }, (err) => {
-        Utils.download("./votingAppShader.wasm", (err, bytes) => {
-            Utils.callApi("ev_subunsub", {ev_txs_changed: true, ev_system_state: true}, 
-              (error, result, full) => {
-                if (result) {
-                  store.dispatch(mainActions.loadAppParams.request(bytes));
-                }
-              }
-            );
-        })
     });
+
+    const headless = !iFrameDetection || connector.isHeadless();
+    connector.connect({ headless })
+      .then(() => startWalletAndShaders())
+      .catch((e) => {
+        console.error('Wallet connect failed', e);
+      });
 
     const unsubscribe = () => {
       emitter(END);
@@ -67,7 +81,7 @@ function* sharedSaga() {
           }
 
           break;
-        
+
         case 'ev_txs_changed':
           yield fork(handleTransactions, payload.result);
 

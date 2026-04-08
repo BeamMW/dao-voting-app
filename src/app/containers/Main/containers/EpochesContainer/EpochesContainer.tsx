@@ -7,7 +7,6 @@ import {
   EpochsFuture,
   EpochsPrevious,
   ProposalPage,
-  StakedInfo
 } from '@app/containers/Main/containers';
 
 const routes = [
@@ -31,11 +30,6 @@ const routes = [
     element: <ProposalPage />,
     exact: true,
   },
-  {
-    path: ROUTES_PATH.MAIN.STAKED_INFO,
-    element: <StakedInfo />,
-    exact: true,
-  }
 ];
 
 const EpochesContainer = () => {

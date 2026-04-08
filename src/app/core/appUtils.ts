@@ -1,4 +1,59 @@
-import { GROTHS_IN_BEAM } from '@app/shared/constants';
+// eslint-disable-next-line import/no-named-as-default, import/extensions
+import BeamDappConnector from '@core/BeamDappConnector.js';
+import { IAsset, IMetadataPairs } from '@core/types';
+
+/** Same parsing as dex-app (values may contain '='). */
+export function parseMetadata(metadata: string | undefined | null): IMetadataPairs {
+  if (!metadata || typeof metadata !== 'string') {
+    return {} as IMetadataPairs;
+  }
+  const splittedMetadata = metadata.split(';');
+  splittedMetadata.shift();
+  return splittedMetadata.reduce((accumulator: IMetadataPairs, value: string) => {
+    if (!value) return accumulator;
+    const data = value.split(/=(.*)/s);
+    const k = data[0];
+    const v = data[1] ?? '';
+    return { ...accumulator, [k]: v };
+  }, {} as IMetadataPairs);
+}
+
+export function assetShortLabel(m: IMetadataPairs | undefined): string {
+  if (!m) return '';
+  return (m.SN || m.UN || m.N || '').trim();
+}
+
+/** Dex PoolTable / ReactSelect: `truncate(SN|UN|N|'Token', 6) (id:aid)` */
+const ASSET_LABEL_MAX = 6;
+
+export function assetDisplayWithId(assetId: number, parsedMetadata: IMetadataPairs | undefined): string {
+  if (assetId === 0) {
+    return 'BEAM (id:0)';
+  }
+  const ticker = assetShortLabel(parsedMetadata) || 'Token';
+  return `${truncate(ticker, ASSET_LABEL_MAX)} (id:${assetId})`;
+}
+
+export function enrichAssetsWithMetadata(assets: any[]): IAsset[] {
+  return assets.map((a: any) => {
+    const rawId = a.asset_id ?? a.aid ?? 0;
+    const n = Number(rawId);
+    const id = Number.isFinite(n) ? n : 0;
+    let parsedMetadata: IMetadataPairs;
+    if (
+      a.metadata_pairs
+      && typeof a.metadata_pairs === 'object'
+      && !Array.isArray(a.metadata_pairs)
+    ) {
+      parsedMetadata = a.metadata_pairs as IMetadataPairs;
+    } else if (typeof a.metadata === 'string') {
+      parsedMetadata = parseMetadata(a.metadata);
+    } else {
+      parsedMetadata = {} as IMetadataPairs;
+    }
+    return { ...a, asset_id: id, parsedMetadata };
+  });
+}
 
 export const copyToClipboard = (value: string) => {
   let textField = document.createElement('textarea');
@@ -18,16 +73,16 @@ export function compact(value: string, stringLength: number = 5): string {
 
 const LENGTH_MAX = 8;
 
-export function truncate(value: string): string {
+export function truncate(value: string, maxLen: number = LENGTH_MAX): string {
   if (!value) {
     return '';
   }
 
-  if (value.length <= LENGTH_MAX) {
+  if (value.length <= maxLen) {
     return value;
   }
 
-  return `${value.slice(0, LENGTH_MAX)}…`;
+  return `${value.slice(0, maxLen)}…`;
 }
 
 export function toUSD(amount: number, rate: number): string {
@@ -57,11 +112,12 @@ export function calcVotingPower(value: number, fullValue: number) {
 }
 
 export function fromGroths(value: number): number {
-  return value && value !== 0 ? value / GROTHS_IN_BEAM : 0;
+  if (!value || value === 0) return 0;
+  return parseFloat(BeamDappConnector.grothToBeam(value));
 }
 
 export function toGroths(value: number): number {
-  return value > 0 ? Math.floor(value * GROTHS_IN_BEAM) : 0;
+  return value > 0 ? BeamDappConnector.beamToGroth(value) : 0;
 }
 
 export function getSign(positive: boolean): string {
