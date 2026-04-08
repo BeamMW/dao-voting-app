@@ -5,11 +5,11 @@ on:
     inputs:
       node_version:
         description: 'Node.js version to use'
-        default: '16'
+        default: '20'
         type: string
       build_command:
         description: 'Command to build the project'
-        default: 'yarn build'
+        default: 'yarn build:prod'
         type: string
       manifest_name:
         description: 'Name of the .dapp application'
@@ -33,11 +33,11 @@ on:
         type: string
       manifest_api_version:
         description: 'API version of the application'
-        default: '7.0'
+        default: '7.3'
         type: string
       manifest_min_api_version:
         description: 'Minimum API version required'
-        default: '7.0'
+        default: '7.3'
         type: string
       manifest_guid:
         description: 'GUID for the .dapp manifest'
@@ -54,7 +54,7 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Set up Git
       run: git fetch --prune --unshallow
@@ -72,7 +72,7 @@ jobs:
           echo "VERSION=${VERSION}" >> $GITHUB_ENV
 
     - name: Set up Node.js environment
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ inputs.node_version }}
 

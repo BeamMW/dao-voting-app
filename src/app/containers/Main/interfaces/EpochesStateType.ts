@@ -1,6 +1,8 @@
 import { VotingAppParams, UserViewParams, ProposalState, TotalViewParams } from '@core/types';
+import { ShaderRuntimeMap } from '@core/shaderRegistry';
 
 export interface EpochesStateType {
+  shaderRuntimeMap: ShaderRuntimeMap | null;
   appParams: VotingAppParams;
   proposals: {
     prev: ProposalState,

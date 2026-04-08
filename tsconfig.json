@@ -5,12 +5,7 @@
     "module": "commonjs",
     "moduleResolution": "Node",
     "esModuleInterop": true,
-    "typeRoots": [
-      "node_modules/@types",
-      "node_modules/web-ext-types",
-      "./src/@types"
-    ],
-    "types": ["node"],
+    "types": ["node", "web-ext-types"],
     "baseUrl": "src/",
     "paths": {
       "@app/*": ["app/*"],

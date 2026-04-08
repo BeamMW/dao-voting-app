@@ -130,16 +130,7 @@ export const Select: React.FC<SelectProps> = ({
   value, className, children, onSelect,
 }) => {
   const [opened, setOpened] = useState(false);
-  const selectRef = useRef<HTMLDivElement>();
-
-  useEffect(() => {
-    if (opened) {
-      const { current } = selectRef;
-      if (current) {
-        current.focus();
-      }
-    }
-  }, [opened]);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   const array = React.Children.toArray(children);
 
@@ -171,23 +162,47 @@ export const Select: React.FC<SelectProps> = ({
     return value === current;
   });
 
-  const handleMouseDown = () => {
-    setOpened(!opened);
-  };
+  useEffect(() => {
+    if (!opened) {
+      return undefined;
+    }
 
-  const handleBlur = () => {
-    setOpened(false);
+    const handleOutsideClick = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (containerRef.current && !containerRef.current.contains(target)) {
+        setOpened(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+    };
+  }, [opened]);
+
+  const handleToggle = () => {
+    if (disabled) {
+      return;
+    }
+
+    setOpened((prev) => !prev);
   };
 
   return (
-    <ContainerStyled className={className}>
-      <ButtonStyled type="button" onMouseDown={handleMouseDown} disabled={disabled}>
+    <ContainerStyled className={className} ref={containerRef}>
+      <ButtonStyled
+        type="button"
+        onClick={handleToggle}
+        disabled={disabled}
+        aria-expanded={opened}
+        aria-haspopup="listbox"
+      >
         <span className='title-text'>Epoch</span> 
         {selected && <span className='title-value'>#{(selected as ReactElement).props.children}</span>}
         {options.length > 1 && <Angle className={angleStyle} value={opened ? 180 : 0} margin={opened ? 1 : 3} />}
       </ButtonStyled>
       {opened && (
-        <SelectStyled ref={selectRef} tabIndex={-1} onBlur={handleBlur}>
+        <SelectStyled role="listbox">
           {options}
         </SelectStyled>
       )}

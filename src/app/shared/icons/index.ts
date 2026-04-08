@@ -1,3 +1,5 @@
+import IconBeam from './icon-beam.svg';
+import IconAsset from './icon-asset.svg';
 import IconBack from './icon-back.svg';
 import IconReceive from './icon-receive-blue.svg';
 import IconSend from './icon-send-blue.svg';
@@ -40,6 +42,8 @@ import IconSort from './icon-sort.svg';
 import IconSearchCancel from './icon-search-cancel.svg';
 
 export {
+  IconBeam,
+  IconAsset,
   IconBack,
   IconReceive,
   IconSend,

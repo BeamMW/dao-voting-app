@@ -7,6 +7,7 @@ import * as actions from './actions';
 type Action = ActionType<typeof actions>;
 
 const initialState: EpochesStateType = {
+  shaderRuntimeMap: null,
   appParams: {
     aid: 0,
     current: {
@@ -65,6 +66,9 @@ const initialState: EpochesStateType = {
 };
 
 const reducer = createReducer<EpochesStateType, Action>(initialState)
+  .handleAction(actions.setShaderRuntimeMap, (state, action) => produce(state, (nexState) => {
+    nexState.shaderRuntimeMap = action.payload;
+  }))
   .handleAction(actions.setUserView, (state, action) => produce(state, (nexState) => {
     nexState.userView = action.payload;
   }))

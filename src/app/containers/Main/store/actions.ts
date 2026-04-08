@@ -1,6 +1,7 @@
 import { createAsyncAction, createAction } from 'typesafe-actions';
 import React from 'react';
 import { ProcessedProposal, UserViewParams, VotingAppParams, ProposalStats } from '@core/types';
+import { ShaderRuntimeMap } from '@core/shaderRegistry';
 
 export const setAppParams = createAction('@@MAIN/SET_PARAMS')<VotingAppParams>();
 export const setUserView = createAction('@@MAIN/SET_USER_VIEW')<UserViewParams>();
@@ -20,11 +21,13 @@ export const setFitlerEpoch = createAction('@@MAIN/SET_FILTER_EPOCH')<number>();
 export const setLocalVotes = createAction('@@MAIN/SET_LOCAL_VOTES')<number[]>();
 export const setLocalVoteCounter = createAction('@@MAIN/SET_LOCAL_VOTE_COUNTER')<number>();
 
+export const setShaderRuntimeMap = createAction('@@MAIN/SET_SHADER_RUNTIME_MAP')<ShaderRuntimeMap>();
+
 export const loadAppParams = createAsyncAction(
     '@@MAIN/LOAD_PARAMS',
     '@@MAIN/LOAD_PARAMS_SUCCESS',
     '@@MAIN/LOAD_PARAMS_FAILURE',
-)<ArrayBuffer, VotingAppParams, any>();
+)<ShaderRuntimeMap | null, VotingAppParams, any>();
 
 export const loadContractInfo = createAsyncAction(
     '@@MAIN/LOAD_CONTRACT_INFO',

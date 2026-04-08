@@ -7,7 +7,7 @@ interface BackDropProps {
 
 const BackdropStyled = styled.div`
   position: fixed;
-  z-index: 3;
+  z-index: var(--z-modal-backdrop);
   top: 0;
   left: 0;
   width: 100%;

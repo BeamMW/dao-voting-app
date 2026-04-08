@@ -9,13 +9,14 @@ import { useNavigate, useRoutes } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { EpochesContainer } from './containers/Main';
+import { TreasuryContainer } from './containers/Treasury';
 import { ToastContainer } from 'react-toastify';
 import { Scrollbars } from 'react-custom-scrollbars';
 
 import './styles';
 
 const trackStyle = css`
-  z-index: 999;
+  z-index: var(--z-scrollbar-thumb);
   border-radius: 3px;
   background-color: rgba(255, 255, 255, 0.2);
 `;
@@ -28,7 +29,11 @@ const routes = [
   {
     path: `${ROUTES.MAIN.BASE}/*`,
     element: <EpochesContainer />,
-  }
+  },
+  {
+    path: ROUTES.TREASURY.BASE,
+    element: <TreasuryContainer />,
+  },
 ];
 
 const App = () => {
